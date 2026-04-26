@@ -140,7 +140,7 @@ export default function Resume() {
         <div className="flex flex-col gap-2 mb-10 z-10 relative pt-4">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-purple-400 w-fit mb-2 backdrop-blur-sm">
             <Sparkles size={14} />
-            <span>AI Resume Scanner · Groq Llama 3.3 70B</span>
+            <span>AI Resume Scanner · Nirvexa Resume AI</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
             ATS Resume Analyzer
@@ -217,7 +217,7 @@ export default function Resume() {
                   </div>
                   {loading && (
                     <p className="text-gray-500 text-xs mt-5 animate-pulse">
-                      Groq Llama 3.3 70B is reading your resume... this takes ~15 seconds
+                     AI is analyzing your resume… this usually takes around 15 seconds
                     </p>
                   )}
                 </>
