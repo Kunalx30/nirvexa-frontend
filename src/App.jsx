@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import SkillMatch from './pages/SkillMatch'
+
 
 // Pages
 import Landing    from './pages/Landing'
@@ -53,6 +55,7 @@ function AppRoutes() {
       <Route path="/interview"   element={<ProtectedRoute><Interview /></ProtectedRoute>} />
       <Route path="/saved"       element={<ProtectedRoute><SavedJobs /></ProtectedRoute>} />
       <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/skills" element={<ProtectedRoute><SkillMatch /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
