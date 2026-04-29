@@ -4,7 +4,7 @@ import { getInitials } from '../../utils/helpers'
 import {
   MessageSquare, Briefcase, FileText,
   Map, Mic, Bookmark, User, Newspaper,
-  LogOut, Menu, X
+  LogOut, Menu, X, Zap, TrendingUp, Building2
 } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -14,9 +14,12 @@ const NAV_LINKS = [
   { to: '/jobs',      label: 'Jobs',         icon: Briefcase     },
   { to: '/resume',    label: 'Resume',       icon: FileText      },
   { to: '/career',    label: 'Career Path',  icon: Map           },
+   { to: '/skills',    label: 'Skill Match',  icon: Zap           },
   { to: '/interview', label: 'Interview',    icon: Mic           },
   { to: '/saved',     label: 'Saved',        icon: Bookmark      },
   { to: '/news',      label: 'News',         icon: Newspaper     },
+  { to: '/salary',  label: 'Salary',  icon: TrendingUp },
+{ to: '/company', label: 'Company', icon: Building2  },
 ]
 
 export default function Navbar() {

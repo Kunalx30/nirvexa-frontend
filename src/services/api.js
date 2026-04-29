@@ -33,7 +33,6 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config
 
-    // If 401 and we haven't retried yet
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
 
@@ -51,7 +50,6 @@ api.interceptors.response.use(
         return api(original)
 
       } catch (refreshError) {
-        // Refresh failed — clear everything and redirect to login
         clearAccessToken()
         localStorage.removeItem('nirvexa_refresh_token')
         localStorage.removeItem('nirvexa_user')
@@ -63,5 +61,10 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+// ── Profile + Auth helpers ────────────────────────────────────────────────────
+export const updateProfile          = (data) => api.put('/auth/me', data)
+export const changePassword         = (data) => api.put('/auth/change-password', data)
+export const fetchInterviewSessions = ()     => api.get('/interview/sessions')
 
 export default api

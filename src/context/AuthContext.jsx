@@ -13,11 +13,9 @@ export function AuthProvider({ children }) {
     const restore = async () => {
       try {
         if (authService.isLoggedIn()) {
-          // Try to get fresh user data
           const savedUser = authService.getSavedUser()
           if (savedUser) setUser(savedUser)
 
-          // Silently refresh token in background
           const res = await fetch(
             `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/refresh`,
             {
@@ -51,6 +49,13 @@ export function AuthProvider({ children }) {
     return u
   }, [])
 
+  // --- ADDED GOOGLE LOGIN HERE ---
+  const googleLogin = useCallback(async (idToken) => {
+    const u = await authService.googleLogin(idToken)
+    setUser(u)
+    return u
+  }, [])
+
   const register = useCallback(async (name, email, password) => {
     const u = await authService.register(name, email, password)
     setUser(u)
@@ -62,7 +67,7 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  const value = { user, setUser, loading, login, register, logout, isAuthenticated: !!user }
+  const value = { user, setUser, loading, login, register, logout, googleLogin, isAuthenticated: !!user }
 
   return (
     <AuthContext.Provider value={value}>

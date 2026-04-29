@@ -2,23 +2,23 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Input from '../components/ui/Input'
-import Button from '../components/ui/Button'
 import { checkPasswordStrength } from '../utils/helpers'
-import { User, Mail, Lock, Eye, EyeOff, CheckCircle, XCircle, ArrowRight } from 'lucide-react'
+import { User, Mail, Lock, Eye, EyeOff, CheckCircle, XCircle, ArrowRight, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { GoogleLogin } from '@react-oauth/google'
 
 export default function Register() {
-  const { register } = useAuth()
+  const { register, googleLogin } = useAuth()
   const navigate     = useNavigate()
 
   const [form, setForm]       = useState({ name: '', email: '', password: '' })
   const [errors, setErrors]   = useState({})
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   const strength = checkPasswordStrength(form.password)
 
-  // Explicit tailwind classes for safe compiling and glowing effects
   const strengthStyles = {
     red:   { bg: 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]', text: 'text-red-400' },
     amber: { bg: 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]', text: 'text-amber-400' },
@@ -53,6 +53,19 @@ export default function Register() {
     }
   }
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setGoogleLoading(true)
+    try {
+      await googleLogin(credentialResponse.credential)
+      toast.success('Welcome to NirVexa!')
+      navigate('/chat')
+    } catch (err) {
+      toast.error('Google sign up failed. Try again.')
+    } finally {
+      setGoogleLoading(false)
+    }
+  }
+
   const checks = [
     { key: 'length',    label: 'At least 8 characters' },
     { key: 'uppercase', label: 'One uppercase letter'  },
@@ -64,7 +77,6 @@ export default function Register() {
   return (
     <div className="min-h-[100dvh] bg-[#0a0a0c] flex items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden font-sans selection:bg-indigo-500/30">
       
-      {/* Ambient Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-purple-600/10 blur-[100px] sm:blur-[150px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-[420px] relative z-10 py-6">
@@ -78,8 +90,36 @@ export default function Register() {
           <p className="text-gray-400 font-light text-sm sm:text-base px-2">Start your AI-powered career journey.</p>
         </div>
 
-        {/* Glassmorphic Card */}
         <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xl">
+
+          {/* Google Sign Up */}
+          <div className="mb-5">
+            {googleLoading ? (
+              <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 text-gray-400 text-sm">
+                <Loader2 size={16} className="animate-spin" /> Signing up with Google...
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error('Google sign up failed')}
+                  theme="filled_black"
+                  shape="rectangular"
+                  size="large"
+                  width="370"
+                  text="signup_with"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 border-t border-white/5" />
+            <span className="text-gray-500 text-[10px] font-medium uppercase tracking-wider">or register with email</span>
+            <div className="flex-1 border-t border-white/5" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
 
             {/* Name Input */}
@@ -89,7 +129,7 @@ export default function Register() {
                 type="text"
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
-                placeholder="Kunal chandelkar"
+                placeholder="Kunal Chandelkar"
                 error={errors.name}
                 icon={<User size={18} className="text-gray-500" />}
                 required
@@ -139,7 +179,6 @@ export default function Register() {
                 </button>
               </div>
 
-              {/* Enhanced Strength bar */}
               {form.password && (
                 <div className="space-y-3 mt-2 bg-white/[0.02] border border-white/5 rounded-xl p-4">
                   <div className="flex gap-1.5">

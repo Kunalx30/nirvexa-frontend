@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import SkillMatch from './pages/SkillMatch'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword  from './pages/ResetPassword'
 
 
 // Pages
@@ -18,6 +20,8 @@ import SavedJobs  from './pages/SavedJobs'
 import Profile    from './pages/Profile'
 import News       from './pages/News'
 import NotFound   from './pages/NotFound'
+import SalaryInsights   from './pages/SalaryInsights'
+import CompanyResearch  from './pages/CompanyResearch'
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -45,6 +49,9 @@ function AppRoutes() {
       <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/news"     element={<News />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password"  element={<ResetPassword />} />
+      
 
       {/* Protected */}
       <Route path="/chat"        element={<ProtectedRoute><Chat /></ProtectedRoute>} />
@@ -56,6 +63,9 @@ function AppRoutes() {
       <Route path="/saved"       element={<ProtectedRoute><SavedJobs /></ProtectedRoute>} />
       <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/skills" element={<ProtectedRoute><SkillMatch /></ProtectedRoute>} />
+      <Route path="/skills"   element={<ProtectedRoute><SkillMatch /></ProtectedRoute>} />
+<Route path="/salary"   element={<ProtectedRoute><SalaryInsights /></ProtectedRoute>} />
+<Route path="/company"  element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<NotFound />} />

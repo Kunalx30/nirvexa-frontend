@@ -20,6 +20,15 @@ export const authService = {
     return user
   },
 
+  async googleLogin(idToken) {
+  const res = await api.post('/auth/google', { idToken })
+  const { access_token, refresh_token, user } = res.data.data
+  setAccessToken(access_token)
+  localStorage.setItem('nirvexa_refresh_token', refresh_token)
+  localStorage.setItem('nirvexa_user', JSON.stringify(user))
+  return user
+},
+
   async logout() {
     try {
       await api.post('/auth/logout')
