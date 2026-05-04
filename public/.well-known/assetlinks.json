@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nirvexa.app",
+      "sha256_cert_fingerprints": [
+        "5D:B6:2B:BA:56:C8:82:05:4F:C6:6F:7F:7D:04:04:01:9E:AC:BB:06:2E:17:1D:70:63:BE:20:BB:36:2C:90:58"
+      ]
+    }
+  }
+]
