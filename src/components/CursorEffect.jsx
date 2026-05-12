@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
  * Google Antigravity style magnetic repulsion grid.
  * Uses a concentric polar layout matching the reference.
  * Particles float continuously and stretch into dashes when repelled.
+ * Phone / touch responsive.
  */
 
 const DOT_COLORS = [
@@ -24,7 +25,6 @@ export default function CursorEffect() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (window.matchMedia?.('(hover: none)')?.matches) return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -84,13 +84,25 @@ export default function CursorEffect() {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
     }
+    
+    const onTouchMove = (e) => {
+      if (e.touches && e.touches.length > 0) {
+        mouse.current.x = e.touches[0].clientX
+        mouse.current.y = e.touches[0].clientY
+      }
+    }
+
     window.addEventListener('mousemove', onMove, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchstart', onTouchMove, { passive: true })
 
     const onLeave = () => {
       mouse.current.x = -1000
       mouse.current.y = -1000
     }
     document.addEventListener('mouseleave', onLeave)
+    document.addEventListener('touchend', onLeave)
+    document.addEventListener('touchcancel', onLeave)
 
     const draw = () => {
       if (!ready.current) {
@@ -112,7 +124,7 @@ export default function CursorEffect() {
         const targetX = d.ox + floatX
         const targetY = d.oy + floatY
 
-        // Calculate repulsion from mouse
+        // Calculate repulsion from mouse/touch
         const dx = d.x - mx
         const dy = d.y - my
         const dist = Math.sqrt(dx * dx + dy * dy)
@@ -172,15 +184,15 @@ export default function CursorEffect() {
 
     return () => {
       window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchstart', onTouchMove)
       window.removeEventListener('resize', resize)
       document.removeEventListener('mouseleave', onLeave)
+      document.removeEventListener('touchend', onLeave)
+      document.removeEventListener('touchcancel', onLeave)
       if (raf.current) cancelAnimationFrame(raf.current)
     }
   }, [])
-
-  if (typeof window !== 'undefined' && window.matchMedia?.('(hover: none)')?.matches) {
-    return null
-  }
 
   return (
     <canvas
