@@ -7,10 +7,10 @@ import { Send, Trash2, Bot, User, Sparkles, Copy, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import remarkGfm from 'remark-gfm'
 
-// Custom component to handle code blocks with copy functionality
+/* ─── CODE BLOCK ───────────────────────────────────────────── */
 const CodeBlock = ({ inline, className, children, ...props }) => {
   const match = /language-(\w+)/.exec(className || '')
   const [copied, setCopied] = useState(false)
@@ -23,22 +23,19 @@ const CodeBlock = ({ inline, className, children, ...props }) => {
 
   if (!inline && match) {
     return (
-      <div className="relative group my-5 rounded-xl overflow-hidden border border-white/10 bg-[#111116] shadow-xl w-full">
-        <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03] border-b border-white/5">
-          <span className="text-[11px] font-mono text-gray-400 uppercase tracking-wider">{match[1]}</span>
-          <button 
-            onClick={handleCopy} 
-            className="flex items-center gap-1.5 text-[11px] font-medium text-gray-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-md border border-white/5"
-          >
-            {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
-            {copied ? <span className="text-emerald-400">Copied</span> : "Copy"}
+      <div className="cb-wrap">
+        <div className="cb-bar">
+          <span className="cb-lang">{match[1]}</span>
+          <button onClick={handleCopy} className="cb-copy">
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
         <SyntaxHighlighter
-          style={vscDarkPlus}
+          style={oneLight}
           language={match[1]}
           PreTag="div"
-          customStyle={{ margin: 0, padding: '1rem', background: 'transparent', fontSize: '0.85rem' }}
+          customStyle={{ margin: 0, padding: '1rem', background: '#fafafa', fontSize: '0.85rem', borderRadius: '0 0 10px 10px' }}
           {...props}
         >
           {String(children).replace(/\n$/, '')}
@@ -46,22 +43,23 @@ const CodeBlock = ({ inline, className, children, ...props }) => {
       </div>
     )
   }
-  
+
   return (
-    <code className="bg-blue-500/10 text-blue-300 px-1.5 py-0.5 rounded-md text-[0.85em] font-mono border border-blue-500/20" {...props}>
+    <code className="cb-inline" {...props}>
       {children}
     </code>
   )
 }
 
+/* ─── CHAT PAGE ────────────────────────────────────────────── */
 export default function Chat() {
   const { user } = useAuth()
-  const [messages,  setMessages]  = useState([])
-  const [input,     setInput]     = useState('')
-  const [loading,   setLoading]   = useState(false)
-  const [fetching,  setFetching]  = useState(true)
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
   const bottomRef = useRef(null)
-  const inputRef  = useRef(null)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -88,14 +86,13 @@ export default function Chat() {
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return
-
     const userMessage = input.trim()
     setInput('')
 
     const tempUserMsg = {
-      id:         Date.now(),
-      role:       'user',
-      content:    userMessage,
+      id: Date.now(),
+      role: 'user',
+      content: userMessage,
       created_at: new Date().toISOString(),
     }
     setMessages(prev => [...prev, tempUserMsg])
@@ -103,13 +100,12 @@ export default function Chat() {
 
     try {
       const data = await chatService.sendMessage(userMessage)
-
       const aiMsg = {
-        id:          Date.now() + 1,
-        role:        'assistant',
-        content:     data.message,
-        intent:      data.intent,
-        created_at:  new Date().toISOString(),
+        id: Date.now() + 1,
+        role: 'assistant',
+        content: data.message,
+        intent: data.intent,
+        created_at: new Date().toISOString(),
       }
       setMessages(prev => [...prev, aiMsg])
     } catch (err) {
@@ -149,34 +145,203 @@ export default function Chat() {
 
   return (
     <Layout>
-      <div 
-        className="fixed bottom-0 left-0 right-0 z-10 flex flex-col bg-[#0a0a0c] overflow-hidden"
-        style={{ height: 'calc(100dvh - 64px)' }}
-      >
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[60vw] h-[400px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
-        {/* ── HEADER (COMPACTED) ───────────────────────────────── */}
-        <div className="shrink-0 w-full border-b border-white/5 bg-[#0a0a0c]/80 backdrop-blur-md z-30 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3 max-w-5xl mx-auto w-full">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20 shrink-0">
-                <Sparkles size={16} className="text-white" />
+        .chat-shell{
+          position:fixed;bottom:0;left:0;right:0;z-index:10;
+          display:flex;flex-direction:column;overflow:hidden;
+          background:#fafafa;font-family:'DM Sans',system-ui,sans-serif;
+          -webkit-font-smoothing:antialiased;
+          height:calc(100dvh - 64px);
+        }
+
+        /* HEADER */
+        .chat-hdr{
+          flex-shrink:0;width:100%;border-bottom:1px solid #e4e4e4;
+          background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);
+          -webkit-backdrop-filter:saturate(180%) blur(20px);
+          z-index:30;padding:10px 24px;
+        }
+        .chat-hdr-in{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+        .chat-hdr-left{display:flex;align-items:center;gap:12px}
+        .chat-hdr-icon{
+          width:34px;height:34px;border-radius:10px;background:#0a0a0a;
+          display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        }
+        .chat-hdr-icon svg{color:#fafafa}
+        .chat-hdr h1{font-size:16px;font-weight:600;color:#0a0a0a;letter-spacing:-.3px;line-height:1.2;margin:0}
+        .chat-hdr p{font-size:12px;color:#a3a3a3;margin:0;font-weight:400}
+        .chat-clear{
+          display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;
+          color:#a3a3a3;background:#fafafa;border:1px solid #e4e4e4;border-radius:10px;
+          padding:6px 12px;cursor:pointer;transition:all .2s;flex-shrink:0;
+        }
+        .chat-clear:hover{color:#ef4444;border-color:#fecaca;background:#fef2f2}
+
+        /* MESSAGES */
+        .chat-msgs{
+          flex:1;overflow-y:auto;width:100%;padding:20px 24px;z-index:10;
+        }
+        .chat-msgs::-webkit-scrollbar{width:4px}
+        .chat-msgs::-webkit-scrollbar-track{background:transparent}
+        .chat-msgs::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:4px}
+        .chat-msgs-in{max-width:900px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+
+        /* EMPTY STATE */
+        .chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:24px;max-width:640px;margin:0 auto}
+        .chat-empty-icon{
+          width:56px;height:56px;border-radius:16px;background:#f3f3f3;border:1px solid #e4e4e4;
+          display:flex;align-items:center;justify-content:center;
+        }
+        .chat-empty-icon svg{color:#0a0a0a}
+        .chat-empty h2{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(24px,4vw,32px);letter-spacing:-1px;color:#0a0a0a;text-align:center;margin:0}
+        .chat-empty h2 em{font-style:italic;color:#3b82f6}
+        .chat-empty-sub{font-size:15px;color:#6b6b6b;text-align:center;max-width:420px;line-height:1.6;margin:0}
+
+        .chat-suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:8px}
+        .chat-sug{
+          text-align:left;padding:14px 16px;background:#fff;border:1px solid #e4e4e4;
+          border-radius:14px;font-size:13px;color:#6b6b6b;cursor:pointer;
+          font-family:'DM Sans',sans-serif;transition:all .25s;line-height:1.5;
+        }
+        .chat-sug:hover{border-color:#0a0a0a;color:#0a0a0a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+
+        /* MESSAGE ROWS */
+        .msg-list{display:flex;flex-direction:column;gap:20px;padding-bottom:8px}
+        .msg-row{display:flex;gap:12px;animation:msgIn .35s ease}
+        .msg-row.user{flex-direction:row-reverse}
+        @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+        .msg-av{
+          width:32px;height:32px;border-radius:10px;display:flex;align-items:center;
+          justify-content:center;flex-shrink:0;margin-top:2px;
+        }
+        .msg-av.ai{background:#0a0a0a}
+        .msg-av.ai svg{color:#fafafa}
+        .msg-av.hu{background:#f3f3f3;border:1px solid #e4e4e4}
+        .msg-av.hu svg{color:#6b6b6b}
+
+        .msg-content{display:flex;flex-direction:column;gap:4px;min-width:0}
+        .msg-row.user .msg-content{align-items:flex-end;max-width:80%}
+        .msg-row:not(.user) .msg-content{align-items:flex-start;width:100%}
+
+        .msg-bubble{padding:14px 18px;border-radius:16px;font-size:14px;line-height:1.7}
+        .msg-row.user .msg-bubble{
+          background:#0a0a0a;color:#fafafa;border-radius:16px 16px 4px 16px;
+        }
+        .msg-row:not(.user) .msg-bubble{
+          background:#fff;border:1px solid #e4e4e4;color:#0a0a0a;
+          border-radius:16px 16px 16px 4px;
+        }
+
+        /* MARKDOWN PROSE */
+        .msg-prose{max-width:none;width:100%}
+        .msg-prose h1,.msg-prose h2,.msg-prose h3{
+          font-weight:600;color:#0a0a0a;letter-spacing:-.3px;margin:20px 0 10px;
+          display:flex;align-items:center;gap:8px;
+        }
+        .msg-prose h1::before,.msg-prose h2::before,.msg-prose h3::before{
+          content:"";display:block;width:6px;height:6px;border-radius:50%;
+          background:#3b82f6;flex-shrink:0;box-shadow:0 0 8px rgba(59,130,246,.4);
+        }
+        .msg-prose h1{font-size:20px} .msg-prose h2{font-size:17px} .msg-prose h3{font-size:15px}
+        .msg-prose p{color:#3a3a3a;font-size:14px;line-height:1.75;margin:6px 0}
+        .msg-prose strong{color:#0a0a0a;font-weight:600}
+        .msg-prose ul,.msg-prose ol{color:#3a3a3a;padding-left:20px;margin:8px 0}
+        .msg-prose li{margin:4px 0;font-size:14px;line-height:1.65}
+        .msg-prose li::marker{color:#a3a3a3}
+        .msg-prose blockquote{
+          border-left:3px solid #e4e4e4;background:#f9f9f9;padding:10px 16px;
+          border-radius:0 10px 10px 0;color:#6b6b6b;margin:12px 0;font-style:normal;
+        }
+        .msg-prose hr{border:none;border-top:1px solid #e4e4e4;margin:16px 0}
+        .msg-prose pre{padding:0;background:transparent;margin:0}
+        .msg-prose a{color:#3b82f6;text-decoration:underline;text-underline-offset:2px}
+        .msg-prose table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+        .msg-prose th{text-align:left;padding:8px 12px;border-bottom:2px solid #e4e4e4;font-weight:600;color:#0a0a0a}
+        .msg-prose td{padding:8px 12px;border-bottom:1px solid #f0f0f0;color:#3a3a3a}
+
+        /* CODE BLOCKS */
+        .cb-wrap{border:1px solid #e4e4e4;border-radius:12px;overflow:hidden;margin:12px 0;background:#fafafa}
+        .cb-bar{
+          display:flex;align-items:center;justify-content:space-between;
+          padding:8px 14px;background:#f3f3f3;border-bottom:1px solid #e4e4e4;
+        }
+        .cb-lang{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#a3a3a3;font-family:'DM Sans',sans-serif}
+        .cb-copy{
+          display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;
+          color:#6b6b6b;background:#fff;border:1px solid #e4e4e4;padding:4px 10px;
+          border-radius:8px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;
+        }
+        .cb-copy:hover{color:#0a0a0a;border-color:#0a0a0a}
+        .cb-inline{background:#f0f0f0;color:#0a0a0a;padding:2px 6px;border-radius:6px;font-size:.85em;font-family:monospace;border:1px solid #e4e4e4}
+
+        /* TYPING INDICATOR */
+        .typing{display:flex;gap:12px;animation:msgIn .35s ease}
+        .typing-dots{display:flex;align-items:center;gap:5px;padding:14px 18px;background:#fff;border:1px solid #e4e4e4;border-radius:16px 16px 16px 4px}
+        .typing-dot{width:7px;height:7px;border-radius:50%;background:#d4d4d4;animation:bounce .6s infinite alternate}
+        .typing-dot:nth-child(2){animation-delay:.15s;background:#a3a3a3}
+        .typing-dot:nth-child(3){animation-delay:.3s;background:#6b6b6b}
+        @keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+
+        /* INPUT AREA */
+        .chat-input-area{
+          flex-shrink:0;width:100%;background:rgba(255,255,255,.9);
+          backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+          border-top:1px solid #e4e4e4;padding:12px 24px 16px;z-index:20;
+        }
+        .chat-input-in{max-width:900px;margin:0 auto}
+        .chat-input-row{
+          display:flex;align-items:flex-end;gap:8px;background:#fff;
+          border:1px solid #e4e4e4;border-radius:16px;padding:6px;
+          transition:border-color .2s,box-shadow .2s;
+        }
+        .chat-input-row:focus-within{border-color:#0a0a0a;box-shadow:0 0 0 3px rgba(10,10,10,.04)}
+        .chat-ta{
+          flex:1;background:transparent;color:#0a0a0a;resize:none;
+          font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;
+          border:none;outline:none;padding:8px 12px;max-height:30vh;min-height:44px;
+        }
+        .chat-ta::placeholder{color:#b0b0b0}
+        .chat-send{
+          width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+          background:#0a0a0a;color:#fafafa;border:none;border-radius:12px;cursor:pointer;
+          transition:transform .2s,box-shadow .2s,opacity .2s;
+        }
+        .chat-send:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+        .chat-send:disabled{opacity:.3;cursor:not-allowed}
+        .chat-hint{text-align:center;font-size:11px;color:#c4c4c4;margin-top:8px}
+        .chat-hint kbd{font-family:'DM Sans',sans-serif;font-weight:500}
+
+        /* LOADING SPINNER OVERRIDE */
+        .chat-loading{display:flex;align-items:center;justify-content:center;height:100%}
+
+        @media(max-width:640px){
+          .chat-hdr{padding:10px 16px}
+          .chat-msgs{padding:16px}
+          .chat-input-area{padding:10px 16px 14px}
+          .chat-suggestions{grid-template-columns:1fr}
+          .msg-row.user .msg-content{max-width:90%}
+        }
+      `}</style>
+
+      <div className="chat-shell">
+
+        {/* HEADER */}
+        <div className="chat-hdr">
+          <div className="chat-hdr-in">
+            <div className="chat-hdr-left">
+              <div className="chat-hdr-icon">
+                <Sparkles size={16} />
               </div>
               <div>
-                <h1 className="text-base sm:text-lg font-bold text-white tracking-tight leading-none mb-0.5">
-                  AI Career Workspace
-                </h1>
-                <p className="text-gray-400 text-[11px] sm:text-xs font-light leading-none">
-                  Your intelligent career strategist & mentor
-                </p>
+                <h1>AI Career Workspace</h1>
+                <p>Your intelligent career strategist</p>
               </div>
             </div>
-            
             {messages.length > 0 && (
-              <button
-                onClick={handleClearHistory}
-                className="flex items-center gap-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 text-xs font-medium transition-colors bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/5 shrink-0"
-              >
+              <button onClick={handleClearHistory} className="chat-clear">
                 <Trash2 size={14} />
                 <span className="hidden sm:inline">Clear</span>
               </button>
@@ -184,79 +349,56 @@ export default function Chat() {
           </div>
         </div>
 
-        {/* ── MESSAGES AREA ────────────────────────────────────── */}
-        <div className="flex-1 overflow-y-auto w-full px-4 sm:px-8 pt-4 pb-4 z-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-          <div className="max-w-5xl mx-auto h-full flex flex-col">
+        {/* MESSAGES */}
+        <div className="chat-msgs">
+          <div className="chat-msgs-in">
             {fetching ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="chat-loading">
                 <LoadingSpinner text="Syncing workspace..." />
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full gap-6 animate-fade-in w-full max-w-3xl mx-auto my-auto">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                    <Bot size={32} className="text-blue-400" />
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">
-                    Hi {user?.name?.split(' ')[0] || 'there'}! 👋
-                  </h2>
-                  <p className="text-gray-400 text-base sm:text-lg font-light leading-relaxed max-w-lg mx-auto">
-                    I'm your intelligent career co-pilot. Let's optimize your resume, prepare for interviews, or map out your next big promotion.
+              <div className="chat-empty">
+                <div className="chat-empty-icon">
+                  <Bot size={28} />
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <h2>Hi {user?.name?.split(' ')[0] || 'there'}! <em>Let's begin.</em></h2>
+                  <p className="chat-empty-sub">
+                    I'm your career co-pilot. Ask me about resume optimization, interview prep, salary insights, or career roadmaps.
                   </p>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mt-4">
+                <div className="chat-suggestions">
                   {suggestedQuestions.map((q, i) => (
                     <button
                       key={i}
                       onClick={() => { setInput(q); inputRef.current?.focus() }}
-                      className="text-left p-3.5 bg-white/[0.02] border border-white/5 hover:border-blue-500/30 hover:bg-white/5 rounded-xl text-sm text-gray-300 hover:text-white transition-all duration-300 shadow-sm group"
+                      className="chat-sug"
                     >
-                      <span className="block group-hover:translate-x-1 transition-transform">{q}</span>
+                      {q}
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col gap-6 pb-2">
+              <div className="msg-list">
                 {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex gap-3 sm:gap-4 animate-fade-in ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-                  >
-                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0 shadow-lg mt-0.5 ${
-                      msg.role === 'user'
-                        ? 'bg-[#1a1a24] border border-white/10'
-                        : 'bg-gradient-to-br from-blue-600 to-purple-600 shadow-purple-500/20'
-                    }`}>
+                  <div key={msg.id} className={`msg-row${msg.role === 'user' ? ' user' : ''}`}>
+                    <div className={`msg-av${msg.role === 'user' ? ' hu' : ' ai'}`}>
                       {msg.role === 'user'
-                        ? <User size={16} className="text-gray-300" />
-                        : <Sparkles size={16} className="text-white" />
+                        ? <User size={15} />
+                        : <Sparkles size={15} />
                       }
                     </div>
-
-                    <div className={`flex flex-col gap-1 w-full ${msg.role === 'user' ? 'items-end max-w-[85%] sm:max-w-[75%]' : 'items-start min-w-0'}`}>
-                      <div className={`px-4 sm:px-5 py-3 w-full ${
-                        msg.role === 'user'
-                          ? 'bg-white/[0.06] text-white rounded-2xl rounded-tr-sm border border-white/5 w-auto'
-                          : 'bg-transparent text-gray-100 overflow-x-auto' 
-                      }`}>
+                    <div className="msg-content">
+                      <div className="msg-bubble">
                         {msg.role === 'assistant' ? (
-                          <div className="prose prose-invert max-w-none w-full
-                            prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight
-                            prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-[15px]
-                            prose-strong:text-white prose-strong:font-semibold
-                            prose-ul:text-gray-300 prose-ol:text-gray-300
-                            prose-li:my-1 prose-li:marker:text-blue-500
-                            prose-blockquote:border-blue-500 prose-blockquote:bg-blue-500/5 prose-blockquote:py-1.5 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:text-gray-300 prose-blockquote:not-italic prose-blockquote:my-3
-                            prose-hr:border-white/10 prose-hr:my-6
-                            prose-pre:p-0 prose-pre:bg-transparent">
+                          <div className="msg-prose">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code: CodeBlock }}>
                               {msg.content}
                             </ReactMarkdown>
                           </div>
                         ) : (
-                          <p className="text-[15px] leading-relaxed font-light">{msg.content}</p>
+                          <span>{msg.content}</span>
                         )}
                       </div>
                     </div>
@@ -264,31 +406,27 @@ export default function Chat() {
                 ))}
 
                 {loading && (
-                  <div className="flex gap-3 sm:gap-4 animate-fade-in mt-1">
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg shadow-purple-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <Sparkles size={16} className="text-white" />
+                  <div className="typing">
+                    <div className="msg-av ai">
+                      <Sparkles size={15} />
                     </div>
-                    <div className="bg-transparent px-4 py-3">
-                      <div className="flex gap-1.5 items-center h-5">
-                        <div className="w-2 h-2 bg-blue-500/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-indigo-500/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-purple-500/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
+                    <div className="typing-dots">
+                      <div className="typing-dot" />
+                      <div className="typing-dot" />
+                      <div className="typing-dot" />
                     </div>
                   </div>
                 )}
               </div>
             )}
-            <div ref={bottomRef} className="h-1" />
+            <div ref={bottomRef} style={{ height: 1 }} />
           </div>
         </div>
 
-        {/* ── INPUT AREA (HORIZONTAL & COMPACT) ─────────────────── */}
-        <div className="shrink-0 w-full bg-[#0a0a0c]/90 backdrop-blur-xl border-t border-white/5 pt-2 sm:pt-3 pb-3 sm:pb-4 px-4 sm:px-6 z-20">
-          <div className="w-full max-w-5xl mx-auto">
-            
-            {/* Horizontal Input Row */}
-            <div className="relative flex items-end gap-2 bg-[#111116] border border-white/10 rounded-2xl p-1.5 focus-within:border-blue-500/50 focus-within:shadow-[0_0_20px_rgba(59,130,246,0.1)] transition-all">
+        {/* INPUT */}
+        <div className="chat-input-area">
+          <div className="chat-input-in">
+            <div className="chat-input-row">
               <textarea
                 ref={inputRef}
                 value={input}
@@ -296,21 +434,18 @@ export default function Chat() {
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything about your career, jobs, skills..."
                 rows={1}
-                className="flex-1 bg-transparent text-gray-100 placeholder-gray-500 resize-none focus:outline-none text-[15px] sm:text-base leading-relaxed max-h-[30vh] px-3 py-2.5 scrollbar-thin scrollbar-thumb-white/10"
-                style={{ minHeight: '44px' }}
+                className="chat-ta"
               />
               <button
                 onClick={sendMessage}
                 disabled={!input.trim() || loading}
-                className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-white/5 disabled:to-white/5 disabled:text-gray-500 text-white rounded-xl transition-all shadow-lg shadow-blue-500/20 disabled:shadow-none"
+                className="chat-send"
               >
-                <Send size={18} className="ml-0.5" />
+                <Send size={17} />
               </button>
             </div>
-            
-            {/* Tiny external helper text */}
-            <p className="text-center text-gray-500 text-[10px] sm:text-xs font-medium mt-1.5 sm:mt-2 hidden sm:block">
-              Press <kbd className="font-sans">Enter</kbd> to send · <kbd className="font-sans">Shift</kbd> + <kbd className="font-sans">Enter</kbd> for new line
+            <p className="chat-hint" style={{ display: window.innerWidth < 640 ? 'none' : 'block' }}>
+              Press <kbd>Enter</kbd> to send · <kbd>Shift</kbd> + <kbd>Enter</kbd> for new line
             </p>
           </div>
         </div>

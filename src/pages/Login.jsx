@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import Input from '../components/ui/Input'
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Shield } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { GoogleLogin } from '@react-oauth/google'
+import CursorEffect from '../components/CursorEffect'
 
 export default function Login() {
   const { login, googleLogin } = useAuth()
-  const navigate  = useNavigate()
+  const navigate = useNavigate()
 
-  const [form, setForm]           = useState({ email: '', password: '' })
-  const [errors, setErrors]       = useState({})
-  const [loading, setLoading]     = useState(false)
-  const [showPass, setShowPass]   = useState(false)
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [showPass, setShowPass] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
   const validate = () => {
     const e = {}
-    if (!form.email)    e.email    = 'Email is required'
+    if (!form.email) e.email = 'Email is required'
     if (!form.password) e.password = 'Password is required'
     setErrors(e)
     return Object.keys(e).length === 0
@@ -55,159 +55,227 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0a0c] flex items-center justify-center px-4 sm:px-6 relative overflow-hidden font-sans selection:bg-indigo-500/30">
-      
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-blue-600/10 blur-[100px] sm:blur-[150px] rounded-full pointer-events-none" />
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
-      <div className="w-full max-w-[420px] relative z-10 py-10">
+        .log-page{
+          min-height:100vh;display:flex;align-items:center;justify-content:center;
+          background:#fafafa;font-family:'DM Sans',system-ui,sans-serif;
+          padding:40px 20px;position:relative;overflow:hidden;
+          -webkit-font-smoothing:antialiased;
+        }
+        .log-card{width:100%;max-width:460px;position:relative;z-index:2}
 
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-10">
-          <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-5 sm:mb-6 shadow-lg shadow-purple-500/20 border border-white/10">
-            <span className="text-white font-bold text-lg sm:text-xl tracking-tight">N</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-2">Welcome back</h1>
-          <p className="text-gray-400 font-light text-sm sm:text-base px-2">Enter your credentials to access your workspace.</p>
-        </div>
+        .log-logo{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:28px;text-decoration:none}
+        .log-lsq{width:32px;height:32px;background:#0a0a0a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fafafa;letter-spacing:-.5px}
+        .log-lname{font-size:18px;font-weight:600;color:#0a0a0a;letter-spacing:-.4px}
 
-        <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xl">
+        .log-heading{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(28px,5vw,36px);font-weight:400;letter-spacing:-1.5px;color:#0a0a0a;text-align:center;line-height:1.1;margin-bottom:8px}
+        .log-heading em{font-style:italic;color:#6b6b6b}
+        .log-sub{font-size:15px;color:#6b6b6b;text-align:center;margin-bottom:36px;font-weight:400}
 
-          {/* Google Login */}
-          <div className="mb-5">
-            {googleLoading ? (
-              <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 text-gray-400 text-sm">
-                <Loader2 size={16} className="animate-spin" /> Signing in with Google...
-              </div>
-            ) : (
-              <div className="flex justify-center">
+        .log-form-wrap{
+          background:#ffffff;border:1px solid #e4e4e4;border-radius:20px;
+          padding:32px 28px;box-shadow:0 2px 4px rgba(0,0,0,.03),0 16px 48px rgba(0,0,0,.06);
+        }
+
+        .log-label{display:block;font-size:13px;font-weight:500;color:#0a0a0a;margin-bottom:6px;letter-spacing:-.1px}
+        .log-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+        .log-forgot{font-size:12px;font-weight:500;color:#6b6b6b;text-decoration:none;transition:color .2s}
+        .log-forgot:hover{color:#0a0a0a}
+
+        .log-input-wrap{position:relative;margin-bottom:16px}
+        .log-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#a3a3a3;pointer-events:none;transition:color .2s}
+        .log-input{
+          width:100%;padding:12px 12px 12px 42px;font-family:'DM Sans',sans-serif;font-size:14px;
+          background:#fafafa;border:1px solid #e4e4e4;border-radius:12px;color:#0a0a0a;
+          outline:none;transition:border-color .2s,box-shadow .2s,background .2s;
+        }
+        .log-input::placeholder{color:#b0b0b0}
+        .log-input:focus{border-color:#0a0a0a;box-shadow:0 0 0 3px rgba(10,10,10,.06);background:#fff}
+        .log-input:hover:not(:focus){border-color:#c4c4c4}
+        .log-input.err{border-color:#ef4444;background:#fef2f2}
+        .log-input-wrap:focus-within .log-icon{color:#0a0a0a}
+
+        .log-pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#a3a3a3;padding:4px;transition:color .2s}
+        .log-pass-toggle:hover{color:#0a0a0a}
+
+        .log-err{font-size:12px;color:#ef4444;margin-top:4px;margin-bottom:8px}
+
+        .log-error-banner{
+          display:flex;align-items:center;gap:10px;padding:12px 14px;
+          background:#fef2f2;border:1px solid #fecaca;border-radius:12px;margin-bottom:16px;
+        }
+        .log-error-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;flex-shrink:0}
+        .log-error-msg{font-size:13px;color:#ef4444;font-weight:500}
+
+        .log-divider{display:flex;align-items:center;gap:14px;margin:20px 0}
+        .log-divider-line{flex:1;height:1px;background:#e4e4e4}
+        .log-divider-text{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#a3a3a3}
+
+        .log-google-wrap{display:flex;justify-content:center;margin-bottom:4px}
+        .log-google-loading{
+          width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+          padding:12px;border-radius:12px;border:1px solid #e4e4e4;color:#a3a3a3;font-size:13px;
+        }
+
+        .log-submit{
+          width:100%;padding:13px 24px;background:#0a0a0a;color:#fafafa;
+          font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+          letter-spacing:-.3px;border:none;border-radius:26px;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          transition:transform .25s cubic-bezier(.4,0,.2,1),box-shadow .25s,opacity .2s;
+        }
+        .log-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.18)}
+        .log-submit:disabled{opacity:.6;cursor:not-allowed}
+
+        .log-footer{text-align:center;margin-top:24px}
+        .log-footer-text{font-size:13px;color:#6b6b6b}
+        .log-footer-link{color:#0a0a0a;font-weight:600;text-decoration:none;letter-spacing:-.2px;transition:color .2s}
+        .log-footer-link:hover{color:#3b82f6}
+        .log-back{
+          display:inline-flex;align-items:center;gap:6px;margin-top:18px;
+          font-size:13px;color:#a3a3a3;text-decoration:none;font-weight:500;transition:color .2s;
+        }
+        .log-back:hover{color:#0a0a0a}
+        .log-secure{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:14px;font-size:11px;color:#c4c4c4}
+
+        @media(max-width:500px){
+          .log-form-wrap{padding:24px 20px;border-radius:16px}
+        }
+      `}</style>
+
+      <div className="log-page">
+        <CursorEffect />
+
+        <div className="log-card">
+
+          {/* Logo */}
+          <Link to="/" className="log-logo">
+            <div className="log-lsq">N</div>
+            <span className="log-lname">Nyrvexa</span>
+          </Link>
+
+          <h1 className="log-heading">Welcome <em>back.</em></h1>
+          <p className="log-sub">Sign in to continue your career journey.</p>
+
+          <div className="log-form-wrap">
+
+            {/* Google */}
+            <div className="log-google-wrap">
+              {googleLoading ? (
+                <div className="log-google-loading">
+                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Signing in with Google...
+                </div>
+              ) : (
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={() => toast.error('Google login failed')}
-                  theme="filled_black"
+                  theme="outline"
                   shape="rectangular"
                   size="large"
-                  width="370"
+                  width="400"
                   text="signin_with"
                 />
-              </div>
-            )}
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 border-t border-white/5" />
-            <span className="text-gray-500 text-[10px] font-medium uppercase tracking-wider">or sign in with email</span>
-            <div className="flex-1 border-t border-white/5" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-
-            {/* Email Input */}
-            <div className="space-y-1 sm:space-y-1.5">
-              <Input
-                label="Email address"
-                type="email"
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-                placeholder="name@nirvexa.ai"
-                error={errors.email}
-                icon={<Mail size={18} className="text-gray-500" />}
-                required
-                className="bg-white/5 border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20 text-white placeholder-gray-600 rounded-xl"
-              />
+              )}
             </div>
 
-            {/* Password Input */}
-            <div className="flex flex-col gap-1 sm:gap-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-300">Password</label>
-                <Link to="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-                  Forgot password?
-                </Link>
+            <div className="log-divider">
+              <div className="log-divider-line" />
+              <span className="log-divider-text">or sign in with email</span>
+              <div className="log-divider-line" />
+            </div>
+
+            <form onSubmit={handleSubmit}>
+
+              {/* Email */}
+              <label className="log-label">Email address</label>
+              <div className="log-input-wrap">
+                <div className="log-icon"><Mail size={16} /></div>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  placeholder="name@nyrvexa.com"
+                  className={`log-input${errors.email ? ' err' : ''}`}
+                />
               </div>
-              <div className="relative group">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors">
-                  <Lock size={18} />
-                </div>
+              {errors.email && <p className="log-err">{errors.email}</p>}
+
+              {/* Password */}
+              <div className="log-label-row">
+                <label className="log-label" style={{ marginBottom: 0 }}>Password</label>
+                <Link to="/forgot-password" className="log-forgot">Forgot password?</Link>
+              </div>
+              <div className="log-input-wrap">
+                <div className="log-icon"><Lock size={16} /></div>
                 <input
                   type={showPass ? 'text' : 'password'}
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••"
-                  className={`w-full bg-white/5 border text-gray-100 placeholder-gray-600 rounded-xl pl-10 pr-10 py-3 sm:py-3.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all ${
-                    errors.password ? 'border-red-500/50 bg-red-500/5' : 'border-white/10 hover:border-white/20'
-                  }`}
+                  className={`log-input${errors.password ? ' err' : ''}`}
+                  style={{ paddingRight: 42 }}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors p-1"
-                >
-                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                <button type="button" onClick={() => setShowPass(!showPass)} className="log-pass-toggle">
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
-            </div>
+              {errors.password && <p className="log-err">{errors.password}</p>}
 
-            {/* Error State */}
-            {errors.general && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                <p className="text-red-400 text-xs sm:text-sm font-medium">{errors.general}</p>
-              </div>
-            )}
+              {/* Error */}
+              {errors.general && (
+                <div className="log-error-banner">
+                  <div className="log-error-dot" />
+                  <p className="log-error-msg">{errors.general}</p>
+                </div>
+              )}
 
-            {/* Submit Button */}
-            <div className="pt-1 sm:pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-3 sm:py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group text-sm sm:text-base"
-              >
+              {/* Submit */}
+              <button type="submit" disabled={loading} className="log-submit">
                 {loading ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                  <>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
                     Signing in...
-                  </span>
+                  </>
                 ) : (
                   <>
                     Sign In
-                    <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px] group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight size={16} />
                   </>
                 )}
               </button>
+
+            </form>
+
+            {/* Register link */}
+            <div className="log-divider">
+              <div className="log-divider-line" />
+              <span className="log-divider-text">New to Nyrvexa?</span>
+              <div className="log-divider-line" />
             </div>
+            <p className="log-footer-text">
+              Ready to accelerate your career?{' '}
+              <Link to="/register" className="log-footer-link">Create an account →</Link>
+            </p>
 
-          </form>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 sm:gap-4 my-6 sm:my-8">
-            <div className="flex-1 border-t border-white/5" />
-            <span className="text-gray-500 text-[10px] sm:text-xs font-medium uppercase tracking-wider">New to NirVexa?</span>
-            <div className="flex-1 border-t border-white/5" />
           </div>
 
-          {/* Register Link */}
-          <p className="text-center text-gray-400 text-xs sm:text-sm">
-            Ready to accelerate your career?{' '}
-            <Link to="/register" className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-300 hover:to-purple-300 font-semibold transition-all">
-              Create an account
+          {/* Bottom */}
+          <div className="log-footer">
+            <Link to="/" className="log-back">
+              <ArrowRight size={14} style={{ transform: 'rotate(180deg)' }} />
+              Back to homepage
             </Link>
-          </p>
-        </div>
+            <div className="log-secure">
+              <Shield size={10} strokeWidth={2} />
+              Secure · Encrypted · Built in India
+            </div>
+          </div>
 
-        {/* Footer Link */}
-        <div className="mt-6 sm:mt-8 text-center">
-          <Link to="/" className="inline-flex items-center gap-1.5 sm:gap-2 text-gray-500 hover:text-gray-300 text-xs sm:text-sm font-medium transition-colors">
-            <ArrowRight size={14} className="rotate-180" />
-            Back to homepage
-          </Link>
         </div>
-
       </div>
-    </div>
+    </>
   )
 }

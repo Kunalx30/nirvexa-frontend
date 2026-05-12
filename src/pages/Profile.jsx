@@ -55,11 +55,11 @@ function PasswordModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="bg-[#111116] border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+      <div className="bg-white border border-[#e4e4e4] rounded-2xl p-8 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-white font-semibold text-lg">Change Password</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight">Change Password</h3>
+          <button onClick={onClose} className="text-[#8b8b8b] hover:text-[#0a0a0a] transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -67,17 +67,17 @@ function PasswordModal({ onClose }) {
         <div className="space-y-4">
           {/* Current password */}
           <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">Current Password</label>
+            <label className="text-xs text-[#6b6b6b] mb-1.5 block">Current Password</label>
             <div className="relative">
               <input
                 type={showCurrent ? 'text' : 'password'}
                 value={current}
                 onChange={e => setCurrent(e.target.value)}
                 placeholder="Enter current password"
-                className="w-full bg-white/5 border border-white/10 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-purple-500/50 transition-all"
+                className="w-full bg-white/5 border border-[#e4e4e4] text-[#3a3a3a] placeholder-gray-600 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-purple-500/50 transition-all"
               />
               <button onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b8b8b] hover:text-[#3a3a3a]">
                 {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -85,17 +85,17 @@ function PasswordModal({ onClose }) {
 
           {/* New password */}
           <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">New Password</label>
+            <label className="text-xs text-[#6b6b6b] mb-1.5 block">New Password</label>
             <div className="relative">
               <input
                 type={showNew ? 'text' : 'password'}
                 value={newPass}
                 onChange={e => setNewPass(e.target.value)}
                 placeholder="Min 8 characters"
-                className="w-full bg-white/5 border border-white/10 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-purple-500/50 transition-all"
+                className="w-full bg-white/5 border border-[#e4e4e4] text-[#3a3a3a] placeholder-gray-600 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-purple-500/50 transition-all"
               />
               <button onClick={() => setShowNew(!showNew)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b8b8b] hover:text-[#3a3a3a]">
                 {showNew ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -103,25 +103,25 @@ function PasswordModal({ onClose }) {
 
           {/* Confirm password */}
           <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">Confirm New Password</label>
+            <label className="text-xs text-[#6b6b6b] mb-1.5 block">Confirm New Password</label>
             <input
               type="password"
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
               placeholder="Repeat new password"
-              className="w-full bg-white/5 border border-white/10 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500/50 transition-all"
+              className="w-full bg-white/5 border border-[#e4e4e4] text-[#3a3a3a] placeholder-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500/50 transition-all"
             />
           </div>
         </div>
 
         <div className="flex gap-3 mt-6">
           <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition-all">
+            className="flex-1 py-2.5 rounded-xl border border-[#e4e4e4] text-[#6b6b6b] hover:text-[#0a0a0a] hover:bg-[#f3f3f3] text-sm transition-all">
             Cancel
           </button>
           <button onClick={handleSubmit} disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm transition-all">
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-[#0a0a0a] font-semibold text-sm transition-all">
             {loading ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : 'Change Password'}
           </button>
         </div>
@@ -281,34 +281,39 @@ export default function Profile() {
 
   // ── Score color helper ─────────────────────────────────────────────────────
   const scoreColor = (score) => {
-    if (score >= 75) return 'text-emerald-400'
-    if (score >= 50) return 'text-amber-400'
-    return 'text-rose-400'
+    if (score >= 75) return 'text-emerald-600'
+    if (score >= 50) return 'text-amber-600'
+    return 'text-rose-600'
   }
 
   const modeBadgeColor = (mode) => {
     const map = {
-      hr: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
-      technical: 'bg-purple-500/10 border-purple-500/20 text-purple-400',
-      stress: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
-      mock: 'bg-teal-500/10 border-teal-500/20 text-teal-400',
+      hr: 'bg-blue-500/10 border-blue-500/20 text-blue-600',
+      technical: 'bg-purple-500/10 border-purple-500/20 text-purple-600',
+      stress: 'bg-rose-500/10 border-rose-500/20 text-rose-600',
+      mock: 'bg-teal-500/10 border-teal-500/20 text-teal-600',
     }
-    return map[mode] || 'bg-gray-500/10 border-gray-500/20 text-gray-400'
+    return map[mode] || 'bg-gray-500/10 border-gray-500/20 text-[#6b6b6b]'
   }
 
   return (
     <Layout>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
+        .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }
+        .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }
+      `}</style>
       {showPasswordModal && <PasswordModal onClose={() => setShowPasswordModal(false)} />}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pb-12 font-sans selection:bg-indigo-500/30">
 
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-600/5 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-50/60 blur-[100px] rounded-full pointer-events-none" />
 
         {/* Header */}
         <div className="flex items-center justify-between mb-10 z-10 relative pt-4">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Account Workspace</h1>
-            <p className="text-gray-400 font-light mt-1">Manage your professional identity and AI preferences.</p>
+            <h1 className="text-3xl font-serif text-[#0a0a0a] tracking-tight">Account Workspace</h1>
+            <p className="text-[#6b6b6b] font-light mt-1">Manage your professional identity and AI preferences.</p>
           </div>
           <Button variant="secondary" size="sm" className="gap-2"
             onClick={() => toast('Public profile coming soon')}>
@@ -319,18 +324,18 @@ export default function Profile() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 z-10 relative">
 
           {/* ── USER TILE ── */}
-          <div className="md:col-span-2 bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl transition-all hover:border-white/10">
+          <div className="md:col-span-2 bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg shadow-purple-500/20 border border-white/10">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-[#0a0a0a] font-bold text-3xl shadow-lg shadow-purple-500/20 border border-[#e4e4e4]">
                   {getInitials(user?.name || 'U')}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">{user?.name || 'User'}</h2>
-                  <p className="text-gray-400 text-base font-light">{user?.email || 'No email available'}</p>
+                  <h2 className="text-2xl font-bold text-[#0a0a0a] tracking-tight">{user?.name || 'User'}</h2>
+                  <p className="text-[#6b6b6b] text-base font-light">{user?.email || 'No email available'}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <span className="badge-blue text-xs px-3 py-1">Member</span>
-                    <span className="text-gray-600 text-xs font-medium">
+                    <span className="text-[#a3a3a3] text-xs font-medium">
                       {user?.experience_level ? user.experience_level.charAt(0).toUpperCase() + user.experience_level.slice(1) : 'Fresher'}
                     </span>
                   </div>
@@ -340,13 +345,13 @@ export default function Profile() {
           </div>
 
           {/* ── SECURITY ── */}
-          <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl flex flex-col justify-between transition-all hover:border-white/10">
+          <div className="bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col justify-between transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <ShieldCheck className="text-emerald-400" size={20} />
-                <h3 className="text-white font-semibold text-lg tracking-tight">Security</h3>
+                <ShieldCheck className="text-emerald-600" size={20} />
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight">Security</h3>
               </div>
-              <p className="text-gray-400 text-sm font-light mb-5">
+              <p className="text-[#6b6b6b] text-sm font-light mb-5">
                 Keep your account secure. We recommend changing passwords regularly.
               </p>
             </div>
@@ -357,15 +362,15 @@ export default function Profile() {
           </div>
 
           {/* ── PROFESSIONAL SKILLS ── */}
-          <div className="md:col-span-3 bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl transition-all hover:border-white/10">
+          <div className="md:col-span-3 bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
-                <BrainCircuit className="text-blue-400" size={20} />
-                <h3 className="text-white font-semibold text-lg tracking-tight">Professional Skills</h3>
+                <BrainCircuit className="text-blue-600" size={20} />
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight">Professional Skills</h3>
               </div>
               {skillsEdited && (
                 <button onClick={saveSkills} disabled={savingSkills}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 text-sm font-semibold rounded-xl transition-all disabled:opacity-60">
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 shadow-sm text-blue-600 text-sm font-semibold rounded-xl transition-all disabled:opacity-60">
                   {savingSkills
                     ? <><Loader2 size={13} className="animate-spin" /> Saving...</>
                     : <><CheckCircle2 size={13} /> Save Skills</>}
@@ -377,15 +382,15 @@ export default function Profile() {
             <div className="flex flex-wrap gap-2 mb-4 min-h-[36px]">
               {skills.length > 0 ? skills.map((skill, i) => (
                 <span key={i}
-                  className="group flex items-center gap-1.5 bg-dark-700 border border-white/10 text-gray-200 text-sm font-medium px-4 py-2 rounded-full hover:border-white/20 transition-all">
+                  className="group flex items-center gap-1.5 bg-dark-700 border border-[#e4e4e4] text-[#3a3a3a] text-sm font-medium px-4 py-2 rounded-full hover:border-[#a3a3a3] transition-all">
                   {skill}
                   <button onClick={() => removeSkill(skill)}
-                    className="text-gray-600 hover:text-rose-400 transition-colors ml-1">
+                    className="text-[#a3a3a3] hover:text-rose-600 transition-colors ml-1">
                     <X size={12} />
                   </button>
                 </span>
               )) : (
-                <p className="text-gray-600 text-sm">No skills added yet. Type below to add.</p>
+                <p className="text-[#a3a3a3] text-sm">No skills added yet. Type below to add.</p>
               )}
             </div>
 
@@ -397,24 +402,24 @@ export default function Profile() {
                 value={skillInput}
                 onChange={e => setSkillInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') addSkill() }}
-                className="flex-1 bg-white/5 border border-white/10 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500/50 transition-all"
+                className="flex-1 bg-white/5 border border-[#e4e4e4] text-[#3a3a3a] placeholder-gray-600 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500/50 transition-all"
               />
               <button onClick={addSkill}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 rounded-xl text-sm transition-all flex items-center gap-1.5">
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-[#e4e4e4] text-[#3a3a3a] rounded-xl text-sm transition-all flex items-center gap-1.5">
                 <Plus size={14} /> Add
               </button>
             </div>
           </div>
 
           {/* ── CAREER PREFERENCES ── */}
-          <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl transition-all hover:border-white/10">
+          <div className="bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-white font-semibold text-lg tracking-tight flex items-center gap-3">
-                <Settings className="text-gray-400" size={18} /> Career Preferences
+              <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight flex items-center gap-3">
+                <Settings className="text-[#6b6b6b]" size={18} /> Career Preferences
               </h3>
               {prefsEdited && (
                 <button onClick={savePreferences} disabled={savingPrefs}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-400 text-xs font-semibold rounded-xl transition-all disabled:opacity-60">
+                  className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 shadow-sm text-teal-600 text-xs font-semibold rounded-xl transition-all disabled:opacity-60">
                   {savingPrefs
                     ? <><Loader2 size={12} className="animate-spin" /> Saving...</>
                     : <><CheckCircle2 size={12} /> Save</>}
@@ -425,7 +430,7 @@ export default function Profile() {
             <div className="space-y-4">
               {/* Preferred Location */}
               <div>
-                <label className="text-xs text-gray-500 mb-1.5 flex items-center gap-1.5">
+                <label className="text-xs text-[#8b8b8b] mb-1.5 flex items-center gap-1.5">
                   <MapPin size={11} /> Preferred Location
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -433,8 +438,8 @@ export default function Profile() {
                     <button key={loc} onClick={() => { setPrefLocation(loc); setPrefsEdited(true) }}
                       className={`px-3 py-1.5 rounded-lg border text-xs transition-all ${
                         prefLocation === loc
-                          ? 'bg-teal-500/15 border-teal-500/30 text-teal-300'
-                          : 'bg-white/3 border-white/8 text-gray-400 hover:text-gray-200 hover:border-white/20'
+                          ? 'bg-[#0a0a0a] border-[#0a0a0a] text-white shadow-sm'
+                          : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b] hover:text-[#3a3a3a] hover:border-[#a3a3a3]'
                       }`}>
                       {loc}
                     </button>
@@ -444,7 +449,7 @@ export default function Profile() {
 
               {/* Job Type */}
               <div>
-                <label className="text-xs text-gray-500 mb-1.5 flex items-center gap-1.5">
+                <label className="text-xs text-[#8b8b8b] mb-1.5 flex items-center gap-1.5">
                   <Briefcase size={11} /> Job Type
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -452,8 +457,8 @@ export default function Profile() {
                     <button key={type} onClick={() => { setJobType(type); setPrefsEdited(true) }}
                       className={`px-3 py-1.5 rounded-lg border text-xs capitalize transition-all ${
                         jobType === type
-                          ? 'bg-teal-500/15 border-teal-500/30 text-teal-300'
-                          : 'bg-white/3 border-white/8 text-gray-400 hover:text-gray-200 hover:border-white/20'
+                          ? 'bg-[#0a0a0a] border-[#0a0a0a] text-white shadow-sm'
+                          : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b] hover:text-[#3a3a3a] hover:border-[#a3a3a3]'
                       }`}>
                       {type}
                     </button>
@@ -463,7 +468,7 @@ export default function Profile() {
 
               {/* Experience Level */}
               <div>
-                <label className="text-xs text-gray-500 mb-1.5 flex items-center gap-1.5">
+                <label className="text-xs text-[#8b8b8b] mb-1.5 flex items-center gap-1.5">
                   <TrendingUp size={11} /> Experience Level
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -471,8 +476,8 @@ export default function Profile() {
                     <button key={level} onClick={() => { setExpLevel(level); setPrefsEdited(true) }}
                       className={`px-3 py-1.5 rounded-lg border text-xs capitalize transition-all ${
                         expLevel === level
-                          ? 'bg-teal-500/15 border-teal-500/30 text-teal-300'
-                          : 'bg-white/3 border-white/8 text-gray-400 hover:text-gray-200 hover:border-white/20'
+                          ? 'bg-[#0a0a0a] border-[#0a0a0a] text-white shadow-sm'
+                          : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b] hover:text-[#3a3a3a] hover:border-[#a3a3a3]'
                       }`}>
                       {level}
                     </button>
@@ -483,19 +488,19 @@ export default function Profile() {
           </div>
 
           {/* ── JOB ALERTS ── */}
-          <div className="md:col-span-2 bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl transition-all hover:border-white/10">
+          <div className="md:col-span-2 bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Zap className="text-amber-400" size={20} />
-                <h3 className="text-white font-semibold text-lg tracking-tight">AI Job Alerts</h3>
+                <Zap className="text-amber-600" size={20} />
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight">AI Job Alerts</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={loadAlerts}
-                  className="p-2 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-colors" title="Refresh">
+                  className="p-2 rounded-xl text-[#8b8b8b] hover:text-[#0a0a0a] hover:bg-[#f3f3f3] transition-colors" title="Refresh">
                   <RefreshCw size={14} />
                 </button>
                 <button onClick={() => setShowForm(!showForm)}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-400 text-sm font-semibold rounded-xl transition-all">
+                  className="flex items-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 shadow-sm text-amber-600 text-sm font-semibold rounded-xl transition-all">
                   {showForm ? <X size={14} /> : <Plus size={14} />}
                   {showForm ? 'Cancel' : 'New Alert'}
                 </button>
@@ -504,29 +509,29 @@ export default function Profile() {
 
             {/* Create form */}
             {showForm && (
-              <div className="mb-6 p-5 bg-white/[0.02] border border-white/10 rounded-2xl space-y-4">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Create New Alert</p>
+              <div className="mb-6 p-5 bg-[#fcfcfc] border border-[#e4e4e4] shadow-sm rounded-2xl space-y-4">
+                <p className="text-xs font-medium text-[#8b8b8b] uppercase tracking-wider">Create New Alert</p>
                 <div>
-                  <label className="text-xs text-gray-400 mb-1.5 block">Keywords <span className="text-gray-600">(comma separated)</span></label>
+                  <label className="text-xs text-[#6b6b6b] mb-1.5 block">Keywords <span className="text-[#a3a3a3]">(comma separated)</span></label>
                   <input type="text" placeholder="e.g. Python, Data Analyst, React"
                     value={keywordsInput} onChange={e => setKeywordsInput(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500/50 transition-all" />
+                    className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#8b8b8b] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] focus:bg-white shadow-sm transition-all" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 mb-1.5 block">Location <span className="text-gray-600">(optional)</span></label>
+                  <label className="text-xs text-[#6b6b6b] mb-1.5 block">Location <span className="text-[#a3a3a3]">(optional)</span></label>
                   <input type="text" placeholder="e.g. Bangalore, Remote"
                     value={location} onChange={e => setLocation(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500/50 transition-all" />
+                    className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#8b8b8b] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] focus:bg-white shadow-sm transition-all" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 mb-1.5 block">Email Frequency</label>
+                  <label className="text-xs text-[#6b6b6b] mb-1.5 block">Email Frequency</label>
                   <div className="flex gap-2">
                     {FREQUENCIES.map(f => (
                       <button key={f} onClick={() => setFrequency(f)}
                         className={`px-4 py-2 text-sm font-semibold rounded-xl border transition-all capitalize ${
                           frequency === f
-                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                            : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                            ? 'bg-[#0a0a0a] border-[#0a0a0a] text-white shadow-sm'
+                            : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b] hover:text-[#0a0a0a] hover:border-[#a3a3a3] shadow-sm'
                         }`}>
                         {f}
                       </button>
@@ -534,7 +539,7 @@ export default function Profile() {
                   </div>
                 </div>
                 <button onClick={handleCreateAlert} disabled={creating}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-amber-500/20">
+                  className="w-full flex items-center justify-center gap-2 bg-[#0a0a0a] text-white hover:bg-[#222222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] disabled:cursor-not-allowed font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:shadow-none disabled:transform-none">
                   {creating ? <><Loader2 size={16} className="animate-spin" /> Creating...</> : <><Bell size={16} /> Create Alert</>}
                 </button>
               </div>
@@ -543,28 +548,28 @@ export default function Profile() {
             {/* Alerts list */}
             {alertsLoading ? (
               <div className="space-y-3">
-                {[1, 2].map(i => <div key={i} className="h-16 bg-white/[0.02] border border-white/5 rounded-2xl animate-pulse" />)}
+                {[1, 2].map(i => <div key={i} className="h-16 bg-[#fcfcfc] border border-[#e4e4e4] rounded-2xl animate-pulse" />)}
               </div>
             ) : alerts.length === 0 ? (
-              <div className="text-center py-8 px-4 bg-white/[0.02] border border-dashed border-white/10 rounded-2xl">
-                <Bell size={32} className="text-gray-700 mx-auto mb-3" />
-                <p className="text-gray-500 text-sm font-light">No alerts set up yet.</p>
-                <p className="text-gray-600 text-xs mt-1">Create one above to get daily job matches by email.</p>
+              <div className="text-center py-8 px-4 bg-[#f9f9f9] border border-dashed border-[#c4c4c4] rounded-2xl">
+                <Bell size={32} className="text-[#c4c4c4] mx-auto mb-3" />
+                <p className="text-[#6b6b6b] text-sm font-medium">No alerts set up yet.</p>
+                <p className="text-[#a3a3a3] font-medium text-xs mt-1">Create one above to get daily job matches by email.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {alerts.map(alert => (
                   <div key={alert.id}
-                    className="flex items-start justify-between gap-4 p-4 bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl transition-all">
+                    className="flex items-start justify-between gap-4 p-4 bg-white shadow-sm border border-[#e4e4e4] hover:border-[#c4c4c4] hover:shadow-md hover:-translate-y-px rounded-2xl transition-all">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {(alert.keywords || []).map((kw, i) => (
-                          <span key={i} className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 rounded-md text-amber-400">
+                          <span key={i} className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-amber-600">
                             {kw}
                           </span>
                         ))}
                       </div>
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-[#8b8b8b]">
                         {alert.location && <span className="flex items-center gap-1"><MapPin size={11} /> {alert.location}</span>}
                         <span className="capitalize flex items-center gap-1"><Zap size={11} className="text-amber-500" /> {alert.frequency}</span>
                         {alert.created_at && (
@@ -572,15 +577,15 @@ export default function Profile() {
                         )}
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                           alert.is_active
-                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                            : 'bg-gray-500/10 border-gray-500/20 text-gray-500'
+                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm'
+                            : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#8b8b8b] shadow-sm'
                         }`}>
                           {alert.is_active ? 'Active' : 'Paused'}
                         </span>
                       </div>
                     </div>
                     <button onClick={() => handleDeleteAlert(alert.id)} disabled={deletingId === alert.id}
-                      className="p-2 rounded-xl text-gray-600 hover:bg-rose-500/10 hover:text-rose-400 transition-colors flex-shrink-0 disabled:opacity-50">
+                      className="p-2 rounded-xl text-[#a3a3a3] hover:bg-rose-500/10 hover:text-rose-600 transition-colors flex-shrink-0 disabled:opacity-50">
                       {deletingId === alert.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                     </button>
                   </div>
@@ -590,27 +595,27 @@ export default function Profile() {
           </div>
 
           {/* ── INTERVIEW HISTORY ── */}
-          <div className="md:col-span-3 bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl transition-all hover:border-white/10">
+          <div className="md:col-span-3 bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <History className="text-purple-400" size={20} />
-                <h3 className="text-white font-semibold text-lg tracking-tight">Interview History</h3>
+                <History className="text-purple-600" size={20} />
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight">Interview History</h3>
               </div>
               <button onClick={loadSessions}
-                className="p-2 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-colors">
+                className="p-2 rounded-xl text-[#8b8b8b] hover:text-[#0a0a0a] hover:bg-[#f3f3f3] transition-colors">
                 <RefreshCw size={14} />
               </button>
             </div>
 
             {sessionsLoading ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map(i => <div key={i} className="h-28 bg-white/[0.02] border border-white/5 rounded-2xl animate-pulse" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-28 bg-[#fcfcfc] border border-[#e4e4e4] rounded-2xl animate-pulse" />)}
               </div>
             ) : sessions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center py-10 px-4 bg-white/[0.02] rounded-2xl border border-dashed border-white/10">
-                <Mic size={32} className="text-gray-700 mb-3" />
-                <p className="text-gray-500 text-sm font-light">No mock interview sessions recorded yet.</p>
-                <p className="text-gray-600 text-xs mt-1">Complete a voice or text interview to see your history here.</p>
+              <div className="flex flex-col items-center justify-center text-center py-10 px-4 bg-[#fcfcfc] rounded-2xl border border-dashed border-white/10">
+                <Mic size={32} className="text-[#c4c4c4] mb-3" />
+                <p className="text-[#8b8b8b] text-sm font-light">No mock interview sessions recorded yet.</p>
+                <p className="text-[#a3a3a3] text-xs mt-1">Complete a voice or text interview to see your history here.</p>
                 <Button size="sm" variant="secondary" className="mt-4"
                   onClick={() => window.location.href = '/interview'}>
                   Start Practice
@@ -620,31 +625,31 @@ export default function Profile() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sessions.map(session => (
                   <div key={session.id}
-                    className="p-5 bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-2xl transition-all">
+                    className="p-5 bg-white shadow-sm border border-[#e4e4e4] hover:border-[#c4c4c4] hover:shadow-md hover:-translate-y-px rounded-2xl transition-all">
                     {/* Mode + difficulty */}
                     <div className="flex items-center gap-2 mb-3">
                       <span className={`text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-lg border capitalize ${modeBadgeColor(session.mode)}`}>
                         {session.mode}
                       </span>
                       {session.difficulty && (
-                        <span className="text-[11px] text-gray-500 capitalize">{session.difficulty}</span>
+                        <span className="text-[11px] text-[#8b8b8b] capitalize">{session.difficulty}</span>
                       )}
                     </div>
 
                     {/* Role */}
-                    <p className="text-white font-medium text-sm mb-1 truncate">{session.role}</p>
+                    <p className="text-[#0a0a0a] font-bold text-sm tracking-tight mb-1 truncate">{session.role}</p>
 
                     {/* Score */}
                     <div className="flex items-center gap-2 mb-3">
-                      <Star size={13} className="text-amber-400" />
+                      <Star size={13} className="text-amber-600" />
                       <span className={`text-lg font-bold ${scoreColor(session.total_score || 0)}`}>
                         {session.total_score ? Math.round(session.total_score) : '—'}
                       </span>
-                      <span className="text-gray-600 text-xs">/ 100</span>
+                      <span className="text-[#a3a3a3] text-xs">/ 100</span>
                     </div>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-3 text-xs text-[#a3a3a3]">
                       {session.avg_wpm > 0 && (
                         <span className="flex items-center gap-1">
                           <TrendingUp size={11} /> {Math.round(session.avg_wpm)} wpm

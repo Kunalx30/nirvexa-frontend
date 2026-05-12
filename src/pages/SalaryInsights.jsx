@@ -38,48 +38,48 @@ export default function SalaryInsights() {
   }
 
   return (
-    <Layout>
+    <Layout>\n      <style>{`\n        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');\n        .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }\n        .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }\n      `}</style>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-16 relative font-sans">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-green-600/6 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-emerald-50/80 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="pt-4 pb-10 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-green-400 mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fcfcfc] shadow-sm border border-[#e4e4e4] text-[#0a0a0a] text-xs font-medium mb-3">
             <TrendingUp size={13} /> Salary Insights
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Salary Insights</h1>
-          <p className="text-gray-400 text-sm mt-2 max-w-xl font-light">
+          <h1 className="text-3xl sm:text-4xl font-serif text-[#0a0a0a] tracking-tight">Salary Insights</h1>
+          <p className="text-[#4a4a4a] text-base font-medium mt-1 max-w-xl">
             Real salary data for Indian job market — powered by live job listings and AI.
           </p>
         </div>
 
         {/* Input card */}
-        <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 sm:p-8 mb-8 z-10 relative">
+        <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-2xl p-6 sm:p-8 mb-8 z-10 relative">
           <div className="grid sm:grid-cols-2 gap-4 mb-5">
             <div>
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">Job Role *</label>
+              <label className="text-xs font-semibold text-[#4a4a4a] uppercase tracking-wider mb-2 block ml-1">Job Role *</label>
               <div className="relative">
-                <BarChart3 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
+                <BarChart3 className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b8b8b]" size={15} />
                 <input
                   type="text"
                   placeholder="e.g. Data Analyst"
                   value={role}
                   onChange={e => { setRole(e.target.value); setResult(null) }}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  className="w-full bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-green-500/50 transition-all"
+                  className="w-full bg-white/5 border border-white/10 text-[#0a0a0a] placeholder-gray-500 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] focus:bg-white shadow-sm transition-all"
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">Location (optional)</label>
+              <label className="text-xs font-semibold text-[#4a4a4a] uppercase tracking-wider mb-2 block ml-1">Location (optional)</label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b8b8b]" size={15} />
                 <input
                   type="text"
                   placeholder="e.g. Bangalore"
                   value={location}
                   onChange={e => { setLocation(e.target.value); setResult(null) }}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  className="w-full bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-green-500/50 transition-all"
+                  className="w-full bg-white/5 border border-white/10 text-[#0a0a0a] placeholder-gray-500 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] focus:bg-white shadow-sm transition-all"
                 />
               </div>
             </div>
@@ -87,22 +87,22 @@ export default function SalaryInsights() {
 
           {/* Quick picks */}
           <div className="mb-4">
-            <p className="text-gray-500 text-xs mb-2">Popular roles:</p>
+            <p className="text-[#8b8b8b] text-xs mb-2">Popular roles:</p>
             <div className="flex flex-wrap gap-2">
               {POPULAR_ROLES.map(r => (
                 <button key={r} onClick={() => { setRole(r); setResult(null) }}
-                  className={`px-2.5 py-1 rounded-lg border text-xs transition-all ${role === r ? 'bg-green-500/15 border-green-500/30 text-green-300' : 'bg-white/3 border-white/8 text-gray-400 hover:text-gray-200 hover:border-white/20'}`}>
+                  className={`px-2.5 py-1 rounded-lg border text-xs transition-all ${role === r ? 'bg-[#0a0a0a] border-[#0a0a0a] text-white shadow-sm font-medium' : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b] hover:text-[#0a0a0a] hover:border-[#a3a3a3] shadow-sm font-medium'}`}>
                   {r}
                 </button>
               ))}
             </div>
           </div>
           <div className="mb-6">
-            <p className="text-gray-500 text-xs mb-2">Cities:</p>
+            <p className="text-[#8b8b8b] text-xs mb-2">Cities:</p>
             <div className="flex flex-wrap gap-2">
               {CITIES.map(c => (
                 <button key={c} onClick={() => { setLocation(c); setResult(null) }}
-                  className={`px-2.5 py-1 rounded-lg border text-xs transition-all ${location === c ? 'bg-green-500/15 border-green-500/30 text-green-300' : 'bg-white/3 border-white/8 text-gray-400 hover:text-gray-200 hover:border-white/20'}`}>
+                  className={`px-2.5 py-1 rounded-lg border text-xs transition-all ${location === c ? 'bg-[#0a0a0a] border-[#0a0a0a] text-white shadow-sm font-medium' : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b] hover:text-[#0a0a0a] hover:border-[#a3a3a3] shadow-sm font-medium'}`}>
                   {c}
                 </button>
               ))}
@@ -110,7 +110,7 @@ export default function SalaryInsights() {
           </div>
 
           <button onClick={handleSearch} disabled={!role.trim() || loading}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 disabled:from-gray-700 disabled:to-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-green-500/20 disabled:shadow-none text-sm">
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#0a0a0a] text-white hover:bg-[#222222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] disabled:cursor-not-allowed font-semibold px-8 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:shadow-none disabled:transform-none text-sm">
             {loading ? <><Loader2 size={16} className="animate-spin" /> Fetching...</> : <><Sparkles size={16} /> Get Salary Data</>}
           </button>
         </div>
@@ -121,7 +121,7 @@ export default function SalaryInsights() {
 
             {/* Source badge */}
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${result.source === 'db' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-purple-500/10 border-purple-500/20 text-purple-400'}`}>
+              <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${result.source === 'db' ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm' : 'bg-purple-50 border-purple-200 text-purple-700 shadow-sm'}`}>
                 {result.source === 'db' ? `📊 Based on ${result.sample_count} real job listings` : '🤖 AI-powered market estimate'}
               </span>
             </div>
@@ -129,15 +129,15 @@ export default function SalaryInsights() {
             {/* Salary range cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: 'Min', value: result.min_salary_lpa, color: 'text-rose-400' },
-                { label: 'Median', value: result.median_lpa, color: 'text-amber-400' },
-                { label: 'Average', value: result.avg_salary_lpa, color: 'text-blue-400' },
-                { label: 'Max', value: result.max_salary_lpa, color: 'text-emerald-400' },
+                { label: 'Min', value: result.min_salary_lpa, color: 'text-rose-600' },
+                { label: 'Median', value: result.median_lpa, color: 'text-amber-600' },
+                { label: 'Average', value: result.avg_salary_lpa, color: 'text-blue-600' },
+                { label: 'Max', value: result.max_salary_lpa, color: 'text-emerald-600' },
               ].map(({ label, value, color }) => (
-                <div key={label} className="bg-[#111116]/80 border border-white/5 rounded-2xl p-5 text-center">
-                  <p className="text-gray-500 text-xs mb-1">{label}</p>
+                <div key={label} className="bg-white border border-[#e4e4e4] shadow-sm hover:shadow-md transition-all rounded-2xl p-5 text-center">
+                  <p className="text-[#8b8b8b] text-xs mb-1">{label}</p>
                   <p className={`text-2xl font-bold ${color}`}>{value ?? '—'}</p>
-                  <p className="text-gray-600 text-xs">LPA</p>
+                  <p className="text-[#a3a3a3] text-xs">LPA</p>
                 </div>
               ))}
             </div>
@@ -146,15 +146,15 @@ export default function SalaryInsights() {
             {result.source === 'ai' && (
               <div className="grid sm:grid-cols-2 gap-4">
                 {result.fresher_lpa && (
-                  <div className="bg-[#111116]/80 border border-white/5 rounded-2xl p-5">
-                    <p className="text-gray-400 text-xs mb-1">Fresher (0–1 yr)</p>
-                    <p className="text-white text-xl font-bold">{result.fresher_lpa} LPA</p>
+                  <div className="bg-white border border-[#e4e4e4] shadow-sm hover:shadow-md transition-all rounded-2xl p-5">
+                    <p className="text-[#6b6b6b] text-xs mb-1">Fresher (0–1 yr)</p>
+                    <p className="text-[#0a0a0a] text-xl font-bold">{result.fresher_lpa} LPA</p>
                   </div>
                 )}
                 {result.experienced_lpa && (
-                  <div className="bg-[#111116]/80 border border-white/5 rounded-2xl p-5">
-                    <p className="text-gray-400 text-xs mb-1">Experienced (5+ yrs)</p>
-                    <p className="text-white text-xl font-bold">{result.experienced_lpa} LPA</p>
+                  <div className="bg-white border border-[#e4e4e4] shadow-sm hover:shadow-md transition-all rounded-2xl p-5">
+                    <p className="text-[#6b6b6b] text-xs mb-1">Experienced (5+ yrs)</p>
+                    <p className="text-[#0a0a0a] text-xl font-bold">{result.experienced_lpa} LPA</p>
                   </div>
                 )}
               </div>
@@ -162,28 +162,28 @@ export default function SalaryInsights() {
 
             {/* Market demand + note */}
             {(result.market_demand || result.note) && (
-              <div className="bg-[#111116]/80 border border-white/5 rounded-2xl p-6 flex items-start gap-3">
-                <AlertCircle size={16} className="text-amber-400 mt-0.5 shrink-0" />
+              <div className="bg-white border border-[#e4e4e4] shadow-sm hover:shadow-md transition-all rounded-2xl p-6 flex items-start gap-3">
+                <AlertCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
                 <div>
                   {result.market_demand && (
-                    <p className="text-gray-300 text-sm font-medium mb-1">
-                      Market demand: <span className={result.market_demand === 'high' ? 'text-emerald-400' : result.market_demand === 'medium' ? 'text-amber-400' : 'text-rose-400'}>{result.market_demand}</span>
+                    <p className="text-[#4a4a4a] text-sm font-medium mb-1">
+                      Market demand: <span className={result.market_demand === 'high' ? 'text-emerald-600' : result.market_demand === 'medium' ? 'text-amber-600' : 'text-rose-600'}>{result.market_demand}</span>
                     </p>
                   )}
-                  {result.note && <p className="text-gray-400 text-sm">{result.note}</p>}
+                  {result.note && <p className="text-[#6b6b6b] text-sm">{result.note}</p>}
                 </div>
               </div>
             )}
 
             {/* Top companies */}
             {result.top_paying_companies?.length > 0 && (
-              <div className="bg-[#111116]/80 border border-white/5 rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2 text-sm">
-                  <Building2 size={15} className="text-green-400" /> Top Paying Companies
+              <div className="bg-white border border-[#e4e4e4] shadow-sm hover:shadow-md transition-all rounded-2xl p-6">
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 flex items-center gap-2 text-sm">
+                  <Building2 size={15} className="text-emerald-600" /> Top Paying Companies
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {result.top_paying_companies.map((c, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-green-500/10 border border-green-500/20 text-green-300 text-xs rounded-lg font-medium">
+                    <span key={i} className="px-3 py-1.5 bg-green-500/10 border border-green-500/20 text-emerald-700 text-xs rounded-lg font-medium">
                       {c}
                     </span>
                   ))}
@@ -193,14 +193,14 @@ export default function SalaryInsights() {
 
             {/* Salary factors */}
             {result.salary_factors?.length > 0 && (
-              <div className="bg-[#111116]/80 border border-white/5 rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2 text-sm">
-                  <TrendingUp size={15} className="text-blue-400" /> What Increases Your Salary
+              <div className="bg-white border border-[#e4e4e4] shadow-sm hover:shadow-md transition-all rounded-2xl p-6">
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 flex items-center gap-2 text-sm">
+                  <TrendingUp size={15} className="text-blue-600" /> What Increases Your Salary
                 </h3>
                 <ul className="space-y-2">
                   {result.salary_factors.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-gray-300 text-sm">
-                      <span className="text-blue-400 mt-0.5">↑</span> {f}
+                    <li key={i} className="flex items-start gap-2.5 text-[#4a4a4a] text-sm">
+                      <span className="text-blue-600 mt-0.5">↑</span> {f}
                     </li>
                   ))}
                 </ul>

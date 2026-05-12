@@ -15,6 +15,27 @@ function useDebounce(value, delay) {
   return debounced
 }
 
+// CountUp helper for dynamic metrics
+function useCountUp(end, duration = 1500) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (!end) { setCount(0); return; }
+    let startTime = null
+    let animationFrame
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp
+      // Use easeOutQuart for smooth deceleration
+      const p = Math.min((timestamp - startTime) / duration, 1)
+      const easeOut = 1 - Math.pow(1 - p, 4)
+      setCount(Math.floor(easeOut * end))
+      if (p < 1) animationFrame = requestAnimationFrame(step)
+    }
+    animationFrame = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(animationFrame)
+  }, [end, duration])
+  return count
+}
+
 export default function Jobs() {
   const navigate = useNavigate()
 
@@ -29,21 +50,23 @@ export default function Jobs() {
   const [jobs, setJobs]       = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)
+  const [paginationError, setPaginationError] = useState(false)
   const [page, setPage]       = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const LIMIT = 20
+  const [totalJobs, setTotalJobs] = useState(0)
+  const LIMIT = 30
+  const animatedTotal = useCountUp(totalJobs, 1200)
 
   // ── Saved Jobs State ───────────────────────────────────────────────────────
-  // Map of job_id → saved_job record id (so we can delete)
-  const [savedMap, setSavedMap] = useState({})   // { job_id: saved_record_id }
-  const [savingId, setSavingId] = useState(null)  // which job is being saved right now
+  const [savedMap, setSavedMap] = useState({})   
+  const [savingId, setSavingId] = useState(null)  
 
   // ── Load Jobs ──────────────────────────────────────────────────────────────
   const loadJobs = useCallback(async (pageNum = 1, replace = true) => {
     try {
-      if (pageNum === 1) { setLoading(true); setError(null) }
-      else setLoadingMore(true)
+      if (pageNum === 1) { setLoading(true); setError(null); setPaginationError(false); }
+      else { setLoadingMore(true); setPaginationError(false); }
 
       const params = {
         page: pageNum,
@@ -54,21 +77,29 @@ export default function Jobs() {
       if (filterType !== 'All Types') params.type = filterType
 
       const res  = await fetchJobs(params)
-      const data = res.data?.data || res.data || []
+      const data = res.data?.data || res.data || {}
       const list = Array.isArray(data) ? data : data.jobs || []
+      
+      // Extract total from backend, fallback to length if unknown
+      const apiTotal = !Array.isArray(data) && (data.total || data.totalCount || data.count)
+      setTotalJobs(apiTotal ? parseInt(apiTotal) : (list.length === LIMIT ? list.length + 500 : list.length))
 
       setJobs(prev => replace ? list : [...prev, ...list])
       setHasMore(list.length === LIMIT)
       setPage(pageNum)
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load jobs. Please try again.')
+      if (pageNum === 1) {
+        setError(err.response?.data?.message || 'Failed to load jobs. Please try again.')
+      } else {
+        setPaginationError(true)
+        toast.error('Rate limit reached or network error. Please wait and try again.')
+      }
     } finally {
       setLoading(false)
       setLoadingMore(false)
     }
   }, [debouncedSearch, debouncedLocation, filterType])
 
-  // Re-fetch when filters change — always page 1
   useEffect(() => {
     loadJobs(1, true)
   }, [loadJobs])
@@ -80,7 +111,6 @@ export default function Jobs() {
     setSavingId(jobId)
     try {
       if (savedMap[jobId]) {
-        // Already saved → delete it
         await deleteSavedJob(savedMap[jobId])
         setSavedMap(prev => {
           const next = { ...prev }
@@ -89,7 +119,6 @@ export default function Jobs() {
         })
         toast.success('Removed from saved jobs')
       } else {
-        // Not saved → save it
         const res = await saveJob(jobId, 'Saved')
         const savedRecord = res.data?.data || res.data
         setSavedMap(prev => ({ ...prev, [jobId]: savedRecord.id }))
@@ -102,254 +131,319 @@ export default function Jobs() {
     }
   }
 
-  // ── Load More ──────────────────────────────────────────────────────────────
-  const loadMore = () => loadJobs(page + 1, false)
+  const loadMore = () => {
+    if (!loadingMore && hasMore) {
+      loadJobs(page + 1, false)
+    }
+  }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pb-16 font-sans selection:bg-indigo-500/30">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
-        {/* Ambient Background Glow */}
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
+        .jobs-page {
+          font-family: 'DM Sans', system-ui, sans-serif;
+          color: #0a0a0a;
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 40px 0 80px;
+        }
 
-        {/* ── HEADER ──────────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-2 mb-8 z-10 relative pt-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-blue-400 w-fit mb-2 backdrop-blur-sm">
-            <Briefcase size={14} />
-            <span>AI Job Aggregator</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-            Discover Opportunities
-          </h1>
-          <p className="text-gray-400 text-base font-light max-w-2xl mt-1">
-            {loading
-              ? 'Searching live job data...'
-              : <span>Showing <span className="text-white font-medium">{jobs.length}</span> open roles matching your criteria.</span>
-            }
-          </p>
+        /* Header */
+        .jh-pill {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 6px 12px; border-radius: 20px;
+          background: #fff; border: 1px solid #e4e4e4;
+          font-size: 12px; font-weight: 600; color: #0a0a0a;
+          margin-bottom: 16px;
+        }
+        .jh-title {
+          font-family: 'DM Serif Display', Georgia, serif;
+          font-size: clamp(32px, 5vw, 48px);
+          line-height: 1.1; letter-spacing: -1px; margin: 0 0 8px;
+        }
+        .jh-sub {
+          font-size: 16px; color: #6b6b6b; margin: 0 0 32px;
+          line-height: 1.5;
+        }
+
+        /* Filters */
+        .jf-container {
+          background: #fff; border: 1px solid #e4e4e4;
+          border-radius: 24px; padding: 24px; margin-bottom: 40px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+        .jf-search-row {
+          position: relative; margin-bottom: 16px;
+        }
+        .jf-icon {
+          position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+          color: #a3a3a3;
+        }
+        .jf-input-main {
+          width: 100%; background: #f9f9f9; border: 1px solid #e4e4e4;
+          border-radius: 16px; padding: 14px 16px 14px 44px;
+          font-family: 'DM Sans', sans-serif; font-size: 15px; color: #0a0a0a;
+          outline: none; transition: all 0.2s;
+        }
+        .jf-input-main:focus { border-color: #0a0a0a; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
+        .jf-input-main::placeholder { color: #a3a3a3; }
+        
+        .jf-spin { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #0a0a0a; }
+
+        .jf-filters-row {
+          display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px;
+        }
+        @media (max-width: 640px) {
+          .jf-filters-row { grid-template-columns: 1fr; }
+        }
+        .jf-input-sub {
+          background: #f9f9f9; border: 1px solid #e4e4e4;
+          border-radius: 12px; padding: 10px 14px;
+          font-family: 'DM Sans', sans-serif; font-size: 14px; color: #0a0a0a;
+          outline: none; transition: all 0.2s; width: 100%;
+        }
+        .jf-input-sub:focus { border-color: #0a0a0a; background: #fff; }
+        .jf-clear {
+          background: #fff; border: 1px solid #e4e4e4; color: #6b6b6b;
+          font-size: 14px; font-weight: 500; padding: 10px 20px;
+          border-radius: 12px; cursor: pointer; transition: all 0.2s;
+        }
+        .jf-clear:hover { background: #f3f3f3; color: #0a0a0a; }
+
+        /* Job Grid */
+        .jg-grid {
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
+        }
+        
+        .jc-card {
+          background: #fff; border: 1px solid #e4e4e4; border-radius: 20px;
+          padding: 24px; transition: all 0.25s ease;
+          display: flex; flex-direction: column; cursor: pointer;
+          position: relative; overflow: hidden;
+        }
+        .jc-card:hover {
+          border-color: #0a0a0a; transform: translateY(-3px);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+        }
+
+        .jc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .jc-title { font-size: 18px; font-weight: 700; color: #0a0a0a; line-height: 1.3; margin: 0 0 4px; }
+        .jc-company { font-size: 14px; color: #6b6b6b; font-weight: 500; display: flex; align-items: center; gap: 6px; margin: 0; }
+        .jc-source { display: inline-flex; align-items: center; gap: 4px; color: #a3a3a3; font-size: 12px; }
+
+        .jc-save-btn {
+          background: none; border: none; cursor: pointer; padding: 4px; margin: -4px;
+          color: #a3a3a3; transition: all 0.2s; border-radius: 50%;
+        }
+        .jc-save-btn:hover { background: #f3f3f3; color: #0a0a0a; }
+        .jc-save-btn.saved { color: #0a0a0a; }
+        .jc-save-btn.saved svg { fill: #0a0a0a; }
+
+        .jc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .jc-pill {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 500;
+          background: #f9f9f9; border: 1px solid #e4e4e4; color: #3a3a3a;
+        }
+
+        .jc-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; flex: 1; }
+        .jc-skill {
+          font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+          padding: 4px 8px; background: #fff; border: 1px solid #e4e4e4; border-radius: 6px; color: #6b6b6b;
+        }
+
+        .jc-btn {
+          width: 100%; background: #0a0a0a; color: #fafafa; border: none;
+          padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 600;
+          cursor: pointer; transition: all 0.2s; text-align: center; font-family: 'DM Sans', sans-serif;
+        }
+        .jc-card:hover .jc-btn { background: #222; }
+
+        /* Loading / Error / Empty */
+        .js-empty {
+          text-align: center; padding: 60px 20px; background: #fff; border: 1px dashed #c4c4c4;
+          border-radius: 24px; margin-top: 20px;
+        }
+        .js-empty svg { color: #a3a3a3; margin: 0 auto 16px; }
+        .js-empty h3 { font-size: 20px; font-weight: 600; color: #0a0a0a; margin: 0 0 8px; }
+        .js-empty p { font-size: 15px; color: #6b6b6b; margin: 0; }
+
+        .js-load-more {
+          display: flex; justify-content: center; margin-top: 40px;
+        }
+        .js-lm-btn {
+          background: #fff; border: 1px solid #0a0a0a; color: #0a0a0a;
+          padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600;
+          cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .js-lm-btn:hover:not(:disabled) { background: #0a0a0a; color: #fafafa; }
+        .js-lm-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #e4e4e4; color: #a3a3a3; }
+        
+        .js-loading-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .js-skeleton {
+          background: #fff; border: 1px solid #e4e4e4; border-radius: 20px; padding: 24px;
+          animation: pulse 1.5s infinite ease-in-out;
+        }
+        .js-sk-bar { background: #f0f0f0; border-radius: 4px; margin-bottom: 12px; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+      `}</style>
+
+      <div className="jobs-page">
+        {/* Header */}
+        <div className="jh-pill">
+          <Briefcase size={14} /> AI Job Aggregator
         </div>
+        <h1 className="jh-title">Discover Opportunities</h1>
+        <p className="jh-sub">
+          {loading 
+            ? 'Searching live job data...' 
+            : `Showing ${animatedTotal.toLocaleString()}${!totalJobs || totalJobs % LIMIT === 0 ? '+' : ''} open roles matching your criteria.`
+          }
+        </p>
 
-        {/* ── SEARCH & FILTERS TOOLBAR ────────────────────────────────────── */}
-        <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-4 sm:p-6 mb-10 z-10 relative shadow-2xl">
-
-          {/* Main Search — wired to FAISS semantic search via ?q= */}
-          <div className="relative mb-4 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" size={18} />
+        {/* Filters */}
+        <div className="jf-container">
+          <div className="jf-search-row">
+            <Search className="jf-icon" size={18} />
             <input
               type="text"
               placeholder="Search by job title, company, or skills (AI-powered)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-gray-100 placeholder-gray-500 rounded-2xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-sm sm:text-base"
+              className="jf-input-main"
             />
-            {/* Searching indicator */}
-            {searchQuery !== debouncedSearch && (
-              <Loader2 size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 animate-spin" />
-            )}
+            {searchQuery !== debouncedSearch && <Loader2 className="jf-spin animate-spin" size={16} />}
           </div>
-
-          {/* Filters */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="jf-filters-row">
             <input
               placeholder="Location (e.g. Bangalore)"
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
-              className="bg-white/5 border border-white/10 text-gray-300 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder-gray-600"
+              className="jf-input-sub"
             />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-white/5 border border-white/10 text-gray-300 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all appearance-none"
+              className="jf-input-sub"
             >
-              <option className="bg-[#111116]">All Types</option>
-              <option className="bg-[#111116]">Full-time</option>
-              <option className="bg-[#111116]">Internship</option>
-              <option className="bg-[#111116]">Remote</option>
-              <option className="bg-[#111116]">Contract</option>
+              <option>All Types</option>
+              <option>Full-time</option>
+              <option>Internship</option>
+              <option>Remote</option>
+              <option>Contract</option>
             </select>
-            <button
-              onClick={() => { setSearchQuery(''); setFilterLocation(''); setFilterType('All Types') }}
-              className="col-span-2 lg:col-span-1 text-sm text-gray-500 hover:text-white border border-white/5 hover:border-white/10 bg-white/[0.02] hover:bg-white/5 rounded-xl px-4 py-2.5 transition-all"
-            >
+            <button onClick={() => { setSearchQuery(''); setFilterLocation(''); setFilterType('All Types') }} className="jf-clear">
               Clear Filters
             </button>
           </div>
         </div>
 
-        {/* ── LOADING STATE ───────────────────────────────────────────────── */}
+        {/* Loading State */}
         {loading && (
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="js-loading-grid">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-[#111116]/80 border border-white/5 rounded-3xl p-6 animate-pulse">
-                <div className="h-5 bg-white/5 rounded-lg w-2/3 mb-3" />
-                <div className="h-3 bg-white/5 rounded w-1/3 mb-6" />
-                <div className="flex gap-2 mb-5">
-                  <div className="h-6 bg-white/5 rounded-md w-20" />
-                  <div className="h-6 bg-white/5 rounded-md w-24" />
-                  <div className="h-6 bg-white/5 rounded-md w-16" />
+              <div key={i} className="js-skeleton">
+                <div className="js-sk-bar" style={{ width: '70%', height: '24px', marginBottom: '16px' }} />
+                <div className="js-sk-bar" style={{ width: '40%', height: '16px', marginBottom: '24px' }} />
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                  <div className="js-sk-bar" style={{ width: '80px', height: '24px' }} />
+                  <div className="js-sk-bar" style={{ width: '100px', height: '24px' }} />
                 </div>
-                <div className="flex gap-2 mb-6">
-                  <div className="h-5 bg-white/5 rounded-md w-12" />
-                  <div className="h-5 bg-white/5 rounded-md w-16" />
-                  <div className="h-5 bg-white/5 rounded-md w-10" />
-                </div>
-                <div className="h-10 bg-white/5 rounded-xl w-full" />
+                <div className="js-sk-bar" style={{ width: '100%', height: '44px', marginTop: 'auto' }} />
               </div>
             ))}
           </div>
         )}
 
-        {/* ── ERROR STATE ─────────────────────────────────────────────────── */}
+        {/* Error State */}
         {error && !loading && (
-          <div className="text-center py-16 px-4 bg-rose-500/5 border border-rose-500/20 rounded-3xl z-10 relative">
-            <AlertCircle size={40} className="text-rose-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">Something went wrong</h3>
-            <p className="text-gray-400 font-light mb-6">{error}</p>
-            <button
-              onClick={() => loadJobs(1, true)}
-              className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-xl transition-all"
-            >
-              Try Again
-            </button>
+          <div className="js-empty" style={{ borderColor: '#fecaca', background: '#fef2f2' }}>
+            <AlertCircle size={40} color="#ef4444" />
+            <h3 style={{ color: '#ef4444' }}>Something went wrong</h3>
+            <p>{error}</p>
+            <button onClick={() => loadJobs(1, true)} className="js-lm-btn" style={{ marginTop: '16px' }}>Try Again</button>
           </div>
         )}
 
-        {/* ── JOB GRID ────────────────────────────────────────────────────── */}
+        {/* Grid */}
         {!loading && !error && (
           <>
-            <div className="grid md:grid-cols-2 gap-5 z-10 relative">
+            <div className="jg-grid">
               {jobs.map(job => (
-                <div
-                  key={job.id}
-                  className="group bg-[#111116]/80 backdrop-blur-xl border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/5 flex flex-col relative overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/jobs/${job.id}`)}
-                >
-                  {/* Hover gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                  <div className="relative z-10 flex-1 flex flex-col">
-                    {/* Header */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1 min-w-0 pr-2">
-                        <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug group-hover:text-blue-400 transition-colors truncate">
-                          {job.title}
-                        </h2>
-                        <p className="text-gray-400 text-sm font-medium mt-1 flex items-center gap-1.5">
-                          {job.company}
-                          {job.source && (
-                            <>
-                              <span className="w-1 h-1 rounded-full bg-gray-600" />
-                              <span className="flex items-center gap-1"><Globe size={12}/> {job.source}</span>
-                            </>
-                          )}
-                        </p>
-                      </div>
-
-                      {/* Bookmark Button */}
-                      <button
-                        onClick={(e) => toggleSave(e, job.id)}
-                        disabled={savingId === job.id}
-                        className="p-2 -mr-2 -mt-2 rounded-full hover:bg-white/5 transition-colors flex-shrink-0"
-                      >
-                        {savingId === job.id
-                          ? <Loader2 size={20} className="text-blue-400 animate-spin" />
-                          : <Bookmark
-                              size={20}
-                              className={`transition-colors ${
-                                savedMap[job.id]
-                                  ? 'text-blue-400 fill-blue-400'
-                                  : 'text-gray-500 hover:text-gray-300'
-                              }`}
-                            />
-                        }
-                      </button>
-                    </div>
-
-                    {/* Meta Pills */}
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {job.location && (
-                        <div className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-gray-300">
-                          <MapPin size={12} className="text-gray-500" /> {job.location}
-                        </div>
-                      )}
-                      {job.salary && (
-                        <div className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/10 text-emerald-400">
-                          <DollarSign size={12} /> {job.salary}
-                        </div>
-                      )}
-                      {job.experience && (
-                        <div className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-gray-300">
-                          <Clock size={12} className="text-gray-500" /> {job.experience}
-                        </div>
-                      )}
-                      {job.type && (
-                        <div className="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/10 text-indigo-400">
-                          {job.type}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Skills Tags */}
-                    {job.skills?.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-6 flex-1">
-                        {job.skills.slice(0, 5).map(skill => (
-                          <span
-                            key={skill}
-                            className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 bg-white/5 border border-white/10 rounded-md text-gray-400"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                        {job.skills.length > 5 && (
-                          <span className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 text-gray-600">
-                            +{job.skills.length - 5} more
+                <div key={job.id} className="jc-card" onClick={() => navigate(`/jobs/${job.id}`)}>
+                  
+                  <div className="jc-header">
+                    <div>
+                      <h2 className="jc-title">{job.title}</h2>
+                      <p className="jc-company">
+                        {job.company}
+                        {job.source && (
+                          <span className="jc-source">
+                            <span>•</span> <Globe size={10} /> {job.source}
                           </span>
                         )}
-                      </div>
-                    )}
-
-                    {/* CTA */}
+                      </p>
+                    </div>
+                    
                     <button
-                      onClick={(e) => { e.stopPropagation(); navigate(`/jobs/${job.id}`) }}
-                      className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-semibold py-3 rounded-xl transition-all group-hover:border-blue-500/30 mt-auto"
+                      onClick={(e) => toggleSave(e, job.id)}
+                      disabled={savingId === job.id}
+                      className={`jc-save-btn ${savedMap[job.id] ? 'saved' : ''}`}
                     >
-                      View Full Details
+                      {savingId === job.id ? <Loader2 size={18} className="animate-spin" /> : <Bookmark size={18} />}
                     </button>
                   </div>
+
+                  <div className="jc-pills">
+                    {job.location && <div className="jc-pill"><MapPin size={12} /> {job.location}</div>}
+                    {job.salary && <div className="jc-pill" style={{ color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}><DollarSign size={12} /> {job.salary}</div>}
+                    {job.experience && <div className="jc-pill"><Clock size={12} /> {job.experience}</div>}
+                    {job.type && <div className="jc-pill"><Briefcase size={12} /> {job.type}</div>}
+                  </div>
+
+                  {job.skills?.length > 0 && (
+                    <div className="jc-skills">
+                      {job.skills.slice(0, 5).map(skill => (
+                        <span key={skill} className="jc-skill">{skill}</span>
+                      ))}
+                      {job.skills.length > 5 && (
+                        <span className="jc-skill" style={{ background: 'transparent', border: 'none' }}>
+                          +{job.skills.length - 5}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <button className="jc-btn">View Full Details</button>
                 </div>
               ))}
             </div>
 
-            {/* ── LOAD MORE ─────────────────────────────────────────────── */}
             {hasMore && jobs.length > 0 && (
-              <div className="flex justify-center mt-10">
-                <button
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="flex items-center gap-2 px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-semibold rounded-2xl transition-all disabled:opacity-50"
-                >
-                  {loadingMore
-                    ? <><Loader2 size={16} className="animate-spin" /> Loading...</>
-                    : <><ChevronDown size={16} /> Load More Jobs</>
-                  }
+              <div className="js-load-more">
+                <button onClick={loadMore} disabled={loadingMore} className="js-lm-btn">
+                  {loadingMore ? (
+                    <><Loader2 size={16} className="animate-spin" /> Loading...</>
+                  ) : paginationError ? (
+                    'Rate Limit Hit • Try Again'
+                  ) : (
+                    <><ChevronDown size={16} /> Load More Jobs</>
+                  )}
                 </button>
               </div>
             )}
 
-            {/* ── EMPTY STATE ───────────────────────────────────────────── */}
             {jobs.length === 0 && (
-              <div className="text-center py-20 px-4 bg-white/[0.02] border border-dashed border-white/10 rounded-3xl mt-6 z-10 relative">
-                <Search size={40} className="text-gray-700 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">No jobs found</h3>
-                <p className="text-gray-500 font-light">
-                  Try different search terms or clear your filters.
-                </p>
+              <div className="js-empty">
+                <Search size={40} />
+                <h3>No jobs found</h3>
+                <p>Try different search terms or clear your filters.</p>
               </div>
             )}
           </>
         )}
-
       </div>
     </Layout>
   )

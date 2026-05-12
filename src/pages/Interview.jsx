@@ -32,17 +32,17 @@ const ROLE_SUGGESTIONS = [
 
 // ── Color helpers ─────────────────────────────────────────────────────────────
 const modeActive = {
-  hr:        'bg-blue-500/10 border-blue-500/40 text-blue-400 shadow-[0_0_24px_rgba(59,130,246,0.15)]',
-  technical: 'bg-purple-500/10 border-purple-500/40 text-purple-400 shadow-[0_0_24px_rgba(168,85,247,0.15)]',
-  mock:      'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-[0_0_24px_rgba(16,185,129,0.15)]',
-  stress:    'bg-rose-500/10 border-rose-500/40 text-rose-400 shadow-[0_0_24px_rgba(244,63,94,0.15)]',
+  hr:        'bg-blue-50 border-blue-200 text-blue-700 shadow-sm',
+  technical: 'bg-purple-50 border-purple-200 text-purple-700 shadow-sm',
+  mock:      'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm',
+  stress:    'bg-rose-50 border-rose-200 text-rose-700 shadow-sm',
 }
 const levelActive = {
-  emerald: 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400',
-  amber:   'bg-amber-500/10 border-amber-500/40 text-amber-400',
-  rose:    'bg-rose-500/10 border-rose-500/40 text-rose-400',
+  emerald: 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm',
+  amber:   'bg-amber-50 border-amber-200 text-amber-700 shadow-sm',
+  rose:    'bg-rose-50 border-rose-200 text-rose-700 shadow-sm',
 }
-const scoreColor = (s) => s >= 80 ? 'text-emerald-400' : s >= 60 ? 'text-amber-400' : 'text-rose-400'
+const scoreColor = (s) => s >= 80 ? 'text-emerald-600' : s >= 60 ? 'text-amber-600' : 'text-rose-600'
 const scoreBar   = (s) => s >= 80 ? 'bg-emerald-500' : s >= 60 ? 'bg-amber-500' : 'bg-rose-500'
 
 // ── ScoreBar component ────────────────────────────────────────────────────────
@@ -50,10 +50,10 @@ function ScoreBar({ label, value }) {
   return (
     <div>
       <div className="flex justify-between text-xs mb-1">
-        <span className="text-gray-400">{label}</span>
+        <span className="text-[#6b6b6b]">{label}</span>
         <span className={scoreColor(value)}>{value}</span>
       </div>
-      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden shadow-inner">
         <div
           className={`h-full rounded-full transition-all duration-700 ${scoreBar(value)}`}
           style={{ width: `${value}%` }}
@@ -274,31 +274,36 @@ export default function Interview() {
   // ─────────────────────────────────────────────────────────────────────────
   if (view === 'setup') return (
     <Layout>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
+        .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }
+        .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }
+      `}</style>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-16 relative font-sans">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-purple-600/8 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-purple-50/80 blur-[100px] rounded-full pointer-events-none" />
 
         {/* Header */}
         <div className="pt-6 pb-10 relative z-10 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-purple-400 mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-purple-600 mb-3">
             <Mic size={13} /> AI Voice Interviewer
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Interview Practice</h1>
-          <p className="text-gray-400 text-sm mt-2 max-w-xl">Speak your answers aloud. Get scored on content, grammar, pace, and confidence.</p>
+          <h1 className="text-3xl sm:text-4xl font-serif text-[#0a0a0a] tracking-tight">Interview Practice</h1>
+          <p className="text-[#4a4a4a] text-base font-medium max-w-xl mt-1">Speak your answers aloud. Get scored on content, grammar, pace, and confidence.</p>
         </div>
 
         <div className="space-y-5 relative z-10">
 
           {/* Role input */}
-          <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-              <Target size={16} className="text-gray-400" /> Target Role
+          <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6">
+            <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 flex items-center gap-2">
+              <Target size={16} className="text-[#6b6b6b]" /> Target Role
             </h3>
             <input
               type="text"
               value={role}
               onChange={e => setRole(e.target.value)}
               placeholder="e.g. Data Analyst, Software Engineer..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500/50 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[#0a0a0a] placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500/50 transition-colors"
             />
             <div className="flex flex-wrap gap-2 mt-3">
               {ROLE_SUGGESTIONS.map(r => (
@@ -307,8 +312,8 @@ export default function Interview() {
                   onClick={() => setRole(r)}
                   className={`px-3 py-1 rounded-lg text-xs border transition-all ${
                     role === r
-                      ? 'bg-purple-500/20 border-purple-500/40 text-purple-300'
-                      : 'bg-white/3 border-white/8 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                      ? 'bg-[#0a0a0a] border border-[#0a0a0a] text-white shadow-sm font-medium'
+                      : 'bg-white/3 border-white/8 text-[#8b8b8b] hover:text-[#3a3a3a] hover:border-white/20'
                   }`}
                 >{r}</button>
               ))}
@@ -316,9 +321,9 @@ export default function Interview() {
           </div>
 
           {/* Mode selection */}
-          <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-              <Sparkles size={16} className="text-gray-400" /> Interview Mode
+          <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6">
+            <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 flex items-center gap-2">
+              <Sparkles size={16} className="text-[#6b6b6b]" /> Interview Mode
             </h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {MODES.map(({ id, label, icon: Icon, desc }) => (
@@ -328,7 +333,7 @@ export default function Interview() {
                   className={`flex flex-col items-center text-center gap-2.5 p-5 rounded-xl border transition-all duration-200 ${
                     mode === id
                       ? `scale-[1.03] ${modeActive[id]}`
-                      : 'bg-white/[0.02] border-white/5 text-gray-400 hover:border-white/15 hover:bg-white/5 hover:text-gray-200'
+                      : 'bg-white/[0.02] border-white/5 text-[#6b6b6b] hover:border-white/15 hover:bg-white/5 hover:text-gray-200'
                   }`}
                 >
                   <Icon size={22} />
@@ -340,9 +345,9 @@ export default function Interview() {
           </div>
 
           {/* Difficulty */}
-          <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-              <Zap size={16} className="text-gray-400" /> Difficulty
+          <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6">
+            <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 flex items-center gap-2">
+              <Zap size={16} className="text-[#6b6b6b]" /> Difficulty
             </h3>
             <div className="flex gap-3">
               {LEVELS.map(({ id, label, color }) => (
@@ -352,7 +357,7 @@ export default function Interview() {
                   className={`flex-1 py-3 rounded-xl font-semibold text-sm border transition-all duration-200 ${
                     level === id
                       ? `scale-[1.03] ${levelActive[color]}`
-                      : 'bg-white/5 border-transparent text-gray-400 hover:bg-white/10 hover:text-white'
+                      : 'bg-white/5 border-transparent text-[#6b6b6b] hover:bg-white/10 hover:text-[#0a0a0a]'
                   }`}
                 >{label}</button>
               ))}
@@ -364,7 +369,7 @@ export default function Interview() {
             <button
               disabled={!mode || !level || !role.trim() || loading}
               onClick={handleStart}
-              className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-white/5 disabled:to-white/5 disabled:border disabled:border-white/10 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-500/20 disabled:shadow-none text-base"
+              className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-white/5 disabled:to-white/5 disabled:border disabled:border-white/10 disabled:text-[#8b8b8b] disabled:cursor-not-allowed text-[#0a0a0a] font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-500/20 disabled:shadow-none text-base"
             >
               {loading
                 ? <><Loader2 size={18} className="animate-spin" /> Generating questions...</>
@@ -372,7 +377,7 @@ export default function Interview() {
               }
             </button>
             {mode && level && role && (
-              <p className="text-gray-500 text-xs text-center mt-3">
+              <p className="text-[#8b8b8b] text-xs text-center mt-3">
                 {MODES.find(m => m.id === mode)?.label} · {level.charAt(0).toUpperCase() + level.slice(1)} · {role}
               </p>
             )}
@@ -391,18 +396,23 @@ export default function Interview() {
 
     return (
       <Layout>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
+          .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }
+          .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }
+        `}</style>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-16 relative font-sans">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[300px] bg-blue-600/8 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[300px] bg-blue-50/80 blur-[100px] rounded-full pointer-events-none" />
 
           {/* Progress bar */}
           <div className="pt-6 pb-6 relative z-10">
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+            <div className="flex items-center justify-between text-xs text-[#8b8b8b] mb-2">
               <span>Question {qIndex + 1} of {questions.length}</span>
-              <button onClick={restart} className="flex items-center gap-1 hover:text-gray-300 transition-colors">
+              <button onClick={restart} className="flex items-center gap-1 hover:text-[#3a3a3a] transition-colors">
                 <RotateCcw size={12} /> Restart
               </button>
             </div>
-            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1 bg-[#f0f0f0] rounded-full overflow-hidden shadow-inner">
               <div
                 className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
@@ -411,16 +421,16 @@ export default function Interview() {
           </div>
 
           {/* Question card */}
-          <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/8 rounded-2xl p-6 sm:p-8 mb-5 relative z-10">
+          <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-2xl p-6 sm:p-8 mb-5 relative z-10">
             <div className="flex items-start gap-3 mb-2">
-              <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                <Brain size={14} className="text-purple-400" />
+              <div className="w-7 h-7 rounded-lg bg-purple-50 border border-purple-200 shadow-sm flex items-center justify-center shrink-0 mt-0.5">
+                <Brain size={14} className="text-purple-600" />
               </div>
-              <p className="text-white text-base sm:text-lg font-medium leading-relaxed">{questions[qIndex]}</p>
+              <p className="text-[#0a0a0a] text-base sm:text-lg font-medium leading-relaxed">{questions[qIndex]}</p>
             </div>
             <button
               onClick={() => speakQuestion(questions[qIndex])}
-              className="mt-4 flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-400 transition-colors"
+              className="mt-4 flex items-center gap-1.5 text-xs text-[#8b8b8b] hover:text-purple-600 transition-colors"
             >
               <Volume2 size={13} /> Hear question again
             </button>
@@ -428,7 +438,7 @@ export default function Interview() {
 
           {/* Recording area */}
           {!answered && (
-            <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 mb-5 relative z-10">
+            <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 mb-5 relative z-10">
               <div className="flex flex-col items-center gap-5">
 
                 {/* Mic button */}
@@ -437,19 +447,19 @@ export default function Interview() {
                   disabled={evaluating}
                   className={`w-20 h-20 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                     isListening
-                      ? 'bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.3)] animate-pulse'
-                      : 'bg-white/5 border-white/20 text-gray-300 hover:bg-white/10 hover:border-white/40'
+                      ? 'bg-rose-500/20 border-rose-500 text-rose-600 shadow-[0_0_30px_rgba(244,63,94,0.3)] animate-pulse'
+                      : 'bg-white/5 border-white/20 text-[#3a3a3a] hover:bg-white/10 hover:border-white/40'
                   } disabled:opacity-40 disabled:cursor-not-allowed`}
                 >
                   {evaluating
-                    ? <Loader2 size={28} className="animate-spin text-purple-400" />
+                    ? <Loader2 size={28} className="animate-spin text-purple-600" />
                     : isListening
                       ? <MicOff size={28} />
                       : <Mic size={28} />
                   }
                 </button>
 
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-[#6b6b6b]">
                   {evaluating
                     ? 'Evaluating your answer...'
                     : isListening
@@ -460,9 +470,9 @@ export default function Interview() {
 
                 {/* Live transcript */}
                 {(transcript || liveText) && (
-                  <div className="w-full bg-white/3 border border-white/8 rounded-xl p-4 text-sm">
-                    <p className="text-gray-300">{transcript}</p>
-                    {liveText && <p className="text-gray-500 italic">{liveText}</p>}
+                  <div className="w-full bg-[#fcfcfc] border border-[#e4e4e4] rounded-2xl p-4 text-sm shadow-inner">
+                    <p className="text-[#3a3a3a]">{transcript}</p>
+                    {liveText && <p className="text-[#8b8b8b] italic">{liveText}</p>}
                   </div>
                 )}
 
@@ -472,17 +482,17 @@ export default function Interview() {
 
           {/* Evaluation result */}
           {evaluation && answered && (
-            <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 mb-5 relative z-10 space-y-5">
+            <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 mb-5 relative z-10 space-y-5">
 
               {/* Score header */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-xs mb-1">Overall Score</p>
+                  <p className="text-[#6b6b6b] text-xs mb-1">Overall Score</p>
                   <div className="flex items-end gap-2">
                     <span className={`text-4xl font-bold ${scoreColor(evaluation.overall_score)}`}>
                       {evaluation.overall_score}
                     </span>
-                    <span className="text-gray-500 text-sm mb-1">/ 100</span>
+                    <span className="text-[#8b8b8b] text-sm mb-1">/ 100</span>
                     <span className={`text-lg font-bold mb-0.5 ${scoreColor(evaluation.overall_score)}`}>
                       · {evaluation.grade}
                     </span>
@@ -490,10 +500,10 @@ export default function Interview() {
                 </div>
                 <div className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
                   evaluation.verdict === 'Strong'
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600'
                     : evaluation.verdict === 'Acceptable'
-                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                      : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-600'
+                      : 'bg-rose-500/10 border-rose-500/30 text-rose-600'
                 }`}>{evaluation.verdict}</div>
               </div>
 
@@ -508,26 +518,26 @@ export default function Interview() {
               </div>
 
               {/* Feedback */}
-              <div className="bg-white/3 border border-white/8 rounded-xl p-4 text-sm text-gray-300 leading-relaxed">
+              <div className="bg-[#fcfcfc] border border-[#e4e4e4] rounded-2xl p-4 text-sm shadow-inner text-[#3a3a3a] leading-relaxed">
                 {evaluation.feedback}
               </div>
 
               {/* Pace + filler */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="bg-white/3 border border-white/8 rounded-xl p-3">
-                  <p className="text-gray-500 mb-1 flex items-center gap-1"><Clock size={11} /> Pace</p>
-                  <p className="text-gray-300">{evaluation.pace_feedback}</p>
+                  <p className="text-[#8b8b8b] mb-1 flex items-center gap-1"><Clock size={11} /> Pace</p>
+                  <p className="text-[#3a3a3a]">{evaluation.pace_feedback}</p>
                 </div>
                 <div className="bg-white/3 border border-white/8 rounded-xl p-3">
-                  <p className="text-gray-500 mb-1 flex items-center gap-1"><Mic size={11} /> Fillers</p>
-                  <p className="text-gray-300">{evaluation.filler_feedback}</p>
+                  <p className="text-[#8b8b8b] mb-1 flex items-center gap-1"><Mic size={11} /> Fillers</p>
+                  <p className="text-[#3a3a3a]">{evaluation.filler_feedback}</p>
                 </div>
               </div>
 
               {/* Suggested answer */}
               <div>
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-1"><CheckCircle size={11} /> Model Answer</p>
-                <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4 text-sm text-gray-300 leading-relaxed">
+                <p className="text-xs text-[#8b8b8b] mb-2 flex items-center gap-1"><CheckCircle size={11} /> Model Answer</p>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl shadow-sm p-4 text-sm text-[#3a3a3a] leading-relaxed">
                   {evaluation.suggested_answer}
                 </div>
               </div>
@@ -535,7 +545,7 @@ export default function Interview() {
               {/* Next / Finish */}
               <button
                 onClick={nextQuestion}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-3 rounded-xl transition-all text-sm"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-[#0a0a0a] font-bold text-lg tracking-tight py-3 rounded-xl transition-all text-sm"
               >
                 {qIndex + 1 >= questions.length
                   ? <><Trophy size={15} /> Finish & See Report</>
@@ -566,26 +576,31 @@ export default function Interview() {
 
     return (
       <Layout>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
+          .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }
+          .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }
+        `}</style>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-16 relative font-sans">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[300px] bg-emerald-600/8 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[300px] bg-emerald-50/80 blur-[100px] rounded-full pointer-events-none" />
 
           {/* Header */}
           <div className="pt-6 pb-8 relative z-10 text-center">
-            <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trophy size={28} className="text-emerald-400" />
+            <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trophy size={28} className="text-emerald-600" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-1">Interview Complete</h1>
-            <p className="text-gray-400 text-sm">{role} · {MODES.find(m => m.id === mode)?.label} · {level}</p>
+            <h1 className="text-3xl font-serif text-[#0a0a0a] mb-1">Interview Complete</h1>
+            <p className="text-[#6b6b6b] text-sm">{role} · {MODES.find(m => m.id === mode)?.label} · {level}</p>
           </div>
 
           <div className="space-y-4 relative z-10">
 
             {/* Overall score card */}
-            <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 text-center">
-              <p className="text-gray-400 text-xs mb-2">Final Score</p>
+            <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 text-center">
+              <p className="text-[#6b6b6b] text-xs mb-2">Final Score</p>
               <div className={`text-6xl font-bold mb-1 ${scoreColor(avgScore)}`}>{avgScore}</div>
-              <div className="text-gray-400 text-sm">out of 100 · Grade <span className="text-white font-semibold">{avgGrade}</span></div>
-              <div className="mt-4 h-2 bg-white/5 rounded-full overflow-hidden">
+              <div className="text-[#6b6b6b] text-sm">out of 100 · Grade <span className="text-[#0a0a0a] font-bold text-lg tracking-tight">{avgGrade}</span></div>
+              <div className="mt-4 h-2 bg-[#f0f0f0] rounded-full overflow-hidden shadow-inner">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ${scoreBar(avgScore)}`}
                   style={{ width: `${avgScore}%` }}
@@ -594,9 +609,9 @@ export default function Interview() {
             </div>
 
             {/* Average metrics */}
-            <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
-              <h3 className="text-white font-semibold mb-4 flex items-center gap-2 text-sm">
-                <BarChart2 size={15} className="text-gray-400" /> Average Scores
+            <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6">
+              <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 flex items-center gap-2 text-sm">
+                <BarChart2 size={15} className="text-[#6b6b6b]" /> Average Scores
               </h3>
               <div className="space-y-3">
                 <ScoreBar label="Content Accuracy" value={metricAvg('content_score')} />
@@ -610,15 +625,15 @@ export default function Interview() {
 
             {/* Per-question breakdown */}
             {allEvals.length > 0 && (
-              <div className="bg-[#111116]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-4 text-sm flex items-center gap-2">
-                  <TrendingUp size={15} className="text-gray-400" /> Question Breakdown
+              <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6">
+                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 text-sm flex items-center gap-2">
+                  <TrendingUp size={15} className="text-[#6b6b6b]" /> Question Breakdown
                 </h3>
                 <div className="space-y-3">
                   {allEvals.map((ev, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <span className="text-gray-500 text-xs w-6 shrink-0">Q{i + 1}</span>
-                      <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <span className="text-[#8b8b8b] text-xs w-6 shrink-0">Q{i + 1}</span>
+                      <div className="flex-1 h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden shadow-inner">
                         <div
                           className={`h-full rounded-full ${scoreBar(ev.overall_score)}`}
                           style={{ width: `${ev.overall_score}%` }}
@@ -628,9 +643,9 @@ export default function Interview() {
                         {ev.overall_score}
                       </span>
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        ev.verdict === 'Strong' ? 'bg-emerald-500/10 text-emerald-400' :
-                        ev.verdict === 'Acceptable' ? 'bg-amber-500/10 text-amber-400' :
-                        'bg-rose-500/10 text-rose-400'
+                        ev.verdict === 'Strong' ? 'bg-emerald-500/10 text-emerald-600' :
+                        ev.verdict === 'Acceptable' ? 'bg-amber-500/10 text-amber-600' :
+                        'bg-rose-500/10 text-rose-600'
                       }`}>{ev.verdict}</span>
                     </div>
                   ))}
@@ -641,7 +656,7 @@ export default function Interview() {
             {/* Restart */}
             <button
               onClick={restart}
-              className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-3.5 rounded-xl transition-all text-sm"
+              className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-[#0a0a0a] font-bold text-lg tracking-tight py-3.5 rounded-xl transition-all text-sm"
             >
               <RotateCcw size={15} /> Start New Interview
             </button>

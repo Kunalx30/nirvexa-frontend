@@ -1,61 +1,276 @@
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Compass, Sparkles } from 'lucide-react'
+import { ArrowRight, Shield } from 'lucide-react'
+import CursorEffect from '../components/CursorEffect'
 
 export default function NotFound() {
   return (
-    <div className="min-h-[100dvh] bg-[#0a0a0c] flex flex-col items-center justify-center text-center px-4 relative overflow-hidden font-sans selection:bg-indigo-500/30">
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
-      {/* Ambient Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-1/4 right-1/4 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none" />
+        .nf-page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #fafafa;
+          font-family: 'DM Sans', system-ui, sans-serif;
+          padding: 40px 20px;
+          position: relative;
+          overflow: hidden;
+          -webkit-font-smoothing: antialiased;
+        }
 
-      <div className="relative z-10 flex flex-col items-center max-w-lg mx-auto w-full">
-        
-        {/* Status Pill */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-400 mb-6 backdrop-blur-sm">
-          <Compass size={14} className="text-blue-400" />
-          <span>Error 404</span>
-        </div>
+        .nf-card {
+          width: 100%;
+          max-width: 460px;
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
 
-        {/* Massive 404 Text */}
-        <h1 className="text-[7rem] sm:text-[10rem] font-black leading-none tracking-tighter bg-gradient-to-br from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl select-none mb-4 sm:mb-2">
-          404
-        </h1>
+        /* Logo */
+        .nf-logo {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          justify-content: center;
+          margin-bottom: 28px;
+          text-decoration: none;
+        }
+        .nf-lsq {
+          width: 32px;
+          height: 32px;
+          background: #0a0a0a;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: #fafafa;
+          letter-spacing: -.5px;
+        }
+        .nf-lname {
+          font-size: 18px;
+          font-weight: 600;
+          color: #0a0a0a;
+          letter-spacing: -.4px;
+        }
 
-        {/* Subtitle */}
-        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-3">
-          Lost your way?
-        </h2>
+        /* 404 number */
+        .nf-code {
+          font-family: 'DM Serif Display', Georgia, serif;
+          font-size: clamp(96px, 22vw, 140px);
+          font-weight: 400;
+          letter-spacing: -6px;
+          color: #0a0a0a;
+          line-height: 1;
+          margin-bottom: 0px;
+          text-align: center;
+          user-select: none;
+        }
 
-        {/* Description */}
-        <p className="text-gray-400 text-base sm:text-lg font-light leading-relaxed mb-10 px-2 sm:px-4">
-          The page you’re looking for doesn’t exist or has been moved. Let’s get you back on the right career path.
-        </p>
+        /* Heading */
+        .nf-heading {
+          font-family: 'DM Serif Display', Georgia, serif;
+          font-size: clamp(26px, 5vw, 34px);
+          font-weight: 400;
+          letter-spacing: -1.5px;
+          color: #0a0a0a;
+          text-align: center;
+          line-height: 1.15;
+          margin-bottom: 10px;
+        }
+        .nf-heading em {
+          font-style: italic;
+          color: #6b6b6b;
+        }
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
-          <Link
-            to="/"
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/25 group w-full sm:w-auto text-base"
-          >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            Back to Home
+        .nf-sub {
+          font-size: 15px;
+          color: #6b6b6b;
+          text-align: center;
+          margin-bottom: 32px;
+          font-weight: 400;
+          line-height: 1.6;
+          max-width: 360px;
+        }
+
+        /* Card wrap */
+        .nf-form-wrap {
+          background: #ffffff;
+          border: 1px solid #e4e4e4;
+          border-radius: 20px;
+          padding: 28px 28px;
+          box-shadow: 0 2px 4px rgba(0,0,0,.03), 0 16px 48px rgba(0,0,0,.06);
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        /* Divider */
+        .nf-divider {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+        .nf-divider-line {
+          flex: 1;
+          height: 1px;
+          background: #e4e4e4;
+        }
+        .nf-divider-text {
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          color: #a3a3a3;
+        }
+
+        /* Buttons */
+        .nf-btn-primary {
+          width: 100%;
+          padding: 13px 24px;
+          background: #0a0a0a;
+          color: #fafafa;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
+          font-weight: 600;
+          letter-spacing: -.3px;
+          border: none;
+          border-radius: 26px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          text-decoration: none;
+          transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+        }
+        .nf-btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 28px rgba(0,0,0,.18);
+        }
+
+        .nf-btn-secondary {
+          width: 100%;
+          padding: 13px 24px;
+          background: #fafafa;
+          color: #0a0a0a;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
+          font-weight: 600;
+          letter-spacing: -.3px;
+          border: 1px solid #e4e4e4;
+          border-radius: 26px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          text-decoration: none;
+          transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s, border-color .2s;
+        }
+        .nf-btn-secondary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0,0,0,.08);
+          border-color: #c4c4c4;
+        }
+
+        /* Footer */
+        .nf-footer {
+          text-align: center;
+          margin-top: 24px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+        .nf-back {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          color: #a3a3a3;
+          text-decoration: none;
+          font-weight: 500;
+          transition: color .2s;
+        }
+        .nf-back:hover { color: #0a0a0a; }
+
+        .nf-secure {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          margin-top: 10px;
+          font-size: 11px;
+          color: #c4c4c4;
+        }
+
+        @media (max-width: 500px) {
+          .nf-form-wrap { padding: 24px 20px; border-radius: 16px; }
+          .nf-code { letter-spacing: -4px; }
+        }
+      `}</style>
+
+      <div className="nf-page">
+        <CursorEffect />
+
+        <div className="nf-card">
+
+          {/* Logo */}
+          <Link to="/" className="nf-logo">
+            <div className="nf-lsq">N</div>
+            <span className="nf-lname">Nyrvexa</span>
           </Link>
 
-          <Link
-            to="/chat"
-            className="flex items-center justify-center gap-2 bg-[#111116] hover:bg-white/5 text-white px-8 py-3.5 rounded-xl font-medium border border-white/10 transition-all w-full sm:w-auto text-base shadow-xl"
-          >
-            <Sparkles size={18} className="text-purple-400" />
-            AI Workspace
-          </Link>
-        </div>
+          {/* 404 */}
+          <div className="nf-code">404</div>
 
-        {/* Footer hint */}
-        <p className="text-gray-600 text-[10px] sm:text-xs mt-16 sm:mt-20 font-medium tracking-widest uppercase">
-          NirVexa · AI Career Platform
-        </p>
+          <h1 className="nf-heading">Page <em>not found.</em></h1>
+          <p className="nf-sub">
+            This page doesn't exist or has been moved. Let's get you back on track.
+          </p>
+
+          <div className="nf-form-wrap">
+
+            <Link to="/" className="nf-btn-primary">
+              <ArrowRight size={16} style={{ transform: 'rotate(180deg)' }} />
+              Back to Homepage
+            </Link>
+
+            <div className="nf-divider">
+              <div className="nf-divider-line" />
+              <span className="nf-divider-text">or</span>
+              <div className="nf-divider-line" />
+            </div>
+
+            <Link to="/chat" className="nf-btn-secondary">
+              Go to AI Assistant
+              <ArrowRight size={16} />
+            </Link>
+
+          </div>
+
+          {/* Bottom */}
+          <div className="nf-footer">
+            <Link to="/login" className="nf-back">
+              <ArrowRight size={14} style={{ transform: 'rotate(180deg)' }} />
+              Sign in instead
+            </Link>
+            <div className="nf-secure">
+              <Shield size={10} strokeWidth={2} />
+              Secure · Encrypted · Built in India
+            </div>
+          </div>
+
+        </div>
       </div>
-    </div>
+    </>
   )
 }
