@@ -1,7 +1,7 @@
 import Layout from '../components/layout/Layout'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
-  Bookmark, MapPin, DollarSign, Clock, ExternalLink,
+  Bookmark, MapPin, DollarSign, IndianRupee, Clock, ExternalLink,
   ArrowLeft, Sparkles, Building2, Briefcase, Loader2, AlertCircle, Globe, Shield
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -168,7 +168,7 @@ export default function JobDetail() {
                   )}
                   {job.salary && (
                     <span className="jd-pill jd-pill-green">
-                      <DollarSign size={13} strokeWidth={2} /> {job.salary}
+                      {/(₹|inr|rs|lpa)/i.test(job.salary) || job.source?.toLowerCase() === 'internshala' ? <IndianRupee size={13} strokeWidth={2} /> : <DollarSign size={13} strokeWidth={2} />} {job.salary}
                     </span>
                   )}
                   {job.experience && (
@@ -176,8 +176,8 @@ export default function JobDetail() {
                       <Clock size={13} strokeWidth={2} /> {job.experience}
                     </span>
                   )}
-                  {job.type && (
-                    <span className="jd-pill jd-pill-blue">{job.type}</span>
+                  {job.job_type && (
+                    <span className="jd-pill jd-pill-blue">{job.job_type.replace('-', ' ')}</span>
                   )}
                 </div>
 

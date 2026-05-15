@@ -1,8 +1,8 @@
 import Layout from '../components/layout/Layout'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, MapPin, Bookmark, Briefcase, DollarSign, Clock, Globe, Loader2, AlertCircle, ChevronDown } from 'lucide-react'
-import { fetchJobs, saveJob, deleteSavedJob } from '../services/jobs'
+import { Search, MapPin, Bookmark, Briefcase, DollarSign, IndianRupee, Clock, Globe, Loader2, AlertCircle, ChevronDown } from 'lucide-react'
+import { fetchJobs, saveJob, deleteSavedJob, fetchJobFilterOptions } from '../services/jobs'
 import toast from 'react-hot-toast'
 
 // Debounce helper
@@ -36,15 +36,38 @@ function useCountUp(end, duration = 1500) {
   return count
 }
 
+// Time formatting helper
+function timeAgo(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+  
+  if (diffInSeconds < 60) return 'Just now';
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) return `${diffInDays}d ago`;
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) return `${diffInMonths}mo ago`;
+  return `${Math.floor(diffInMonths / 12)}y ago`;
+}
+
 export default function Jobs() {
   const navigate = useNavigate()
 
   // ── Search & Filter State ──────────────────────────────────────────────────
-  const [searchQuery, setSearchQuery]     = useState('')
-  const [filterLocation, setFilterLocation] = useState('')
-  const [filterType, setFilterType]       = useState('All Types')
-  const debouncedSearch   = useDebounce(searchQuery, 500)
-  const debouncedLocation = useDebounce(filterLocation, 500)
+  const [searchQuery, setSearchQuery]        = useState('')
+  const [filterLocation, setFilterLocation]  = useState('')
+  const [filterCompany, setFilterCompany]    = useState('')
+  const [filterSource, setFilterSource]      = useState('all')
+  const [filterPostedWithin, setFilterPostedWithin] = useState('all')
+  const [filterType, setFilterType]          = useState('all')
+  const debouncedSearch    = useDebounce(searchQuery, 500)
+  const debouncedLocation  = useDebounce(filterLocation, 500)
+  const debouncedCompany   = useDebounce(filterCompany, 500)
 
   // ── Jobs Data State ────────────────────────────────────────────────────────
   const [jobs, setJobs]       = useState([])
@@ -62,6 +85,20 @@ export default function Jobs() {
   const [savedMap, setSavedMap] = useState({})   
   const [savingId, setSavingId] = useState(null)  
 
+  const [dynamicSources, setDynamicSources] = useState([])
+  const [dynamicTypes, setDynamicTypes] = useState([])
+
+  // ── Load Filter Options ────────────────────────────────────────────────────
+  useEffect(() => {
+    fetchJobFilterOptions()
+      .then(res => {
+        const data = res.data || {}
+        setDynamicSources(data.sources || [])
+        setDynamicTypes(data.types || [])
+      })
+      .catch(err => console.error("Could not load filter options", err))
+  }, [])
+
   // ── Load Jobs ──────────────────────────────────────────────────────────────
   const loadJobs = useCallback(async (pageNum = 1, replace = true) => {
     try {
@@ -72,9 +109,12 @@ export default function Jobs() {
         page: pageNum,
         limit: LIMIT,
       }
-      if (debouncedSearch)   params.q        = debouncedSearch
-      if (debouncedLocation) params.location = debouncedLocation
-      if (filterType !== 'All Types') params.type = filterType
+      if (debouncedSearch)   params.q             = debouncedSearch
+      if (debouncedLocation) params.location      = debouncedLocation
+      if (debouncedCompany)  params.company       = debouncedCompany
+      if (filterType !== 'all') params.type       = filterType
+      if (filterSource !== 'all') params.source   = filterSource
+      if (filterPostedWithin !== 'all') params.posted_within = filterPostedWithin
 
       const res  = await fetchJobs(params)
       const data = res.data?.data || res.data || {}
@@ -98,7 +138,7 @@ export default function Jobs() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [debouncedSearch, debouncedLocation, filterType])
+  }, [debouncedSearch, debouncedLocation, debouncedCompany, filterSource, filterType, filterPostedWithin])
 
   useEffect(() => {
     loadJobs(1, true)
@@ -193,7 +233,8 @@ export default function Jobs() {
         .jf-spin { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #0a0a0a; }
 
         .jf-filters-row {
-          display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px;
+          display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 12px;
         }
         @media (max-width: 640px) {
           .jf-filters-row { grid-template-columns: 1fr; }
@@ -214,52 +255,100 @@ export default function Jobs() {
 
         /* Job Grid */
         .jg-grid {
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;
         }
         
         .jc-card {
-          background: #fff; border: 1px solid #e4e4e4; border-radius: 20px;
-          padding: 24px; transition: all 0.25s ease;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 24px;
+          padding: 24px; 
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           display: flex; flex-direction: column; cursor: pointer;
           position: relative; overflow: hidden;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.2);
         }
         .jc-card:hover {
-          border-color: #0a0a0a; transform: translateY(-3px);
-          box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+          transform: translateY(-6px) scale(1.01);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.5);
+          border-color: rgba(0,0,0,0.1);
+        }
+        .jc-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .jc-card:hover::before {
+          opacity: 1;
         }
 
-        .jc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        .jc-title { font-size: 18px; font-weight: 700; color: #0a0a0a; line-height: 1.3; margin: 0 0 4px; }
-        .jc-company { font-size: 14px; color: #6b6b6b; font-weight: 500; display: flex; align-items: center; gap: 6px; margin: 0; }
-        .jc-source { display: inline-flex; align-items: center; gap: 4px; color: #a3a3a3; font-size: 12px; }
+        .jc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .jc-company-info { display: flex; align-items: center; gap: 16px; }
+        .jc-logo {
+          width: 48px; height: 48px; flex-shrink: 0;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+          color: #0d9488;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 22px; font-weight: 700; font-family: 'DM Serif Display', serif;
+          box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+        }
+        .jc-title { font-size: 18px; font-weight: 700; color: #111827; line-height: 1.3; margin: 0 0 4px; font-family: 'DM Sans', sans-serif;}
+        .jc-company { font-size: 14px; color: #4b5563; font-weight: 500; display: flex; align-items: center; gap: 6px; margin: 0; }
+        .jc-time { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
 
         .jc-save-btn {
-          background: none; border: none; cursor: pointer; padding: 4px; margin: -4px;
-          color: #a3a3a3; transition: all 0.2s; border-radius: 50%;
+          background: rgba(243, 244, 246, 0.8); border: none; cursor: pointer; padding: 10px;
+          color: #9ca3af; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
         }
-        .jc-save-btn:hover { background: #f3f3f3; color: #0a0a0a; }
-        .jc-save-btn.saved { color: #0a0a0a; }
-        .jc-save-btn.saved svg { fill: #0a0a0a; }
+        .jc-save-btn:hover { background: #fee2e2; color: #ef4444; transform: scale(1.1); }
+        .jc-save-btn.saved { color: #ef4444; background: #fee2e2; }
+        .jc-save-btn.saved svg { fill: #ef4444; }
+
+        .jc-summary {
+          font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 20px;
+          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
 
         .jc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .jc-pill {
-          display: inline-flex; align-items: center; gap: 4px;
-          padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 500;
-          background: #f9f9f9; border: 1px solid #e4e4e4; color: #3a3a3a;
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;
+          background: #f3f4f6; color: #374151;
+          transition: all 0.2s ease;
         }
+        .jc-pill:hover { background: #e5e7eb; }
+        .jc-pill.salary { color: #047857; background: #d1fae5; }
+        .jc-pill.type { color: #1d4ed8; background: #dbeafe; }
 
         .jc-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; flex: 1; }
         .jc-skill {
-          font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-          padding: 4px 8px; background: #fff; border: 1px solid #e4e4e4; border-radius: 6px; color: #6b6b6b;
+          font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+          padding: 6px 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; color: #6b7280;
+          transition: all 0.2s ease;
+        }
+        .jc-skill:hover { border-color: #d1d5db; color: #374151; background: #f9fafb; }
+
+        .jc-footer {
+          display: flex; justify-content: space-between; align-items: center; margin-top: auto;
+          padding-top: 16px; border-top: 1px dashed #e5e7eb;
         }
 
+        .jc-source-tag { display: inline-flex; align-items: center; gap: 6px; color: #6b7280; font-size: 13px; font-weight: 500;}
+
         .jc-btn {
-          width: 100%; background: #0a0a0a; color: #fafafa; border: none;
-          padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 600;
-          cursor: pointer; transition: all 0.2s; text-align: center; font-family: 'DM Sans', sans-serif;
+          background: #111827; color: #f9fafb; border: none;
+          padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600;
+          cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px;
         }
-        .jc-card:hover .jc-btn { background: #222; }
+        .jc-card:hover .jc-btn { background: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 
         /* Loading / Error / Empty */
         .js-empty {
@@ -323,18 +412,45 @@ export default function Jobs() {
               onChange={(e) => setFilterLocation(e.target.value)}
               className="jf-input-sub"
             />
+            <input
+              placeholder="Company"
+              value={filterCompany}
+              onChange={(e) => setFilterCompany(e.target.value)}
+              className="jf-input-sub"
+            />
+            <select
+              value={filterSource}
+              onChange={(e) => setFilterSource(e.target.value)}
+              className="jf-input-sub"
+            >
+              <option value="all">All Sources</option>
+              {dynamicSources.map(src => (
+                <option key={src} value={src}>{src.charAt(0).toUpperCase() + src.slice(1)}</option>
+              ))}
+            </select>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="jf-input-sub"
             >
-              <option>All Types</option>
-              <option>Full-time</option>
-              <option>Internship</option>
-              <option>Remote</option>
-              <option>Contract</option>
+              <option value="all">All Types</option>
+              {dynamicTypes.map(type => (
+                <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')}</option>
+              ))}
             </select>
-            <button onClick={() => { setSearchQuery(''); setFilterLocation(''); setFilterType('All Types') }} className="jf-clear">
+            <select
+              value={filterPostedWithin}
+              onChange={(e) => setFilterPostedWithin(e.target.value)}
+              className="jf-input-sub"
+            >
+              <option value="all">Any Time</option>
+              <option value="1">Past 24 hours</option>
+              <option value="3">Past 3 days</option>
+              <option value="7">Past 7 days</option>
+              <option value="14">Past 14 days</option>
+              <option value="30">Past 30 days</option>
+            </select>
+            <button onClick={() => { setSearchQuery(''); setFilterLocation(''); setFilterCompany(''); setFilterSource('all'); setFilterType('all'); setFilterPostedWithin('all'); }} className="jf-clear">
               Clear Filters
             </button>
           </div>
@@ -375,48 +491,68 @@ export default function Jobs() {
                 <div key={job.id} className="jc-card" onClick={() => navigate(`/jobs/${job.id}`)}>
                   
                   <div className="jc-header">
-                    <div>
-                      <h2 className="jc-title">{job.title}</h2>
-                      <p className="jc-company">
-                        {job.company}
-                        {job.source && (
-                          <span className="jc-source">
-                            <span>•</span> <Globe size={10} /> {job.source}
+                    <div className="jc-company-info">
+                      <div className="jc-logo">
+                        {job.company ? job.company.charAt(0).toUpperCase() : 'C'}
+                      </div>
+                      <div>
+                        <h2 className="jc-title">{job.title}</h2>
+                        <p className="jc-company">{job.company}</p>
+                        {job.posted_at && (
+                          <span className="jc-time">
+                            <Clock size={10} /> Posted {timeAgo(job.posted_at)}
                           </span>
                         )}
-                      </p>
+                      </div>
                     </div>
                     
                     <button
                       onClick={(e) => toggleSave(e, job.id)}
                       disabled={savingId === job.id}
                       className={`jc-save-btn ${savedMap[job.id] ? 'saved' : ''}`}
+                      title={savedMap[job.id] ? "Remove from saved" : "Save job"}
                     >
                       {savingId === job.id ? <Loader2 size={18} className="animate-spin" /> : <Bookmark size={18} />}
                     </button>
                   </div>
 
+                  {job.ai_summary && (
+                    <div className="jc-summary">
+                      {job.ai_summary}
+                    </div>
+                  )}
+
                   <div className="jc-pills">
-                    {job.location && <div className="jc-pill"><MapPin size={12} /> {job.location}</div>}
-                    {job.salary && <div className="jc-pill" style={{ color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}><DollarSign size={12} /> {job.salary}</div>}
-                    {job.experience && <div className="jc-pill"><Clock size={12} /> {job.experience}</div>}
-                    {job.type && <div className="jc-pill"><Briefcase size={12} /> {job.type}</div>}
+                    {job.location && <div className="jc-pill"><MapPin size={14} /> {job.location}</div>}
+                    {job.salary && (
+                      <div className="jc-pill salary">
+                        {/(₹|inr|rs|lpa)/i.test(job.salary) || job.source?.toLowerCase() === 'internshala' ? <IndianRupee size={14} /> : <DollarSign size={14} />} {job.salary}
+                      </div>
+                    )}
+                    {job.job_type && <div className="jc-pill type"><Briefcase size={14} /> {job.job_type.replace('-', ' ')}</div>}
                   </div>
 
                   {job.skills?.length > 0 && (
                     <div className="jc-skills">
-                      {job.skills.slice(0, 5).map(skill => (
+                      {job.skills.slice(0, 4).map(skill => (
                         <span key={skill} className="jc-skill">{skill}</span>
                       ))}
-                      {job.skills.length > 5 && (
+                      {job.skills.length > 4 && (
                         <span className="jc-skill" style={{ background: 'transparent', border: 'none' }}>
-                          +{job.skills.length - 5}
+                          +{job.skills.length - 4} more
                         </span>
                       )}
                     </div>
                   )}
 
-                  <button className="jc-btn">View Full Details</button>
+                  <div className="jc-footer">
+                    {job.source && (
+                      <span className="jc-source-tag">
+                        <Globe size={14} /> {job.source}
+                      </span>
+                    )}
+                    <button className="jc-btn">View Details</button>
+                  </div>
                 </div>
               ))}
             </div>

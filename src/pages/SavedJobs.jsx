@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import {
   ExternalLink, Bookmark, Trash2, Building2, MapPin,
   FolderOpen, Loader2, AlertCircle, RefreshCw, Briefcase,
-  DollarSign, Clock
+  DollarSign, IndianRupee, Clock
 } from 'lucide-react'
 import { fetchSavedJobs, updateSavedJob, deleteSavedJob } from '../services/jobs'
 import toast from 'react-hot-toast'
@@ -159,24 +159,54 @@ export default function SavedJobs() {
 
         /* ── Card ── */
         .sj-card {
-          background: #fff; border: 1px solid #e4e4e4; border-radius: 20px;
-          padding: 26px; display: flex; flex-direction: column;
-          transition: all 0.25s ease;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 24px;
+          padding: 24px; display: flex; flex-direction: column;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative; overflow: hidden;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.2);
         }
         .sj-card:hover {
-          border-color: #0a0a0a;
-          box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+          transform: translateY(-4px) scale(1.01);
+          border-color: rgba(0,0,0,0.1);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.5);
         }
+        .sj-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .sj-card:hover::before {
+          opacity: 1;
+        }
+        
         .sj-card-top {
           display: flex; justify-content: space-between;
-          align-items: flex-start; margin-bottom: 16px;
+          align-items: flex-start; margin-bottom: 20px;
+        }
+        .sj-company-info { display: flex; align-items: center; gap: 14px; }
+        .sj-logo {
+          width: 44px; height: 44px; flex-shrink: 0;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+          color: #0d9488;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 20px; font-weight: 700; font-family: 'DM Serif Display', serif;
+          box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
         }
         .sj-job-title {
-          font-size: 18px; font-weight: 700; color: #0a0a0a;
-          line-height: 1.3; margin: 0 0 4px;
+          font-size: 18px; font-weight: 700; color: #111827;
+          line-height: 1.3; margin: 0 0 4px; font-family: 'DM Sans', sans-serif;
         }
         .sj-company-row {
-          font-size: 13px; color: #6b6b6b; font-weight: 500;
+          font-size: 14px; color: #4b5563; font-weight: 500;
           display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
         }
         .sj-status-badge {
@@ -194,13 +224,15 @@ export default function SavedJobs() {
         .sj-del-btn:hover { background: #fef2f2; color: #ef4444; }
         .sj-del-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ── Info pills ── */
-        .sj-info-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+        .sj-info-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .sj-info-pill {
-          display: inline-flex; align-items: center; gap: 4px;
-          padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 500;
-          background: #f9f9f9; border: 1px solid #e4e4e4; color: #3a3a3a;
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+          background: #f3f4f6; color: #374151; transition: all 0.2s ease;
         }
+        .sj-info-pill:hover { background: #e5e7eb; }
+        .sj-info-pill.salary { color: #047857; background: #d1fae5; }
+        .sj-info-pill.type { color: #1d4ed8; background: #dbeafe; }
 
         /* ── Section label ── */
         .sj-section-label {
@@ -348,20 +380,25 @@ export default function SavedJobs() {
 
                   {/* Top row */}
                   <div className="sj-card-top">
-                    <div style={{ flex: 1, minWidth: 0, paddingRight: 8 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 4, marginBottom: 4 }}>
-                        <h2 className="sj-job-title">{jobData.title || 'Job Listing'}</h2>
-                        <span
-                          className="sj-status-badge"
-                          style={statusStyle}
-                        >
-                          {sj.status}
-                        </span>
+                    <div style={{ flex: 1, minWidth: 0, paddingRight: 8, display: 'flex', gap: '14px' }}>
+                      <div className="sj-logo">
+                        {jobData.company ? jobData.company.charAt(0).toUpperCase() : 'C'}
                       </div>
-                      <p className="sj-company-row">
-                        {jobData.company && <><Building2 size={13} /> {jobData.company}</>}
-                        {jobData.location && <><span>·</span><MapPin size={13} /> {jobData.location}</>}
-                      </p>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
+                          <h2 className="sj-job-title">{jobData.title || 'Job Listing'}</h2>
+                          <span
+                            className="sj-status-badge"
+                            style={statusStyle}
+                          >
+                            {sj.status}
+                          </span>
+                        </div>
+                        <p className="sj-company-row">
+                          {jobData.company && <>{jobData.company}</>}
+                          {jobData.location && <><span>·</span><MapPin size={13} /> {jobData.location}</>}
+                        </p>
+                      </div>
                     </div>
                     <button
                       className="sj-del-btn"
@@ -378,9 +415,13 @@ export default function SavedJobs() {
 
                   {/* Info pills */}
                   <div className="sj-info-pills">
-                    {jobData.type && <span className="sj-info-pill"><Briefcase size={11} /> {jobData.type}</span>}
-                    {jobData.salary && <span className="sj-info-pill" style={{ color: '#059669', background: '#ecfdf5', borderColor: '#d1fae5' }}><DollarSign size={11} /> {jobData.salary}</span>}
-                    {jobData.experience && <span className="sj-info-pill"><Clock size={11} /> {jobData.experience}</span>}
+                    {jobData.job_type && <span className="sj-info-pill type"><Briefcase size={12} /> {jobData.job_type.replace('-', ' ')}</span>}
+                    {jobData.salary && (
+                      <span className="sj-info-pill salary">
+                        {/(₹|inr|rs|lpa)/i.test(jobData.salary) || jobData.source?.toLowerCase() === 'internshala' ? <IndianRupee size={12} /> : <DollarSign size={12} />} {jobData.salary}
+                      </span>
+                    )}
+                    {jobData.source && <span className="sj-info-pill"><MapPin size={12} /> {jobData.source}</span>}
                   </div>
 
                   {/* Pipeline status */}

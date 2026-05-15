@@ -4,10 +4,18 @@ import api from './api'
 
 /**
  * GET /jobs
- * Supports: q (FAISS semantic), location, type, page, limit
+ * Supports: q (FAISS semantic), location, company, skills, type, source, posted_within, page, limit
  */
 export const fetchJobs = (params = {}) => {
   return api.get('/jobs', { params })
+}
+
+/**
+ * GET /jobs/filters/options
+ * Returns distinct sources and job types
+ */
+export const fetchJobFilterOptions = () => {
+  return api.get('/jobs/filters/options')
 }
 
 /**

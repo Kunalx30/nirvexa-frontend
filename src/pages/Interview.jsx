@@ -8,15 +8,19 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '../services/api'
+import { useAuth } from '../context/AuthContext'
+import { playInterviewTTS, stopInterviewTTS } from '../services/ttsService'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const FILLER_REGEX = /\b(um|uh|like|you know|basically|literally|actually|right|so)\b/gi
+const FILLER_TERMS = ['um', 'uh', 'umm', 'uhh', 'like', 'you know', 'basically', 'literally', 'actually', 'right', 'so']
+const FILLER_REGEX = /\b(you know|basically|literally|actually|right|umm|uhh|um|uh|like|so)\b/gi
+const INTRO_QUESTION = 'Tell me about yourself.'
 
 const MODES = [
-  { id: 'hr',        label: 'HR / Behavioral',     icon: MessageSquare, color: 'blue',    desc: '10 behavioral questions' },
-  { id: 'technical', label: 'Technical',            icon: Brain,         color: 'purple',  desc: '10 technical questions'  },
-  { id: 'mock',      label: 'Full Mock',            icon: Mic,           color: 'emerald', desc: '5 HR + 5 Technical'      },
-  { id: 'stress',    label: 'Stress Test',          icon: Flame,         color: 'rose',    desc: '15 rapid-fire questions' },
+  { id: 'hr',        label: 'HR / Behavioral',     icon: MessageSquare, color: 'blue',    desc: '12+ behavioral questions' },
+  { id: 'technical', label: 'Technical',            icon: Brain,         color: 'purple',  desc: '12+ technical questions'  },
+  { id: 'mock',      label: 'Full Mock',            icon: Mic,           color: 'emerald', desc: '6 HR + 6 Technical'      },
+  { id: 'stress',    label: 'Stress Test',          icon: Flame,         color: 'rose',    desc: '18 rapid-fire questions' },
 ]
 
 const LEVELS = [
@@ -44,27 +48,60 @@ const levelActive = {
 }
 const scoreColor = (s) => s >= 80 ? 'text-emerald-600' : s >= 60 ? 'text-amber-600' : 'text-rose-600'
 const scoreBar   = (s) => s >= 80 ? 'bg-emerald-500' : s >= 60 ? 'bg-amber-500' : 'bg-rose-500'
+const clampScore = (value) => Math.max(0, Math.min(100, Number.isFinite(Number(value)) ? Math.round(Number(value)) : 0))
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // ── ScoreBar component ────────────────────────────────────────────────────────
 function ScoreBar({ label, value }) {
+  const safeValue = clampScore(value)
   return (
     <div>
       <div className="flex justify-between text-xs mb-1">
         <span className="text-[#6b6b6b]">{label}</span>
-        <span className={scoreColor(value)}>{value}</span>
+        <span className={scoreColor(safeValue)}>{safeValue}</span>
       </div>
       <div className="h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden shadow-inner">
         <div
-          className={`h-full rounded-full transition-all duration-700 ${scoreBar(value)}`}
-          style={{ width: `${value}%` }}
+          className={`h-full rounded-full transition-all duration-700 ${scoreBar(safeValue)}`}
+          style={{ width: `${safeValue}%` }}
         />
       </div>
     </div>
   )
 }
 
+function getFillerDetails(text) {
+  const counts = FILLER_TERMS.reduce((acc, term) => ({ ...acc, [term]: 0 }), {})
+  const matches = text.match(FILLER_REGEX) || []
+  matches.forEach(match => {
+    const key = match.toLowerCase().trim()
+    counts[key] = (counts[key] || 0) + 1
+  })
+  return Object.entries(counts)
+    .filter(([, count]) => count > 0)
+    .map(([word, count]) => ({ word, count }))
+}
+
+function paceLabel(wpm) {
+  if (!wpm) return 'not measured'
+  if (wpm < 105) return 'too slow'
+  if (wpm < 125) return 'slightly slow'
+  if (wpm <= 165) return 'ideal'
+  if (wpm <= 185) return 'slightly fast'
+  return 'too fast'
+}
+
+function getDisplayName(user) {
+  const rawName = user?.name || user?.full_name || user?.username || ''
+  if (rawName.trim()) return rawName.trim().split(/\s+/)[0]
+  const emailName = user?.email?.split('@')?.[0]
+  return emailName ? emailName.split(/[._-]/)[0] : ''
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Interview() {
+  const { user } = useAuth()
+  const userFirstName = getDisplayName(user)
   // ── View state: 'setup' | 'interview' | 'report'
   const [view, setView]           = useState('setup')
 
@@ -85,6 +122,9 @@ export default function Interview() {
   const [liveText, setLiveText]       = useState('')
   const startTimeRef  = useRef(null)
   const recognitionRef = useRef(null)
+  const transcriptRef = useRef('')
+  const liveTextRef = useRef('')
+  const shouldKeepListeningRef = useRef(false)
 
   // ── Per-question results
   const [evaluation, setEvaluation]   = useState(null)
@@ -93,16 +133,41 @@ export default function Interview() {
 
   // ── Session-level aggregates
   const [allEvals, setAllEvals]       = useState([])
+  const metricAvg = useCallback((key) => allEvals.length
+    ? Math.round(allEvals.reduce((s, e) => s + (e[key] || 0), 0) / allEvals.length)
+    : 0, [allEvals])
 
-  // ── TTS
-  const speakQuestion = useCallback((text) => {
-    if (!window.speechSynthesis) return
-    window.speechSynthesis.cancel()
-    const utt = new SpeechSynthesisUtterance(text)
-    utt.rate = 0.92
-    utt.pitch = 1
-    window.speechSynthesis.speak(utt)
+
+  const speakText = useCallback(async (text, options = {}) => {
+    if (!text) return
+    return playInterviewTTS(text, {
+      voice: 'ananya',
+      rate: options.rate ?? 1,
+      pitch: options.pitch ?? 1.02,
+      playbackRate: options.playbackRate ?? 1,
+    })
   }, [])
+
+
+  const speakQuestion = useCallback((text) => {
+    speakText(text, { rate: 1, pitch: 1.02 })
+  }, [speakText])
+
+  const speakIntroThenQuestion = useCallback((question) => {
+    const greeting = userFirstName ? `Hi ${userFirstName},` : 'Hi,'
+    const intro = `${greeting} I am Ananya, your HR interviewer for this ${role.trim()} interview. I will keep this simple and ask one question at a time. Let us begin. ${question}`
+    speakText(intro, { rate: 1, pitch: 1.02 })
+  }, [role, speakText, userFirstName])
+
+  const speakAcknowledgement = useCallback((evaluationData) => {
+    const score = evaluationData?.overall_score
+    const text = score >= 80
+      ? 'Got it. That was a strong answer.'
+      : score >= 60
+        ? 'Got it. Good answer. I have a few small suggestions.'
+        : 'Got it. Let us make this answer clearer.'
+    speakText(text, { rate: 1, pitch: 1.02 })
+  }, [speakText])
 
   // ── Speech recognition setup ──────────────────────────────────────────────
   const initRecognition = useCallback(() => {
@@ -112,6 +177,7 @@ export default function Interview() {
     const r = new SpeechRecognition()
     r.continuous      = true
     r.interimResults  = true
+    r.maxAlternatives = 1
     r.lang            = 'en-IN'
 
     r.onresult = (e) => {
@@ -120,12 +186,25 @@ export default function Interview() {
         const t = e.results[i][0].transcript
         e.results[i].isFinal ? (final += t) : (interim += t)
       }
-      if (final) setTranscript(prev => prev + ' ' + final)
+      if (final) {
+        transcriptRef.current = `${transcriptRef.current} ${final}`.trim()
+        setTranscript(transcriptRef.current)
+      }
+      liveTextRef.current = interim
       setLiveText(interim)
     }
 
     r.onerror = (e) => {
       if (e.error !== 'no-speech') toast.error('Mic error: ' + e.error)
+    }
+
+    r.onend = () => {
+      if (!shouldKeepListeningRef.current) return
+      try {
+        r.start()
+      } catch {
+        // Chrome can throw if recognition is already starting.
+      }
     }
 
     return r
@@ -143,7 +222,9 @@ export default function Interview() {
       const genRes = await api.post('/interview/generate', {
         role: role.trim(), mode, difficulty: level,
       })
-      const qs = genRes.data.questions
+      const generated = genRes.data.questions || []
+      const hasIntro = generated[0]?.toLowerCase?.().includes('tell me about yourself')
+      const qs = hasIntro ? generated : [INTRO_QUESTION, ...generated]
 
       // 2. Create session
       const sessRes = await api.post('/interview/session', {
@@ -156,7 +237,7 @@ export default function Interview() {
       setAllEvals([])
       setView('interview')
 
-      setTimeout(() => speakQuestion(qs[0]), 600)
+      setTimeout(() => speakIntroThenQuestion(qs[0]), 600)
     } catch (err) {
       toast.error('Failed to start interview. Try again.')
       console.error(err)
@@ -171,7 +252,10 @@ export default function Interview() {
     if (!r) { toast.error('Speech recognition not supported in this browser. Use Chrome.'); return }
     setTranscript('')
     setLiveText('')
+    transcriptRef.current = ''
+    liveTextRef.current = ''
     recognitionRef.current = r
+    shouldKeepListeningRef.current = true
     r.start()
     startTimeRef.current = Date.now()
     setIsListening(true)
@@ -179,14 +263,17 @@ export default function Interview() {
 
   // ── Stop recording + evaluate ─────────────────────────────────────────────
   const stopAndEvaluate = async () => {
+    shouldKeepListeningRef.current = false
     if (recognitionRef.current) {
       recognitionRef.current.stop()
       recognitionRef.current = null
     }
     setIsListening(false)
-    setLiveText('')
+    await wait(650)
 
-    const finalTranscript = transcript.trim()
+    const finalTranscript = `${transcriptRef.current} ${liveTextRef.current}`.replace(/\s+/g, ' ').trim()
+    setTranscript(finalTranscript)
+    setLiveText('')
     if (!finalTranscript || finalTranscript.length < 10) {
       toast.error('Answer too short — please speak more.')
       return
@@ -194,7 +281,9 @@ export default function Interview() {
 
     const duration  = Math.round((Date.now() - startTimeRef.current) / 1000) || 1
     const words     = finalTranscript.trim().split(/\s+/).length
-    const fillers   = (finalTranscript.match(FILLER_REGEX) || []).length
+    const fillerDetails = getFillerDetails(finalTranscript)
+    const fillers   = fillerDetails.reduce((sum, item) => sum + item.count, 0)
+    const wpm = Math.round((words / duration) * 60)
 
     setEvaluating(true)
     try {
@@ -206,9 +295,20 @@ export default function Interview() {
         word_count:       words,
         filler_count:     fillers,
       })
-      setEvaluation(res.data.evaluation)
-      setAllEvals(prev => [...prev, res.data.evaluation])
+      const evaluationData = {
+        ...res.data.evaluation,
+        duration_seconds: duration,
+        word_count: words,
+        filler_count: fillers,
+        filler_details: fillerDetails,
+        filler_rate_percent: words ? Number(((fillers / words) * 100).toFixed(1)) : 0,
+        wpm,
+        pace_label: paceLabel(wpm),
+      }
+      setEvaluation(evaluationData)
+      setAllEvals(prev => [...prev, evaluationData])
       setAnswered(true)
+      speakAcknowledgement(evaluationData)
     } catch (err) {
       toast.error('Evaluation failed. Try again.')
     } finally {
@@ -224,8 +324,11 @@ export default function Interview() {
       return
     }
     setQIndex(next)
+    shouldKeepListeningRef.current = false
     setTranscript('')
     setLiveText('')
+    transcriptRef.current = ''
+    liveTextRef.current = ''
     setEvaluation(null)
     setAnswered(false)
     setTimeout(() => speakQuestion(questions[next]), 300)
@@ -236,35 +339,48 @@ export default function Interview() {
     if (!sessionId || allEvals.length === 0) { setView('report'); return }
 
     const avgScore = Math.round(allEvals.reduce((s, e) => s + (e.overall_score || 0), 0) / allEvals.length)
-    const avgWpm   = 130 // placeholder — real wpm tracked per answer
-    const totalFillers = allEvals.length // minimal proxy
+    const avgWpm   = Math.round(allEvals.reduce((s, e) => s + (e.wpm || 0), 0) / allEvals.length)
+    const totalFillers = allEvals.reduce((s, e) => s + (e.filler_count || 0), 0)
+    const metricScores = {
+      content_score: metricAvg('content_score'),
+      keyword_score: metricAvg('keyword_score'),
+      grammar_score: metricAvg('grammar_score'),
+      confidence_score: metricAvg('confidence_score'),
+      pace_score: metricAvg('pace_score'),
+      completeness_score: metricAvg('completeness_score'),
+    }
 
     try {
       await api.put(`/interview/session/${sessionId}`, {
-        total_score: avgScore, avg_wpm: avgWpm, filler_word_count: totalFillers,
+        total_score: avgScore,
+        avg_wpm: avgWpm,
+        filler_word_count: totalFillers,
+        metric_scores: metricScores,
       })
     } catch (e) { /* non-blocking */ }
 
     setView('report')
-    window.speechSynthesis?.cancel()
+    stopInterviewTTS()
   }
 
   // ── Restart ───────────────────────────────────────────────────────────────
   const restart = () => {
-    window.speechSynthesis?.cancel()
+    stopInterviewTTS()
+    shouldKeepListeningRef.current = false
     if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null }
     setView('setup')
     setMode(''); setLevel(''); setRole('')
     setQuestions([]); setQIndex(0); setSessionId(null)
     setTranscript(''); setLiveText('')
+    transcriptRef.current = ''; liveTextRef.current = ''
     setEvaluation(null); setEvaluating(false); setAnswered(false)
     setAllEvals([])
   }
 
   // ── Cleanup on unmount ────────────────────────────────────────────────────
-  useEffect(() => {
+useEffect(() => {
     return () => {
-      window.speechSynthesis?.cancel()
+      stopInterviewTTS()
       if (recognitionRef.current) recognitionRef.current.stop()
     }
   }, [])
@@ -526,11 +642,19 @@ export default function Interview() {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="bg-white/3 border border-white/8 rounded-xl p-3">
                   <p className="text-[#8b8b8b] mb-1 flex items-center gap-1"><Clock size={11} /> Pace</p>
-                  <p className="text-[#3a3a3a]">{evaluation.pace_feedback}</p>
+                  <p className="text-[#3a3a3a]">{evaluation.wpm} WPM · {evaluation.pace_label}</p>
+                  <p className="text-[#6b6b6b] mt-1">{evaluation.pace_feedback}</p>
                 </div>
                 <div className="bg-white/3 border border-white/8 rounded-xl p-3">
                   <p className="text-[#8b8b8b] mb-1 flex items-center gap-1"><Mic size={11} /> Fillers</p>
-                  <p className="text-[#3a3a3a]">{evaluation.filler_feedback}</p>
+                  <p className="text-[#3a3a3a]">
+                    {evaluation.filler_count} words · {evaluation.filler_rate_percent}% of answer
+                  </p>
+                  <p className="text-[#6b6b6b] mt-1">
+                    {evaluation.filler_details?.length
+                      ? evaluation.filler_details.map(item => `${item.word} (${item.count})`).join(', ')
+                      : 'No filler words detected'}
+                  </p>
                 </div>
               </div>
 
@@ -569,6 +693,9 @@ export default function Interview() {
       ? Math.round(allEvals.reduce((s, e) => s + (e.overall_score || 0), 0) / allEvals.length)
       : 0
     const avgGrade  = allEvals.length ? allEvals[allEvals.length - 1]?.grade : 'N/A'
+    const avgWpm = allEvals.length
+      ? Math.round(allEvals.reduce((s, e) => s + (e.wpm || 0), 0) / allEvals.length)
+      : 0
 
     const metricAvg = (key) => allEvals.length
       ? Math.round(allEvals.reduce((s, e) => s + (e[key] || 0), 0) / allEvals.length)
@@ -620,6 +747,30 @@ export default function Interview() {
                 <ScoreBar label="Confidence"        value={metricAvg('confidence_score')} />
                 <ScoreBar label="Speaking Pace"     value={metricAvg('pace_score')} />
                 <ScoreBar label="Completeness"      value={metricAvg('completeness_score')} />
+              </div>
+            </div>
+
+            <div className="bg-white border border-[#e4e4e4] shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-2xl p-6">
+              <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight mb-4 text-sm flex items-center gap-2">
+                <Clock size={15} className="text-[#6b6b6b]" /> Measured Speaking Stats
+              </h3>
+              <div className="grid grid-cols-3 gap-3 text-center text-xs">
+                <div className="bg-[#fcfcfc] border border-[#e4e4e4] rounded-xl p-3">
+                  <p className="text-[#8b8b8b] mb-1">Avg Pace</p>
+                  <p className="text-[#0a0a0a] font-bold text-lg">{avgWpm} WPM</p>
+                </div>
+                <div className="bg-[#fcfcfc] border border-[#e4e4e4] rounded-xl p-3">
+                  <p className="text-[#8b8b8b] mb-1">Fillers</p>
+                  <p className="text-[#0a0a0a] font-bold text-lg">
+                    {allEvals.reduce((s, e) => s + (e.filler_count || 0), 0)}
+                  </p>
+                </div>
+                <div className="bg-[#fcfcfc] border border-[#e4e4e4] rounded-xl p-3">
+                  <p className="text-[#8b8b8b] mb-1">Words</p>
+                  <p className="text-[#0a0a0a] font-bold text-lg">
+                    {allEvals.reduce((s, e) => s + (e.word_count || 0), 0)}
+                  </p>
+                </div>
               </div>
             </div>
 
