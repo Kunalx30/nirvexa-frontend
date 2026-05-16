@@ -23,6 +23,33 @@ export default function CareerPath() {
   const [loading, setLoading]           = useState(false)
   const [result, setResult]             = useState(null)
 
+  const renderResourceLink = (r, isSidebar = false) => {
+    const urlMatch = r.match(/(https?:\/\/[^\s]+)/)
+    if (urlMatch) {
+      const url = urlMatch[0]
+      let label = r.replace(url, '').replace(/:\s*$/, '').trim()
+      if (!label) label = 'View Resource'
+      
+      if (isSidebar) {
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-[#3a3a3a] hover:text-blue-600 font-medium text-xs flex items-center gap-1 transition-colors leading-snug break-all w-fit mt-0.5">
+            {label} <ExternalLink size={10} className="shrink-0" />
+          </a>
+        )
+      }
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-[11px] px-2.5 py-1 bg-blue-50/80 border border-blue-200 text-blue-700 hover:bg-blue-100 rounded-lg flex items-center gap-1 transition-colors w-fit inline-flex">
+          {label} <ExternalLink size={10} />
+        </a>
+      )
+    }
+    
+    if (isSidebar) {
+       return <p className="text-[#3a3a3a] font-medium text-xs leading-snug">{r}</p>
+    }
+    return <span className="text-[11px] px-2.5 py-1 bg-[#fcfcfc] border border-[#e4e4e4] rounded-lg text-[#6b6b6b] inline-flex">{r}</span>
+  }
+
   const handleGenerate = async () => {
     if (!targetRole.trim() || !skills.trim()) {
       toast.error('Please fill in target role and current skills')
@@ -179,9 +206,7 @@ export default function CareerPath() {
                     {step.resources?.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {step.resources.map((r, j) => (
-                          <span key={j} className="text-xs px-2.5 py-1 bg-white/5 border border-[#e4e4e4] rounded-lg text-[#6b6b6b]">
-                            {r}
-                          </span>
+                          <div key={j}>{renderResourceLink(r)}</div>
                         ))}
                       </div>
                     )}
@@ -239,7 +264,7 @@ export default function CareerPath() {
                       <li key={i} className="flex items-center gap-2 p-2.5 rounded-xl bg-[#fcfcfc] border border-[#e4e4e4] hover:border-[#c4c4c4] hover:shadow-sm hover:-translate-y-px transition-colors">
                         <ChevronRight size={12} className="text-emerald-600 shrink-0" />
                         <div>
-                          <p className="text-[#3a3a3a] font-medium text-xs">{item.resource}</p>
+                          {renderResourceLink(item.resource, true)}
                           <p className="text-[#8b8b8b] font-medium text-[10px] mt-0.5">{item.skill}</p>
                         </div>
                       </li>

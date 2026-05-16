@@ -9,7 +9,6 @@ const TABS = [
   { label: 'AI',           value: 'ai'          },
   { label: 'Data Science', value: 'data-science' },
   { label: 'Startups',     value: 'startups'    },
-  { label: 'Govt Jobs',    value: 'govt-jobs'   },
 ]
 
 export default function News() {
@@ -22,7 +21,7 @@ export default function News() {
     if (showToast) setRefreshing(true)
     else setLoading(true)
     try {
-      const res = await api.get(`/news?category=${active}&limit=12`)
+      const res = await api.get(`/news?category=${active}&limit=40`)
       const articles = res.data?.articles || res.data?.data || res.data || []
       setNews(Array.isArray(articles) ? articles : [])
       if (showToast) toast.success('News refreshed!')
