@@ -24,6 +24,8 @@ export default function CareerPath() {
   const [result, setResult]             = useState(null)
 
   const renderResourceLink = (r, isSidebar = false) => {
+    if (!r || typeof r !== 'string') return null;
+    
     const urlMatch = r.match(/(https?:\/\/[^\s]+)/)
     if (urlMatch) {
       const url = urlMatch[0]
@@ -203,9 +205,9 @@ export default function CareerPath() {
                     {step.why_important && (
                       <p className="text-[#4a4a4a] font-medium text-sm mb-3 leading-relaxed">{step.why_important}</p>
                     )}
-                    {step.resources?.length > 0 && (
+                    {step.resources && (
                       <div className="flex flex-wrap gap-2">
-                        {step.resources.map((r, j) => (
+                        {(Array.isArray(step.resources) ? step.resources : typeof step.resources === 'string' ? [step.resources] : []).map((r, j) => (
                           <div key={j}>{renderResourceLink(r)}</div>
                         ))}
                       </div>
@@ -257,7 +259,10 @@ export default function CareerPath() {
                 </h3>
                 <ul className="space-y-2">
                   {(result.steps || [])
-                    .flatMap(s => (s.resources || []).map(r => ({ resource: r, skill: s.skill_to_learn })))
+                    .flatMap(s => {
+                      const resArr = Array.isArray(s.resources) ? s.resources : typeof s.resources === 'string' ? [s.resources] : [];
+                      return resArr.map(r => ({ resource: r, skill: s.skill_to_learn }));
+                    })
                     .filter((v, i, arr) => arr.findIndex(x => x.resource === v.resource) === i)
                     .slice(0, 8)
                     .map((item, i) => (
