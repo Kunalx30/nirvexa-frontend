@@ -23,6 +23,12 @@ export default function CareerPath() {
   const [loading, setLoading]           = useState(false)
   const [result, setResult]             = useState(null)
 
+  const safeArray = (val) => {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    return [val];
+  }
+
   const renderResourceLink = (r, isSidebar = false) => {
     if (!r || typeof r !== 'string') return null;
     
@@ -187,7 +193,7 @@ export default function CareerPath() {
               )}
 
               <div className="relative border-l-2 border-[#e4e4e4] ml-4 space-y-8 pb-2">
-                {(result.steps || []).map((step, i) => (
+                {safeArray(result.steps).map((step, i) => (
                   <div key={i} className="relative pl-8">
                     <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-2 border-blue-500 shadow-sm flex items-center justify-center">
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
@@ -225,11 +231,11 @@ export default function CareerPath() {
                 <h3 className="text-[#0a0a0a] font-bold tracking-tight mb-4 flex items-center gap-2 text-sm">
                   <AlertTriangle size={16} className="text-amber-600" /> Skill Gap
                 </h3>
-                {result.skill_gap?.missing?.length > 0 ? (
+                {safeArray(result.skill_gap?.missing).length > 0 ? (
                   <>
                     <p className="text-[#8b8b8b] text-xs mb-3">Skills to acquire:</p>
                     <div className="flex flex-wrap gap-2">
-                      {result.skill_gap.missing.map((s, i) => (
+                      {safeArray(result.skill_gap?.missing).map((s, i) => (
                         <span key={i} className="text-xs font-medium px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg border border-amber-200 shadow-sm">{s}</span>
                       ))}
                     </div>
@@ -240,11 +246,11 @@ export default function CareerPath() {
                   </div>
                 )}
 
-                {result.skill_gap?.already_have?.length > 0 && (
+                {safeArray(result.skill_gap?.already_have).length > 0 && (
                   <div className="mt-4">
                     <p className="text-[#8b8b8b] text-xs mb-2">Already have:</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {result.skill_gap.already_have.map((s, i) => (
+                      {safeArray(result.skill_gap?.already_have).map((s, i) => (
                         <span key={i} className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded border border-emerald-200 shadow-sm">{s}</span>
                       ))}
                     </div>
@@ -258,9 +264,9 @@ export default function CareerPath() {
                   <BookOpen size={16} className="text-emerald-600" /> All Resources
                 </h3>
                 <ul className="space-y-2">
-                  {(result.steps || [])
+                  {safeArray(result.steps)
                     .flatMap(s => {
-                      const resArr = Array.isArray(s.resources) ? s.resources : typeof s.resources === 'string' ? [s.resources] : [];
+                      const resArr = safeArray(s.resources);
                       return resArr.map(r => ({ resource: r, skill: s.skill_to_learn }));
                     })
                     .filter((v, i, arr) => arr.findIndex(x => x.resource === v.resource) === i)
