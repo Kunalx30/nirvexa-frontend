@@ -49,7 +49,6 @@ export function AuthProvider({ children }) {
     return u
   }, [])
 
-  // --- ADDED GOOGLE LOGIN HERE ---
   const googleLogin = useCallback(async (idToken) => {
     const u = await authService.googleLogin(idToken)
     setUser(u)

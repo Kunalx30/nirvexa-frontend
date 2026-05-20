@@ -22,6 +22,7 @@ import News       from './pages/News'
 import NotFound   from './pages/NotFound'
 import SalaryInsights   from './pages/SalaryInsights'
 import CompanyResearch  from './pages/CompanyResearch'
+import RoadmapGraph from './pages/RoadmapGraph'
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -66,6 +67,7 @@ function AppRoutes() {
       <Route path="/skills"   element={<ProtectedRoute><SkillMatch /></ProtectedRoute>} />
 <Route path="/salary"   element={<ProtectedRoute><SalaryInsights /></ProtectedRoute>} />
 <Route path="/company"  element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
+<Route path="/roadmap-graph" element={<RoadmapGraph />} />
 
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
