@@ -1,4 +1,4 @@
-﻿import Layout from '../components/layout/Layout'
+import Layout from '../components/layout/Layout'
 import { useState } from 'react'
 import {
   Sparkles, Map, AlertTriangle, BookOpen, Loader2, Target,
@@ -13,7 +13,7 @@ const EXPERIENCE_OPTIONS = [
   { label: 'Fresher', value: 0 },
   { label: '1 yr',    value: 1 },
   { label: '2 yrs',   value: 2 },
-  { label: '3â€“5 yrs', value: 4 },
+  { label: '3"“5 yrs', value: 4 },
   { label: '5+ yrs',  value: 6 },
 ]
 
@@ -90,7 +90,7 @@ async function generatePDF({ result, currentRole, targetRole, userName }) {
     if (y + needed > H - 23) newPage()
   }
 
-  // pill â€” all RGB, no hex, no special unicode
+  // pill "” all RGB, no hex, no special unicode
   const pill = (text, x, py, bgR, bgG, bgB, txR, txG, txB, bdR, bdG, bdB) => {
     doc.setFontSize(7.5)
     doc.setFont('helvetica', 'bold')
@@ -151,7 +151,7 @@ async function generatePDF({ result, currentRole, targetRole, userName }) {
   doc.setTextColor(75, 85, 99)
   doc.text(`${currentRole || 'Student'}  ->  ${targetRole}`, ML, y)
 
-  // User name â€” premium personalisation
+  // User name "” premium personalisation
   if (userName) {
     y += 8
     // Personal label on its own line in gray
@@ -273,13 +273,13 @@ async function generatePDF({ result, currentRole, targetRole, userName }) {
       subtopics.forEach((sub, si) => {
         // Check if we need a new page
         if (cy + 12 > H - 23) {
-          // close current card visually â€” just continue on new page
+          // close current card visually "” just continue on new page
           doc.addPage()
           addPageChrome()
           cy = 18
         }
 
-        // Row bg â€” alternating
+        // Row bg "” alternating
         if (si % 2 === 0) {
           doc.setFillColor(247, 248, 250)
           doc.roundedRect(ML + 7, cy - 4, CW - 10, 9.5, 1.2, 1.2, 'F')
@@ -476,7 +476,7 @@ async function generatePDF({ result, currentRole, targetRole, userName }) {
   }
 
   const filename = `Nyrvexa_Career_Roadmap_${targetRole.replace(/\s+/g, '_')}.pdf`
-  // Blob URL approach â€” avoids CSP iframe block that doc.save() triggers
+  // Blob URL approach "” avoids CSP iframe block that doc.save() triggers
   const blob = doc.output('blob')
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
@@ -577,7 +577,7 @@ export default function CareerPath() {
           </div>
           <h1 className="cp-serif text-3xl sm:text-4xl text-[#0a0a0a] mb-1">Career Path Generator</h1>
           <p className="text-[#6b6b6b] text-sm font-medium max-w-lg">
-            Tell us where you're headed â€” we'll map every step of the journey.
+            Tell us where you're headed "” we'll map every step of the journey.
           </p>
         </div>
 
@@ -834,14 +834,14 @@ export default function CareerPath() {
               )}
             </div>
 
-            {/* â”€â”€ PDF Download â€” appears only after last step â”€â”€ */}
+            {/* â”€â”€ PDF Download "” appears only after last step â”€â”€ */}
             {allStepsSeen && (
               <div className="fade-slide bg-white border border-[#e4e4e4] rounded-3xl p-6 sm:p-8 shadow-[0_4px_24px_rgb(0,0,0,0.05)]">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                   <div>
                     <h3 className="cp-serif text-xl text-[#0a0a0a] mb-1">Save Your Roadmap</h3>
                     <p className="text-[#6b6b6b] text-sm max-w-md">
-                      Download a structured PDF with all steps, resources, and skill gap â€” ready to share or refer back to anytime.
+                      Download a structured PDF with all steps, resources, and skill gap "” ready to share or refer back to anytime.
                     </p>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {['All steps included', 'Clickable resource links', 'Skill gap summary', 'A4 format'].map(f => (

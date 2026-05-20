@@ -181,31 +181,42 @@ export default function Interview() {
     r.lang            = 'en-IN'
 
     r.onresult = (e) => {
-      let interim = '', final = ''
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const t = e.results[i][0].transcript
-        e.results[i].isFinal ? (final += t) : (interim += t)
-      }
-      if (final) {
-        transcriptRef.current = `${transcriptRef.current} ${final}`.trim()
-        setTranscript(transcriptRef.current)
-      }
-      liveTextRef.current = interim
-      setLiveText(interim)
+  let interim = ''
+  // Only process results from this event's resultIndex onwards
+  for (let i = e.resultIndex; i < e.results.length; i++) {
+    const t = e.results[i][0].transcript
+    if (e.results[i].isFinal) {
+      transcriptRef.current = (transcriptRef.current + ' ' + t).trim()
+      setTranscript(transcriptRef.current)
+      liveTextRef.current = ''
+    } else {
+      interim += t
     }
+  }
+  liveTextRef.current = interim
+  setLiveText(interim)
+}
 
     r.onerror = (e) => {
       if (e.error !== 'no-speech') toast.error('Mic error: ' + e.error)
     }
 
-    r.onend = () => {
-      if (!shouldKeepListeningRef.current) return
-      try {
-        r.start()
-      } catch {
-        // Chrome can throw if recognition is already starting.
-      }
-    }
+   r.onend = () => {
+  if (!shouldKeepListeningRef.current) return
+  setTimeout(() => {
+    if (!shouldKeepListeningRef.current) return
+    const fresh = new (window.SpeechRecognition || window.webkitSpeechRecognition)()
+    fresh.continuous = true
+    fresh.interimResults = true
+    fresh.maxAlternatives = 1
+    fresh.lang = 'en-IN'
+    fresh.onresult = r.onresult
+    fresh.onerror = r.onerror
+    fresh.onend = r.onend
+    recognitionRef.current = fresh
+    try { fresh.start() } catch {}
+  }, 100)
+}
 
     return r
   }, [])
