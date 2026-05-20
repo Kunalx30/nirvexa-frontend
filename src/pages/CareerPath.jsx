@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   Sparkles, Map, AlertTriangle, BookOpen, Loader2, Target,
   Compass, CheckCircle2, Clock, ExternalLink,
-  Milestone, ArrowRight, Flag, Download
+  Milestone, ArrowRight, Flag, Download, PanelRightOpen, Layers
 } from 'lucide-react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
@@ -54,6 +54,9 @@ const DIFF_COLOR = {
   'Intermediate': 'bg-amber-50 text-amber-700 border-amber-200',
   'Advanced':     'bg-rose-50 text-rose-700 border-rose-200',
 }
+
+const countStepSubtopics = (steps = []) => steps.reduce((sum, step) => sum + safeArray(step.subtopics).length, 0)
+const countStepResources = (steps = []) => steps.reduce((sum, step) => sum + safeArray(step.resources).length, 0)
 
 // â”€â”€ PDF Generator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function generatePDF({ result, currentRole, targetRole, userName }) {
@@ -536,7 +539,9 @@ export default function CareerPath() {
             const parsed = JSON.parse(saved)
             userName = parsed.name || parsed.full_name || ''
           }
-        } catch {}
+        } catch {
+          userName = ''
+        }
       }
       await generatePDF({ result, currentRole, targetRole, userName })
       toast.success('PDF downloaded!')
@@ -551,6 +556,10 @@ export default function CareerPath() {
   const steps           = safeArray(result?.steps)
   const currentStepData = steps[activeStep]
   const allStepsSeen    = result && activeStep === steps.length - 1
+  const missingSkills    = safeArray(result?.skill_gap?.missing)
+  const ownedSkills      = safeArray(result?.skill_gap?.already_have)
+  const totalSubtopics   = countStepSubtopics(steps)
+  const totalResources   = countStepResources(steps)
 
   return (
     <Layout>
@@ -560,6 +569,13 @@ export default function CareerPath() {
         .cp-serif { font-family: 'DM Serif Display', Georgia, serif; }
         .step-node { transition: all 0.2s ease; }
         .step-node.active { transform: scale(1.08); }
+        .cp-grid-bg {
+          background-image:
+            linear-gradient(rgba(228,228,228,.42) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(228,228,228,.42) 1px, transparent 1px);
+          background-size: 28px 28px;
+          background-position: -1px -1px;
+        }
         @keyframes fadeSlide {
           from { opacity: 0; transform: translateY(10px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -567,22 +583,21 @@ export default function CareerPath() {
         .fade-slide { animation: fadeSlide 0.3s ease forwards; }
       `}</style>
 
-      <div className="cp-sans max-w-6xl mx-auto px-4 sm:px-6 pb-20 relative">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-blue-50/60 blur-[120px] rounded-full pointer-events-none" />
+      <div className="cp-sans cp-grid-bg max-w-7xl mx-auto px-4 sm:px-6 pb-20 relative">
 
         {/* Header */}
-        <div className="relative z-10 pt-6 mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#e4e4e4] shadow-sm text-xs font-medium text-[#0a0a0a] mb-3">
+        <div className="relative z-10 pt-6 mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white border border-[#e4e4e4] shadow-sm text-xs font-semibold text-[#0a0a0a] mb-3">
             <Compass size={13} className="text-blue-500" /> AI Career Architect
           </div>
-          <h1 className="cp-serif text-3xl sm:text-4xl text-[#0a0a0a] mb-1">Career Path Generator</h1>
-          <p className="text-[#6b6b6b] text-sm font-medium max-w-lg">
+          <h1 className="cp-serif text-3xl sm:text-5xl text-[#0a0a0a] leading-tight mb-1">Build a career path you can scan.</h1>
+          <p className="text-[#6b6b6b] text-sm sm:text-base font-medium max-w-2xl">
             Tell us where you're headed "” we'll map every step of the journey.
           </p>
         </div>
 
         {/* Input card */}
-        <div className="relative z-10 bg-white border border-[#e4e4e4] rounded-3xl p-6 sm:p-8 mb-10 shadow-[0_4px_24px_rgb(0,0,0,0.05)]">
+        <div className="relative z-10 bg-white border border-[#e4e4e4] rounded-lg p-5 sm:p-6 mb-6 shadow-sm">
           <div className="grid sm:grid-cols-2 gap-5 mb-6">
             <div>
               <label className="block text-[11px] font-semibold text-[#8b8b8b] uppercase tracking-widest mb-2 ml-1">Current Role</label>
@@ -590,7 +605,7 @@ export default function CareerPath() {
                 type="text" placeholder="e.g. Student, Junior Dev"
                 value={currentRole}
                 onChange={e => { setCurrentRole(e.target.value); setResult(null) }}
-                className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#c4c4c4] rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] transition-all"
+                className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#c4c4c4] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-all"
               />
             </div>
             <div>
@@ -601,7 +616,7 @@ export default function CareerPath() {
                   type="text" placeholder="e.g. ML Engineer, Data Analyst"
                   value={targetRole}
                   onChange={e => { setTargetRole(e.target.value); setResult(null) }}
-                  className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#c4c4c4] rounded-2xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] transition-all"
+                  className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#c4c4c4] rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-all"
                 />
               </div>
             </div>
@@ -613,7 +628,7 @@ export default function CareerPath() {
                   type="text" placeholder="e.g. Python, SQL, Excel"
                   value={skills}
                   onChange={e => { setSkills(e.target.value); setResult(null) }}
-                  className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#c4c4c4] rounded-2xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] transition-all"
+                  className="w-full bg-[#fcfcfc] border border-[#e4e4e4] text-[#0a0a0a] placeholder-[#c4c4c4] rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-all"
                 />
               </div>
             </div>
@@ -623,7 +638,7 @@ export default function CareerPath() {
                 {EXPERIENCE_OPTIONS.map(opt => (
                   <button
                     key={opt.value} onClick={() => setExperience(opt.value)}
-                    className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
+                    className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
                       experience === opt.value
                         ? 'bg-[#0a0a0a] text-white border-[#0a0a0a]'
                         : 'bg-[#fcfcfc] text-[#6b6b6b] border-[#e4e4e4] hover:border-[#a3a3a3]'
@@ -636,7 +651,7 @@ export default function CareerPath() {
           <button
             onClick={handleGenerate}
             disabled={!targetRole.trim() || !skills.trim() || loading}
-            className="inline-flex items-center gap-2 bg-[#0a0a0a] text-white hover:bg-[#222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] disabled:cursor-not-allowed font-semibold px-7 py-3 rounded-xl text-sm transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:transform-none"
+            className="inline-flex items-center gap-2 bg-[#0a0a0a] text-white hover:bg-[#222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] disabled:cursor-not-allowed font-semibold px-7 py-3 rounded-lg text-sm transition-all shadow-sm hover:-translate-y-0.5 disabled:transform-none"
           >
             {loading
               ? <><Loader2 size={16} className="animate-spin" /> Building your roadmap...</>
@@ -650,33 +665,81 @@ export default function CareerPath() {
           <div className="relative z-10 space-y-6">
 
             {/* Meta bar */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e4e4e4] rounded-xl shadow-sm text-xs font-medium text-[#4a4a4a]">
-                <Clock size={13} className="text-blue-500" /> {result.estimated_total_weeks} weeks total
+            <div className="rounded-lg border border-[#e4e4e4] bg-white p-4 sm:p-5 shadow-sm">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Generated path</p>
+                  <h2 className="cp-serif text-2xl sm:text-3xl text-[#111]">{currentRole || 'Student'} to {targetRole}</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { icon: Clock, label: 'Weeks', value: result.estimated_total_weeks || '?' },
+                    { icon: Milestone, label: 'Steps', value: steps.length },
+                    { icon: Layers, label: 'Topics', value: totalSubtopics },
+                    { icon: BookOpen, label: 'Resources', value: totalResources },
+                  ].map(item => {
+                    const Icon = item.icon
+                    return (
+                      <div key={item.label} className="rounded-lg border border-[#e4e4e4] bg-[#fcfcfc] px-3 py-2 min-w-[86px]">
+                        <Icon size={14} className="text-[#6b6b6b]" />
+                        <p className="mt-1 text-lg font-black text-[#111] leading-none">{item.value}</p>
+                        <p className="mt-1 text-[10px] font-bold text-[#8b8b8b] uppercase">{item.label}</p>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#e4e4e4] rounded-xl shadow-sm text-xs font-medium text-[#4a4a4a]">
-                <Milestone size={13} className="text-blue-500" /> {steps.length} steps
+              <div className="mt-4 flex flex-wrap gap-2">
+                {result.difficulty && (
+                  <span className={`px-3 py-1.5 rounded-md text-xs font-semibold border ${DIFF_COLOR[result.difficulty] || 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b]'}`}>
+                    {result.difficulty}
+                  </span>
+                )}
+                {missingSkills.slice(0, 5).map((s, i) => (
+                  <span key={i} className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs rounded-md font-semibold">
+                    Gap: {s}
+                  </span>
+                ))}
               </div>
-              {result.difficulty && (
-                <span className={`px-3 py-1.5 rounded-xl text-xs font-semibold border ${DIFF_COLOR[result.difficulty] || 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b]'}`}>
-                  {result.difficulty}
-                </span>
-              )}
-              {safeArray(result.skill_gap?.missing).slice(0, 4).map((s, i) => (
-                <span key={i} className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs rounded-lg font-medium">
-                  Gap: {s}
-                </span>
-              ))}
             </div>
 
             {/* GPS Navigator */}
-            <div className="bg-white border border-[#e4e4e4] rounded-3xl shadow-[0_4px_24px_rgb(0,0,0,0.05)] overflow-hidden">
+            <div className="grid xl:grid-cols-[300px_1fr] gap-5 items-start">
+              <aside className="rounded-lg border border-[#e4e4e4] bg-white p-4 shadow-sm xl:sticky xl:top-20">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 mb-3">
+                  <PanelRightOpen size={14} />
+                  Step focus
+                </div>
+                <div className="space-y-2">
+                  {steps.map((step, i) => (
+                    <button
+                      key={`${step.skill_to_learn}-${i}`}
+                      onClick={() => setActiveStep(i)}
+                      className={`w-full rounded-lg border p-3 text-left transition hover:-translate-y-px hover:shadow-sm ${
+                        activeStep === i
+                          ? 'border-[#0a0a0a] bg-[#0a0a0a] text-white'
+                          : 'border-blue-100 bg-blue-50 text-[#111] hover:border-blue-200'
+                      }`}
+                    >
+                      <span className={`inline-flex h-7 w-7 items-center justify-center rounded-md text-xs font-black ${activeStep === i ? 'bg-white text-[#111]' : 'bg-blue-500 text-white'}`}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span className={`mt-2 block text-sm font-bold leading-snug ${activeStep === i ? 'text-white' : 'text-[#111]'}`}>{step.skill_to_learn}</span>
+                      <span className={`mt-1 block text-[11px] ${activeStep === i ? 'text-white/70' : 'text-[#6b6b6b]'}`}>
+                        {safeArray(step.subtopics).length} topics - {safeArray(step.resources).length} resources
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </aside>
+
+            <div className="bg-white border border-[#e4e4e4] rounded-lg shadow-sm overflow-hidden">
 
               {/* Step track */}
               <div className="border-b border-[#e4e4e4] px-6 py-5 overflow-x-auto">
                 <div className="flex items-center gap-0 min-w-max">
                   <div className="flex flex-col items-center gap-1.5 mr-2">
-                    <div className="w-8 h-8 rounded-full bg-[#0a0a0a] flex items-center justify-center shadow-sm">
+                    <div className="w-8 h-8 rounded-lg bg-[#0a0a0a] flex items-center justify-center shadow-sm">
                       <Compass size={14} className="text-white" />
                     </div>
                     <span className="text-[10px] text-[#8b8b8b] font-medium">Start</span>
@@ -688,7 +751,7 @@ export default function CareerPath() {
                         onClick={() => setActiveStep(i)}
                         className={`step-node flex flex-col items-center gap-1.5 ${activeStep === i ? 'active' : ''}`}
                       >
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-200 shadow-sm ${
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold border-2 transition-all duration-200 shadow-sm ${
                           i < activeStep    ? 'bg-blue-500 border-blue-500 text-white'
                           : i === activeStep ? 'bg-white border-blue-500 text-blue-600 shadow-[0_0_0_3px_rgba(59,130,246,0.15)]'
                           : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#a3a3a3] hover:border-[#a3a3a3]'
@@ -705,7 +768,7 @@ export default function CareerPath() {
                   ))}
                   <div className={`w-8 h-0.5 ${activeStep === steps.length - 1 ? 'bg-blue-500' : 'bg-[#e4e4e4]'}`} />
                   <div className="flex flex-col items-center gap-1.5">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${activeStep === steps.length - 1 ? 'bg-emerald-500' : 'bg-[#f0f0f0]'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm transition-colors ${activeStep === steps.length - 1 ? 'bg-emerald-500' : 'bg-[#f0f0f0]'}`}>
                       <Flag size={13} className={activeStep === steps.length - 1 ? 'text-white' : 'text-[#c4c4c4]'} />
                     </div>
                     <span className="text-[10px] text-[#8b8b8b] font-medium">Goal</span>
@@ -726,7 +789,7 @@ export default function CareerPath() {
                       </h2>
                     </div>
                     {currentStepData.estimated_weeks && (
-                      <div className="shrink-0 text-center bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3">
+                      <div className="shrink-0 text-center bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
                         <p className="text-2xl font-bold text-blue-600">{currentStepData.estimated_weeks}</p>
                         <p className="text-[10px] text-blue-400 font-semibold uppercase tracking-wide">weeks</p>
                       </div>
@@ -746,8 +809,8 @@ export default function CareerPath() {
                       </p>
                       <div className="grid sm:grid-cols-2 gap-2">
                         {safeArray(currentStepData.subtopics).map((sub, j) => (
-                          <div key={j} className="flex items-start gap-3 p-3 rounded-xl bg-[#fcfcfc] border border-[#e4e4e4] hover:border-[#c4c4c4] hover:shadow-sm transition-all">
-                            <div className="shrink-0 mt-0.5 w-6 h-6 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center">
+                          <div key={j} className="flex items-start gap-3 p-3 rounded-lg bg-[#fcfcfc] border border-[#e4e4e4] hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-sm transition-all">
+                            <div className="shrink-0 mt-0.5 w-6 h-6 rounded-md bg-blue-50 border border-blue-200 flex items-center justify-center">
                               <span className="text-[10px] font-bold text-blue-600">{j + 1}</span>
                             </div>
                             <div className="flex-1 min-w-0">
@@ -780,7 +843,7 @@ export default function CareerPath() {
                           const meta = getPlatformMeta(r)
                           return (
                             <a key={j} href={parsed.url} target="_blank" rel="noopener noreferrer"
-                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition-all hover:-translate-y-0.5 hover:shadow-sm ${meta.color}`}
+                              className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-xs font-medium transition-all hover:-translate-y-0.5 hover:shadow-sm ${meta.color}`}
                             >
                               <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
                               {parsed.label}
@@ -795,12 +858,12 @@ export default function CareerPath() {
                     <button
                       onClick={() => setActiveStep(i => Math.max(0, i - 1))}
                       disabled={activeStep === 0}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#e4e4e4] text-xs font-medium text-[#6b6b6b] hover:border-[#a3a3a3] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e4e4e4] text-xs font-medium text-[#6b6b6b] hover:border-[#a3a3a3] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >â† Previous</button>
                     <button
                       onClick={() => setActiveStep(i => Math.min(steps.length - 1, i + 1))}
                       disabled={activeStep === steps.length - 1}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0a0a0a] text-white text-xs font-medium hover:bg-[#222] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0a0a0a] text-white text-xs font-medium hover:bg-[#222] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >Next Step <ArrowRight size={12} /></button>
                     {activeStep === steps.length - 1 && (
                       <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 ml-1">
@@ -811,22 +874,23 @@ export default function CareerPath() {
                 </div>
               )}
             </div>
+            </div>
 
             {/* Summary + already have */}
             <div className="grid sm:grid-cols-2 gap-5">
               {result.summary && (
-                <div className="bg-white border border-[#e4e4e4] rounded-3xl p-6 shadow-[0_4px_24px_rgb(0,0,0,0.04)]">
+                <div className="bg-white border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
                   <h3 className="text-xs font-semibold text-[#8b8b8b] uppercase tracking-widest mb-3">Transition Summary</h3>
                   <p className="text-[#3a3a3a] text-sm leading-relaxed">{result.summary}</p>
                 </div>
               )}
-              {safeArray(result.skill_gap?.already_have).length > 0 && (
-                <div className="bg-white border border-[#e4e4e4] rounded-3xl p-6 shadow-[0_4px_24px_rgb(0,0,0,0.04)]">
+              {ownedSkills.length > 0 && (
+                <div className="bg-white border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
                   <h3 className="text-xs font-semibold text-[#8b8b8b] uppercase tracking-widest mb-3 flex items-center gap-2">
                     <CheckCircle2 size={13} className="text-emerald-500" /> Skills You Already Have
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {safeArray(result.skill_gap?.already_have).map((s, i) => (
+                    {ownedSkills.map((s, i) => (
                       <span key={i} className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-lg font-medium">âœ“ {s}</span>
                     ))}
                   </div>
@@ -836,7 +900,7 @@ export default function CareerPath() {
 
             {/* â”€â”€ PDF Download "” appears only after last step â”€â”€ */}
             {allStepsSeen && (
-              <div className="fade-slide bg-white border border-[#e4e4e4] rounded-3xl p-6 sm:p-8 shadow-[0_4px_24px_rgb(0,0,0,0.05)]">
+              <div className="fade-slide bg-white border border-[#e4e4e4] rounded-lg p-6 sm:p-8 shadow-sm">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                   <div>
                     <h3 className="cp-serif text-xl text-[#0a0a0a] mb-1">Save Your Roadmap</h3>
@@ -854,7 +918,7 @@ export default function CareerPath() {
                   <button
                     onClick={handleDownloadPDF}
                     disabled={pdfLoading}
-                    className="shrink-0 inline-flex items-center gap-2.5 bg-[#0a0a0a] text-white hover:bg-[#222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] font-semibold px-6 py-3.5 rounded-2xl text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:transform-none disabled:cursor-not-allowed"
+                    className="shrink-0 inline-flex items-center gap-2.5 bg-[#0a0a0a] text-white hover:bg-[#222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] font-semibold px-6 py-3.5 rounded-lg text-sm transition-all shadow-sm hover:-translate-y-0.5 disabled:transform-none disabled:cursor-not-allowed"
                   >
                     {pdfLoading
                       ? <><Loader2 size={16} className="animate-spin" /> Generating...</>

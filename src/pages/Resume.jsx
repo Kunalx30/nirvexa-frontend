@@ -68,6 +68,41 @@ const getScoreGradient = (score) => {
   return 'from-rose-400 to-pink-400'
 }
 
+const getResumeScoreTone = (score = 0) => {
+  if (score >= 80) return {
+    label: 'Competitive',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-200',
+    text: 'text-emerald-700',
+    bar: 'bg-emerald-500',
+    note: 'Strong enough to apply, but still tune it to each JD.'
+  }
+  if (score >= 60) return {
+    label: 'Close',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    text: 'text-blue-700',
+    bar: 'bg-blue-500',
+    note: 'Good base. Improve keywords, impact, and role alignment before serious applications.'
+  }
+  if (score >= 40) return {
+    label: 'Needs Work',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    text: 'text-amber-700',
+    bar: 'bg-amber-500',
+    note: 'Readable, but not yet strong for competitive roles. Fix gaps before applying widely.'
+  }
+  return {
+    label: 'High Risk',
+    bg: 'bg-rose-50',
+    border: 'border-rose-200',
+    text: 'text-rose-700',
+    bar: 'bg-rose-500',
+    note: 'Likely to struggle in ATS and recruiter screening. Rework the structure and evidence.'
+  }
+}
+
 const downloadPDF = (base64, filename = 'resume.pdf') => {
   const bytes = atob(base64)
   const arr   = new Uint8Array(bytes.length)
@@ -482,17 +517,20 @@ const StepTemplate = ({ form, update, templates, loadingTemplates }) => (
 // SHARED UI
 // -----------------------------------------------------------------------------
 
-const SectionTitle = ({ icon: Icon, title, subtitle }) => (
-  <div className="flex items-start gap-3">
-    <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm text-blue-600">
-      <Icon size={15} className="text-blue-600" />
+const SectionTitle = ({ icon, title, subtitle }) => {
+  const IconComponent = icon
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm text-blue-600">
+        <IconComponent size={15} className="text-blue-600" />
+      </div>
+      <div>
+        <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight">{title}</h3>
+        {subtitle && <p className="text-[#8b8b8b] text-xs mt-0.5 font-light">{subtitle}</p>}
+      </div>
     </div>
-    <div>
-      <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight">{title}</h3>
-      {subtitle && <p className="text-[#8b8b8b] text-xs mt-0.5 font-light">{subtitle}</p>}
-    </div>
-  </div>
-)
+  )
+}
 
 // -----------------------------------------------------------------------------
 // BUILDER RESULT SCREEN
@@ -821,20 +859,51 @@ const ResumeAnalyzer = () => {
   }
 
   const atsStyles = result ? getAtsStyles(result.ats_status) : null
+  const scoreTone = result ? getResumeScoreTone(result.overall_score) : null
+  const matchedCount = result?.matched_keywords?.length || result?.skills_found?.length || 0
+  const missingCount = result?.missing_keywords?.length || 0
+  const issueCount = (result?.ats_issues?.length || 0) + (result?.improvements?.length || 0)
 
   return (
     <div className="space-y-6">
+      <div className="rounded-lg border border-[#e4e4e4] bg-white p-5 shadow-sm">
+        <div className="grid lg:grid-cols-[1fr_320px] gap-5 items-end">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
+              <Target size={13} />
+              Resume Analyzer
+            </div>
+            <h2 className="mt-3 text-2xl sm:text-3xl font-serif text-[#0a0a0a]">Get an honest ATS readout.</h2>
+            <p className="mt-2 text-sm text-[#6b6b6b] max-w-2xl">
+              Upload a PDF resume. Add a JD when you want market-realistic fit scoring, missing keywords, ATS issues, and exact additions.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              ['Mode', jdMode ? 'JD' : 'ATS'],
+              ['File', file ? 'Ready' : 'None'],
+              ['History', history.length],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-lg border border-[#e4e4e4] bg-[#fcfcfc] p-3">
+                <p className="text-lg font-black text-[#111] leading-none">{value}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase text-[#8b8b8b]">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Mode toggle */}
-      <div className="flex items-center gap-3 p-1 bg-[#ffffff] shadow-sm rounded-xl border border-[#e4e4e4] w-fit">
+      <div className="flex items-center gap-3 p-1 bg-[#ffffff] shadow-sm rounded-lg border border-[#e4e4e4] w-fit">
         <button
           onClick={() => setJdMode(false)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!jdMode ? 'bg-[#0a0a0a] text-[#fafafa] text-[#0a0a0a]' : 'text-[#6b6b6b] hover:text-[#0a0a0a]'}`}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${!jdMode ? 'bg-[#0a0a0a] text-[#fafafa]' : 'text-[#6b6b6b] hover:text-[#0a0a0a]'}`}
         >
           Generic Analysis
         </button>
         <button
           onClick={() => setJdMode(true)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${jdMode ? 'bg-purple-600 text-[#0a0a0a]' : 'text-[#6b6b6b] hover:text-[#0a0a0a]'}`}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${jdMode ? 'bg-[#0a0a0a] text-white' : 'text-[#6b6b6b] hover:text-[#0a0a0a]'}`}
         >
           <Zap size={13} /> JD-Match Mode
         </button>
@@ -842,7 +911,7 @@ const ResumeAnalyzer = () => {
 
       {/* JD textarea */}
       {jdMode && (
-        <div className="bg-purple-500/5 border border-purple-500/15 rounded-2xl p-5">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
           <TextArea
             label="Paste Job Description"
             icon={FileText}
@@ -860,17 +929,17 @@ const ResumeAnalyzer = () => {
         onDragOver={e => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`relative border-2 border-dashed rounded-[2rem] p-10 text-center transition-all duration-300 backdrop-blur-xl flex flex-col items-center justify-center min-h-[200px]
+        className={`relative border-2 border-dashed rounded-lg p-10 text-center transition-all duration-300 backdrop-blur-xl flex flex-col items-center justify-center min-h-[200px]
           ${dragging ? 'border-blue-500 bg-blue-50' : 'border-[#e4e4e4] bg-[#ffffff] hover:border-[#c4c4c4]'}`}
       >
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-[#e4e4e4] rounded-2xl flex items-center justify-center mb-4">
+        <div className="w-16 h-16 mx-auto bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center mb-4">
           {file ? <FileCheck size={28} className="text-emerald-600" /> : <UploadCloud size={28} className="text-blue-600" />}
         </div>
         {!file ? (
           <>
             <p className="text-[#0a0a0a] font-semibold mb-1">Drag & drop your PDF resume</p>
             <p className="text-[#8b8b8b] text-sm mb-5">Max 5MB</p>
-            <label className="cursor-pointer bg-[#f9f9f9] hover:bg-[#e4e4e4] border border-[#e4e4e4] text-[#0a0a0a] text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
+            <label className="cursor-pointer bg-[#f9f9f9] hover:bg-[#e4e4e4] border border-[#e4e4e4] text-[#0a0a0a] text-sm font-medium px-5 py-2.5 rounded-lg transition-all">
               Browse Files
               <input type="file" accept=".pdf" onChange={e => handleFile(e.target.files[0])} className="hidden" />
             </label>
@@ -886,7 +955,7 @@ const ResumeAnalyzer = () => {
               <button
                 onClick={analyze}
                 disabled={loading}
-                className="flex items-center gap-2 bg-[#0a0a0a] text-[#fafafa] hover:bg-[#222222] hover:shadow-lg hover:-translate-y-0.5 disabled:from-gray-800 disabled:text-[#8b8b8b] disabled:cursor-not-allowed text-[#0a0a0a] font-semibold px-7 py-3 rounded-xl transition-all shadow-lg shadow-md shadow-black/10"
+                className="flex items-center gap-2 bg-[#0a0a0a] text-[#fafafa] hover:bg-[#222222] hover:-translate-y-0.5 disabled:bg-[#e4e4e4] disabled:text-[#8b8b8b] disabled:cursor-not-allowed font-semibold px-7 py-3 rounded-lg transition-all shadow-sm shadow-black/10"
               >
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Analyzing...</> : <><Sparkles size={16} /> Analyze Resume</>}
               </button>
@@ -904,16 +973,13 @@ const ResumeAnalyzer = () => {
         <div className="space-y-5">
           {/* Score row */}
           <div className="grid md:grid-cols-3 gap-5">
-            <div className="md:col-span-2 bg-[#ffffff] backdrop-blur-xl border border-[#e4e4e4] rounded-3xl p-7 flex items-center justify-between shadow-2xl">
+            <div className={`md:col-span-2 border rounded-lg p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm ${scoreTone.bg} ${scoreTone.border}`}>
               <div className="flex-1 pr-4">
                 <h3 className="text-[#6b6b6b] text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Target size={14} className="text-blue-600" /> Overall Score
                 </h3>
-                <p className="text-[#6b6b6b] text-sm font-light leading-relaxed">
-                  {result.overall_score >= 80 ? 'Strong and competitive for most roles.'
-                    : result.overall_score >= 60 ? 'Good - a few improvements will make it stand out.'
-                    : 'Needs work before applying to competitive roles.'}
-                </p>
+                <p className={`text-sm font-black uppercase tracking-wider ${scoreTone.text}`}>{scoreTone.label}</p>
+                <p className="mt-1 text-[#525252] text-sm leading-relaxed">{scoreTone.note}</p>
                 {result.jd_mode && result.jd_match_score != null && (
                   <div className="mt-3 flex items-center gap-2">
                     <span className="text-xs text-purple-600 font-semibold uppercase tracking-wider">JD Match</span>
@@ -924,13 +990,16 @@ const ResumeAnalyzer = () => {
                 )}
               </div>
               <div className="text-right shrink-0">
-                <span className={`text-[4.5rem] font-black leading-none bg-gradient-to-br ${getScoreGradient(result.overall_score)} bg-clip-text text-transparent`}>
+                <span className={`text-[4.5rem] font-black leading-none ${scoreTone.text}`}>
                   {result.overall_score}
                 </span>
                 <span className="text-[#8b8b8b] text-xl font-bold">/100</span>
+                <div className="mt-3 h-2 rounded-full bg-white/80 overflow-hidden border border-white">
+                  <div className={`h-full rounded-full ${scoreTone.bar}`} style={{ width: `${result.overall_score}%` }} />
+                </div>
               </div>
             </div>
-            <div className="bg-[#ffffff] backdrop-blur-xl border border-[#e4e4e4] rounded-3xl p-7 shadow-2xl flex flex-col justify-between">
+            <div className="bg-[#ffffff] backdrop-blur-xl border border-[#e4e4e4] rounded-lg p-6 shadow-sm flex flex-col justify-between">
               <h3 className="text-[#6b6b6b] text-xs font-semibold uppercase tracking-wider mb-3">ATS Status</h3>
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full animate-pulse shrink-0 ${atsStyles.dot}`} />
@@ -942,9 +1011,26 @@ const ResumeAnalyzer = () => {
             </div>
           </div>
 
+          <div className="grid sm:grid-cols-3 gap-3">
+            {[
+              { icon: CheckCircle2, label: result.jd_mode ? 'Matched Keywords' : 'Detected Skills', value: matchedCount, cls: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+              { icon: XCircle, label: 'Missing Keywords', value: missingCount, cls: 'text-rose-600 bg-rose-50 border-rose-200' },
+              { icon: AlertTriangle, label: 'Fixes Needed', value: issueCount, cls: 'text-amber-600 bg-amber-50 border-amber-200' },
+            ].map(item => {
+              const Icon = item.icon
+              return (
+                <div key={item.label} className={`rounded-lg border p-4 ${item.cls}`}>
+                  <Icon size={16} />
+                  <p className="mt-2 text-2xl font-black leading-none">{item.value}</p>
+                  <p className="mt-1 text-[10px] font-bold uppercase">{item.label}</p>
+                </div>
+              )
+            })}
+          </div>
+
           {/* Section scores breakdown (JD mode) */}
 {result.jd_mode && result.section_scores && (
-  <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+  <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
     <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2 text-sm">
       <Target size={16} className="text-blue-600" /> Score Breakdown
     </h3>
@@ -977,25 +1063,25 @@ const ResumeAnalyzer = () => {
           {result.jd_mode && (
             <div className="grid md:grid-cols-2 gap-5">
               {result.matched_keywords?.length > 0 && (
-                <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+                <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
                   <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2 text-sm">
                     <CheckCircle2 size={18} className="text-emerald-600" /> Matched Keywords
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {result.matched_keywords.map((k, i) => (
-                      <span key={i} className="text-xs px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-300 font-medium">{k}</span>
+                      <span key={i} className="text-xs px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-md text-emerald-700 font-semibold">{k}</span>
                     ))}
                   </div>
                 </div>
               )}
               {result.missing_keywords?.length > 0 && (
-                <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+                <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
                   <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2 text-sm">
                     <XCircle size={18} className="text-rose-600" /> Missing Keywords
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {result.missing_keywords.map((k, i) => (
-                      <span key={i} className="text-xs px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-300 font-medium">{k}</span>
+                      <span key={i} className="text-xs px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-md text-rose-700 font-semibold">{k}</span>
                     ))}
                   </div>
                 </div>
@@ -1006,13 +1092,13 @@ const ResumeAnalyzer = () => {
           {/* Strengths + Improvements */}
           <div className="grid md:grid-cols-2 gap-5">
             {result.strengths?.length > 0 && (
-              <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+              <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
                 <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2">
                   <CheckCircle2 size={18} className="text-emerald-600" /> Strengths
                 </h3>
                 <ul className="space-y-2">
                   {result.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[#3a3a3a] text-sm bg-white/4 p-3 rounded-xl border border-[#e4e4e4]">
+                    <li key={i} className="flex items-start gap-2 text-[#3a3a3a] text-sm bg-[#fcfcfc] p-3 rounded-lg border border-[#e4e4e4]">
                       <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" /> {s}
                     </li>
                   ))}
@@ -1020,13 +1106,13 @@ const ResumeAnalyzer = () => {
               </div>
             )}
             {result.improvements?.length > 0 && (
-              <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+              <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
                 <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2">
                   <AlertTriangle size={18} className="text-amber-600" /> Improvements
                 </h3>
                 <ul className="space-y-2">
                   {result.improvements.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[#3a3a3a] text-sm bg-white/4 p-3 rounded-xl border border-[#e4e4e4]">
+                    <li key={i} className="flex items-start gap-2 text-[#3a3a3a] text-sm bg-[#fcfcfc] p-3 rounded-lg border border-[#e4e4e4]">
                       <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" /> {s}
                     </li>
                   ))}
@@ -1037,13 +1123,13 @@ const ResumeAnalyzer = () => {
 
           {/* Skills found */}
           {result.skills_found?.length > 0 && (
-            <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+            <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
               <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2">
                 <CheckCircle2 size={18} className="text-blue-600" /> Skills Detected
               </h3>
               <div className="flex flex-wrap gap-2">
                 {result.skills_found.map((s, i) => (
-                  <span key={i} className="text-xs px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-300 font-medium">{s}</span>
+                  <span key={i} className="text-xs px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-md text-blue-700 font-semibold">{s}</span>
                 ))}
               </div>
             </div>
@@ -1051,13 +1137,13 @@ const ResumeAnalyzer = () => {
 
           {/* Recommended additions (JD mode) */}
           {result.jd_mode && result.recommended_additions?.length > 0 && (
-            <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-3xl p-6 shadow-xl">
+            <div className="bg-[#ffffff] border border-[#e4e4e4] rounded-lg p-6 shadow-sm">
               <h3 className="text-[#0a0a0a] font-semibold mb-4 flex items-center gap-2">
                 <ArrowRight size={18} className="text-purple-600" /> Recommended Additions
               </h3>
               <ul className="space-y-2">
                 {result.recommended_additions.map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[#3a3a3a] text-sm bg-purple-500/5 p-3 rounded-xl border border-purple-500/15">
+                  <li key={i} className="flex items-start gap-2 text-[#3a3a3a] text-sm bg-blue-50 p-3 rounded-lg border border-blue-100">
                     <Plus size={14} className="text-purple-600 mt-0.5 shrink-0" /> {r}
                   </li>
                 ))}
@@ -1067,13 +1153,13 @@ const ResumeAnalyzer = () => {
 
           {/* ATS issues (JD mode) */}
           {result.jd_mode && result.ats_issues?.length > 0 && (
-            <div className="bg-amber-500/5 border border-amber-500/15 rounded-3xl p-6">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
               <h3 className="text-[#0a0a0a] font-semibold mb-3 flex items-center gap-2 text-sm">
                 <AlertTriangle size={16} className="text-amber-600" /> ATS Formatting Issues
               </h3>
               <ul className="space-y-1.5">
                 {result.ats_issues.map((issue, i) => (
-                  <li key={i} className="text-amber-300/80 text-xs">- {issue}</li>
+                  <li key={i} className="text-amber-700 text-xs">- {issue}</li>
                 ))}
               </ul>
             </div>
