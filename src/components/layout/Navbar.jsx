@@ -5,28 +5,29 @@ import {
   MessageSquare, Briefcase, FileText,
   Map, Mic, Bookmark, User, Newspaper,
   LogOut, Menu, X, Zap, TrendingUp, Building2,
-  ChevronDown
+  ChevronDown, GitBranch
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 const NAV_LINKS = [
-  { to: '/chat',      label: 'AI Chat',      icon: MessageSquare },
-  { to: '/jobs',      label: 'Jobs',         icon: Briefcase     },
-  { to: '/resume',    label: 'Resume',       icon: FileText      },
-  { to: '/career',    label: 'Career Path',  icon: Map           },
-  { to: '/skills',    label: 'Skill Match',  icon: Zap           },
-  { to: '/interview', label: 'Interview',    icon: Mic           },
-  { to: '/news',      label: 'News',         icon: Newspaper     },
-  { to: '/salary',    label: 'Salary',       icon: TrendingUp    },
-  { to: '/company',   label: 'Company',      icon: Building2     },
+  { to: '/chat',          label: 'AI Chat',     icon: MessageSquare },
+  { to: '/jobs',          label: 'Jobs',        icon: Briefcase     },
+  { to: '/resume',        label: 'Resume',      icon: FileText      },
+  { to: '/career',        label: 'Career Path', icon: Map           },
+  { to: '/skills',        label: 'Skill Match', icon: Zap           },
+  { to: '/interview',     label: 'Interview',   icon: Mic           },
+  { to: '/news',          label: 'News',        icon: Newspaper     },
+  { to: '/salary',        label: 'Salary',      icon: TrendingUp    },
+  { to: '/company',       label: 'Company',     icon: Building2     },
+  { to: '/roadmap-graph', label: 'Roadmaps',    icon: GitBranch     },
 ]
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const navigate  = useNavigate()
+  const location  = useLocation()
+  const [mobileOpen,  setMobileOpen]  = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
 
@@ -36,12 +37,10 @@ export default function Navbar() {
     navigate('/login')
   }
 
-  // Close profile dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
+      if (profileRef.current && !profileRef.current.contains(e.target))
         setProfileOpen(false)
-      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -52,143 +51,208 @@ export default function Navbar() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
 
-        .nb{
+        .nb {
           position:sticky;top:0;z-index:200;
-          background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);
+          background:rgba(255,255,255,.94);
+          backdrop-filter:saturate(180%) blur(20px);
           -webkit-backdrop-filter:saturate(180%) blur(20px);
-          border-bottom:1px solid #e4e4e4;font-family:'DM Sans',system-ui,sans-serif;
+          border-bottom:1px solid #e8e8e8;
+          font-family:'DM Sans',system-ui,sans-serif;
           -webkit-font-smoothing:antialiased;
         }
-        .nb-in{max-width:1200px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
-
-        /* Logo */
-        .nb-logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
-        .nb-lsq{width:28px;height:28px;background:#0a0a0a;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fafafa;letter-spacing:-.5px}
-        .nb-lname{font-size:16px;font-weight:600;color:#0a0a0a;letter-spacing:-.4px}
-
-        /* Nav links */
-        .nb-links{display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:0 8px}
-        .nb-links::-webkit-scrollbar{display:none}
-        .nb-link{
-          display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:10px;
-          font-size:13px;font-weight:450;color:#6b6b6b;text-decoration:none;
-          white-space:nowrap;transition:all .2s;letter-spacing:-.1px;
+        .nb-in {
+          max-width:1400px;margin:0 auto;padding:0 20px;height:58px;
+          display:flex;align-items:center;justify-content:space-between;gap:8px;
         }
-        .nb-link:hover{color:#0a0a0a;background:#f3f3f3}
-        .nb-link.active{color:#0a0a0a;background:#f0f0f0;font-weight:550}
-        .nb-link svg{flex-shrink:0}
 
-        /* Right side */
-        .nb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+        /* ── Logo ── */
+        .nb-logo {
+          display:flex;align-items:center;gap:8px;
+          text-decoration:none;flex-shrink:0;
+        }
+        .nb-lsq {
+          width:30px;height:30px;background:#0a0a0a;border-radius:8px;
+          display:flex;align-items:center;justify-content:center;
+          font-size:14px;font-weight:700;color:#fafafa;flex-shrink:0;
+        }
+        .nb-lname {
+          font-size:15px;font-weight:600;color:#0a0a0a;
+          letter-spacing:-.4px;white-space:nowrap;
+        }
 
-        /* Profile dropdown */
-        .nb-profile{position:relative}
-        .nb-profile-btn{
-          display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;
-          border-radius:24px;border:1px solid #e4e4e4;background:#fff;cursor:pointer;
+        /* ── Right cluster: nav + divider + profile ── */
+        .nb-right {
+          display:flex;align-items:center;gap:6px;
+          flex-shrink:0;
+        }
+
+        /* ── Nav links ── */
+        .nb-links {
+          display:flex;align-items:center;gap:2px;
+        }
+
+        /* ── Each pill ── */
+        .nb-link {
+          display:inline-flex;align-items:center;gap:0;
+          height:34px;
+          padding:0 8px;
+          border-radius:9px;
+          font-size:12.5px;font-weight:500;
+          color:#5a5a5a;
+          text-decoration:none;
+          white-space:nowrap;
+          overflow:hidden;
+          max-width:34px;
+          transition:
+            max-width .26s cubic-bezier(.25,1.1,.5,1),
+            background .18s ease,
+            color .18s ease,
+            padding .22s cubic-bezier(.25,1.1,.5,1);
+          flex-shrink:0;
+        }
+
+        .nb-link-icon {
+          flex-shrink:0;
+          display:flex;align-items:center;justify-content:center;
+          width:18px;height:18px;
+        }
+
+        .nb-link-label {
+          opacity:0;
+          max-width:0;
+          overflow:hidden;
+          transition:
+            opacity .18s ease .04s,
+            max-width .22s cubic-bezier(.25,1.1,.5,1);
+          font-size:12.5px;font-weight:500;
+          margin-left:0;
+          white-space:nowrap;
+        }
+
+        .nb-link:hover {
+          max-width:120px;
+          padding:0 10px 0 8px;
+          background:#f0f0f0;
+          color:#0a0a0a;
+        }
+        .nb-link:hover .nb-link-label {
+          opacity:1;
+          max-width:90px;
+          margin-left:6px;
+        }
+
+        .nb-link.active {
+          color:#0a0a0a;
+          background:#ececec;
+          max-width:120px;
+          padding:0 10px 0 8px;
+        }
+        .nb-link.active .nb-link-label {
+          opacity:1;
+          max-width:90px;
+          margin-left:6px;
+        }
+
+        /* ── Divider ── */
+        .nb-divider {
+          width:1px;height:22px;background:#e4e4e4;
+          flex-shrink:0;margin:0 2px;
+        }
+
+        /* ── Profile ── */
+        .nb-profile { position:relative; }
+        .nb-profile-btn {
+          display:flex;align-items:center;gap:7px;
+          padding:4px 10px 4px 4px;border-radius:24px;
+          border:1px solid #e4e4e4;background:#fff;cursor:pointer;
           transition:all .2s;
         }
-        .nb-profile-btn:hover{border-color:#c4c4c4;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-        .nb-avatar{
-          width:30px;height:30px;border-radius:50%;background:#0a0a0a;
+        .nb-profile-btn:hover { border-color:#c4c4c4;box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .nb-avatar {
+          width:28px;height:28px;border-radius:50%;background:#0a0a0a;
           display:flex;align-items:center;justify-content:center;
-          font-size:11px;font-weight:700;color:#fafafa;letter-spacing:-.3px;
+          font-size:11px;font-weight:700;color:#fafafa;
         }
-        .nb-profile-name{font-size:13px;font-weight:500;color:#0a0a0a;letter-spacing:-.2px}
-        .nb-profile-btn svg{color:#a3a3a3;transition:transform .2s}
-        .nb-profile-btn.open svg:last-child{transform:rotate(180deg)}
+        .nb-profile-name { font-size:13px;font-weight:500;color:#0a0a0a;letter-spacing:-.2px; }
+        .nb-profile-btn svg { color:#a3a3a3;transition:transform .2s; }
+        .nb-profile-btn.open svg:last-child { transform:rotate(180deg); }
 
-        .nb-dropdown{
-          position:absolute;top:calc(100% + 6px);right:0;min-width:180px;
+        .nb-dropdown {
+          position:absolute;top:calc(100% + 8px);right:0;min-width:180px;
           background:#fff;border:1px solid #e4e4e4;border-radius:14px;
-          box-shadow:0 8px 32px rgba(0,0,0,.08);padding:6px;z-index:100;
+          box-shadow:0 8px 32px rgba(0,0,0,.08);padding:6px;z-index:300;
           animation:dropIn .2s ease;
         }
-        @keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-        .nb-drop-item{
-          display:flex;align-items:center;gap:8px;width:100%;padding:10px 14px;
-          border-radius:10px;font-size:13px;font-weight:450;color:#6b6b6b;
+        @keyframes dropIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+        .nb-drop-item {
+          display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;
+          border-radius:9px;font-size:13px;font-weight:450;color:#6b6b6b;
           background:none;border:none;cursor:pointer;text-decoration:none;
           font-family:'DM Sans',sans-serif;transition:all .15s;text-align:left;
         }
-        .nb-drop-item:hover{background:#f3f3f3;color:#0a0a0a}
-        .nb-drop-item.danger:hover{background:#fef2f2;color:#ef4444}
-        .nb-drop-sep{height:1px;background:#f0f0f0;margin:4px 8px}
+        .nb-drop-item:hover { background:#f3f3f3;color:#0a0a0a; }
+        .nb-drop-item.danger:hover { background:#fef2f2;color:#ef4444; }
+        .nb-drop-sep { height:1px;background:#f0f0f0;margin:4px 6px; }
 
-        /* Auth buttons (logged out) */
-        .nb-auth{display:flex;align-items:center;gap:6px}
-        .nb-login{font-size:13px;font-weight:500;color:#6b6b6b;text-decoration:none;padding:7px 16px;border-radius:20px;transition:all .2s}
-        .nb-login:hover{color:#0a0a0a;background:#f3f3f3}
-        .nb-signup{
-          font-size:13px;font-weight:600;background:#0a0a0a;color:#fafafa;
-          padding:8px 20px;border-radius:22px;text-decoration:none;letter-spacing:-.2px;
-          transition:opacity .2s,transform .2s;
-        }
-        .nb-signup:hover{opacity:.82;transform:translateY(-1px)}
+        /* ── Auth ── */
+        .nb-auth { display:flex;align-items:center;gap:6px; }
+        .nb-login { font-size:13px;font-weight:500;color:#6b6b6b;text-decoration:none;padding:7px 16px;border-radius:20px;transition:all .2s; }
+        .nb-login:hover { color:#0a0a0a;background:#f3f3f3; }
+        .nb-signup { font-size:13px;font-weight:600;background:#0a0a0a;color:#fafafa;padding:8px 20px;border-radius:22px;text-decoration:none;transition:opacity .2s,transform .2s; }
+        .nb-signup:hover { opacity:.82;transform:translateY(-1px); }
 
-        /* Mobile toggle */
-        .nb-mobile-btn{
-          display:none;background:none;border:1px solid #e4e4e4;border-radius:10px;
-          padding:6px;cursor:pointer;color:#6b6b6b;transition:all .2s;
-        }
-        .nb-mobile-btn:hover{color:#0a0a0a;background:#f3f3f3}
+        /* ── Mobile ── */
+        .nb-mobile-btn { display:none;background:none;border:1px solid #e4e4e4;border-radius:9px;padding:6px;cursor:pointer;color:#6b6b6b;transition:all .2s; }
+        .nb-mobile-btn:hover { color:#0a0a0a;background:#f3f3f3; }
+        .nb-mobile { display:none;border-top:1px solid #e4e4e4;background:#fff;padding:12px 16px;animation:dropIn .25s ease; }
+        .nb-mobile-links { display:grid;grid-template-columns:1fr 1fr;gap:4px; }
+        .nb-mobile-link { display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:450;color:#6b6b6b;text-decoration:none;transition:all .15s; }
+        .nb-mobile-link:hover { background:#f3f3f3;color:#0a0a0a; }
+        .nb-mobile-link.active { background:#f0f0f0;color:#0a0a0a;font-weight:550; }
+        .nb-mobile-logout { display:flex;align-items:center;gap:8px;width:100%;margin-top:8px;padding:10px 14px;border-radius:12px;border:none;background:none;font-size:13px;font-weight:450;color:#ef4444;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s; }
+        .nb-mobile-logout:hover { background:#fef2f2; }
 
-        /* Mobile menu */
-        .nb-mobile{
-          display:none;border-top:1px solid #e4e4e4;background:#fff;
-          padding:12px 16px;animation:dropIn .25s ease;
-        }
-        .nb-mobile-links{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-        .nb-mobile-link{
-          display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;
-          font-size:13px;font-weight:450;color:#6b6b6b;text-decoration:none;transition:all .15s;
-        }
-        .nb-mobile-link:hover{background:#f3f3f3;color:#0a0a0a}
-        .nb-mobile-link.active{background:#f0f0f0;color:#0a0a0a;font-weight:550}
-        .nb-mobile-logout{
-          display:flex;align-items:center;gap:8px;width:100%;margin-top:8px;
-          padding:10px 14px;border-radius:12px;border:none;background:none;
-          font-size:13px;font-weight:450;color:#ef4444;cursor:pointer;
-          font-family:'DM Sans',sans-serif;transition:all .15s;
-        }
-        .nb-mobile-logout:hover{background:#fef2f2}
-
-        /* Hide desktop nav on mobile, show mobile toggle */
-        @media(max-width:900px){
-          .nb-links{display:none}
-          .nb-profile-name{display:none}
-          .nb-mobile-btn{display:flex}
-          .nb-mobile.open{display:block}
+        @media(max-width:1024px){
+          .nb-links { display:none; }
+          .nb-divider { display:none; }
+          .nb-profile-name { display:none; }
+          .nb-mobile-btn { display:flex; }
+          .nb-mobile.open { display:block; }
         }
       `}</style>
 
       <nav className="nb">
         <div className="nb-in">
 
-          {/* Logo */}
+          {/* Logo — left */}
           <Link to="/" className="nb-logo">
             <div className="nb-lsq">N</div>
             <span className="nb-lname">Nyrvexa</span>
           </Link>
 
-          {/* Desktop Nav */}
-          {isAuthenticated && (
-            <div className="nb-links">
-              {NAV_LINKS.map(({ to, label, icon: Icon }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className={`nb-link${location.pathname === to ? ' active' : ''}`}
-                >
-                  <Icon size={14} />
-                  {label}
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Right */}
+          {/* Everything on the right */}
           <div className="nb-right">
+
+            {isAuthenticated && (
+              <>
+                <div className="nb-links">
+                  {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+                    <Link
+                      key={to}
+                      to={to}
+                      className={`nb-link${location.pathname === to ? ' active' : ''}`}
+                    >
+                      <span className="nb-link-icon">
+                        <Icon size={17} strokeWidth={1.9} />
+                      </span>
+                      <span className="nb-link-label">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+                <div className="nb-divider" />
+              </>
+            )}
+
             {isAuthenticated ? (
               <div className="nb-profile" ref={profileRef}>
                 <button
@@ -197,23 +261,19 @@ export default function Navbar() {
                 >
                   <div className="nb-avatar">{getInitials(user?.name)}</div>
                   <span className="nb-profile-name">{user?.name?.split(' ')[0]}</span>
-                  <ChevronDown size={14} />
+                  <ChevronDown size={13} />
                 </button>
-
                 {profileOpen && (
                   <div className="nb-dropdown">
                     <Link to="/profile" className="nb-drop-item" onClick={() => setProfileOpen(false)}>
-                      <User size={15} />
-                      Profile
+                      <User size={15} /> Profile
                     </Link>
                     <Link to="/saved" className="nb-drop-item" onClick={() => setProfileOpen(false)}>
-                      <Bookmark size={15} />
-                      Saved Jobs
+                      <Bookmark size={15} /> Saved Jobs
                     </Link>
                     <div className="nb-drop-sep" />
                     <button className="nb-drop-item danger" onClick={() => { setProfileOpen(false); handleLogout() }}>
-                      <LogOut size={15} />
-                      Log out
+                      <LogOut size={15} /> Log out
                     </button>
                   </div>
                 )}
@@ -225,7 +285,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Mobile toggle */}
             {isAuthenticated && (
               <button className="nb-mobile-btn" onClick={() => setMobileOpen(!mobileOpen)}>
                 {mobileOpen ? <X size={18} /> : <Menu size={18} />}
@@ -240,28 +299,22 @@ export default function Navbar() {
           <div className={`nb-mobile${mobileOpen ? ' open' : ''}`}>
             <div className="nb-mobile-links">
               {NAV_LINKS.map(({ to, label, icon: Icon }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={() => setMobileOpen(false)}
-                  className={`nb-mobile-link${location.pathname === to ? ' active' : ''}`}
-                >
-                  <Icon size={15} />
-                  {label}
+                <Link key={to} to={to} onClick={() => setMobileOpen(false)}
+                  className={`nb-mobile-link${location.pathname === to ? ' active' : ''}`}>
+                  <Icon size={15} /> {label}
                 </Link>
               ))}
-              <Link to="/profile" onClick={() => setMobileOpen(false)} className={`nb-mobile-link${location.pathname === '/profile' ? ' active' : ''}`}>
-                <User size={15} />
-                Profile
+              <Link to="/profile" onClick={() => setMobileOpen(false)}
+                className={`nb-mobile-link${location.pathname === '/profile' ? ' active' : ''}`}>
+                <User size={15} /> Profile
               </Link>
-              <Link to="/saved" onClick={() => setMobileOpen(false)} className={`nb-mobile-link${location.pathname === '/saved' ? ' active' : ''}`}>
-                <Bookmark size={15} />
-                Saved Jobs
+              <Link to="/saved" onClick={() => setMobileOpen(false)}
+                className={`nb-mobile-link${location.pathname === '/saved' ? ' active' : ''}`}>
+                <Bookmark size={15} /> Saved Jobs
               </Link>
             </div>
             <button className="nb-mobile-logout" onClick={handleLogout}>
-              <LogOut size={15} />
-              Log out
+              <LogOut size={15} /> Log out
             </button>
           </div>
         )}

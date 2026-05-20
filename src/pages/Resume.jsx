@@ -1,9 +1,9 @@
 /**
  * src/pages/Resume.jsx
- * NirVexa — Resume Suite (Phase 6.0)
+ * NirVexa - Resume Suite (Phase 6.0)
  *
- * Tab 1: ATS Analyzer  — upload PDF + optional JD → score + keywords
- * Tab 2: AI Builder    — 4-step form → Groq → LaTeX → PDF download
+ * Tab 1: ATS Analyzer  - upload PDF + optional JD - score + keywords
+ * Tab 2: AI Builder    - 4-step form - Groq - LaTeX - PDF download
  */
 
 import Layout from '../components/layout/Layout'
@@ -21,9 +21,9 @@ import api from '../services/api'
 import toast from 'react-hot-toast'
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // API CALLS
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const analyzeResumeAPI = (file, jdText = '') => {
   const formData = new FormData()
@@ -46,9 +46,9 @@ const regenerateResumeAPI = (resumeId, data) =>
 const compileLatexAPI = (latex_code) =>
   api.post('/resume/compile', { latex_code }, { timeout: 60000 })
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const getAtsStyles = (status) => {
   const s = status?.toLowerCase()
@@ -87,9 +87,9 @@ const openPDFPreview = (base64) => {
   window.open(URL.createObjectURL(blob), '_blank')
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // FORM INITIAL STATE
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const emptyEdu = () => ({ degree: '', institution: '', year: '', cgpa: '' })
 const emptyExp = () => ({ company: '', role: '', duration: '', location: '', bullets_raw: '' })
@@ -112,9 +112,9 @@ const initialForm = {
   template_id: '',
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // STEP CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const STEPS = [
   { id: 0, label: 'Personal',   icon: User },
@@ -124,9 +124,9 @@ const STEPS = [
   { id: 4, label: 'Template',   icon: LayoutIcon },
 ]
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // SUB-COMPONENT: Input field
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const Field = ({ label, icon: Icon, type = 'text', value, onChange, placeholder, required, className = '' }) => (
   <div className={`flex flex-col gap-1.5 ${className}`}>
@@ -159,9 +159,9 @@ const TextArea = ({ label, icon: Icon, value, onChange, placeholder, rows = 4, h
   </div>
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STEP 0 — Personal Info
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// STEP 0 - Personal Info
+// -----------------------------------------------------------------------------
 
 const StepPersonal = ({ form, update }) => (
   <div className="space-y-6">
@@ -179,13 +179,13 @@ const StepPersonal = ({ form, update }) => (
     <div className="border-t border-[#e4e4e4] pt-5">
       <SectionTitle icon={Target} title="Target Role" subtitle="Tailor the resume to a specific job" />
       <div className="space-y-4 mt-3">
-        <Field label="Job Title / Target Role" icon={Briefcase} value={form.target_role} onChange={v => update('target_role', v)} placeholder="Software Engineer, Product Manager, Data Analyst…" required />
+        <Field label="Job Title / Target Role" icon={Briefcase} value={form.target_role} onChange={v => update('target_role', v)} placeholder="Software Engineer, Product Manager, Data Analyst..." required />
         <TextArea
-          label="Job Description (optional — enables JD-match mode)"
+          label="Job Description (optional - enables JD-match mode)"
           icon={FileText}
           value={form.job_description}
           onChange={v => update('job_description', v)}
-          placeholder="Paste the full job description here. AI will tailor keywords and bullets to this specific role…"
+          placeholder="Paste the full job description here. AI will tailor keywords and bullets to this specific role..."
           rows={5}
           hint="Pasting a JD boosts ATS match score by injecting exact keywords the employer's system scans for."
         />
@@ -194,9 +194,9 @@ const StepPersonal = ({ form, update }) => (
   </div>
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STEP 1 — Experience + Projects
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// STEP 1 - Experience + Projects
+// -----------------------------------------------------------------------------
 
 const StepExperience = ({ form, update, enhanceBullets, enhancing }) => {
   const addExp  = () => update('experience', [...form.experience, emptyExp()])
@@ -218,13 +218,13 @@ const StepExperience = ({ form, update, enhanceBullets, enhancing }) => {
   const handleEnhance = async (i) => {
     const raw = form.experience[i].bullets_raw
     if (!raw.trim()) return toast.error('Add some bullet points first')
-    const bullets = raw.split('\n').map(b => b.replace(/^[-•]\s*/, '').trim()).filter(Boolean)
+    const bullets = raw.split('\n').map(b => b.replace(/^[--]\s*/, '').trim()).filter(Boolean)
     if (!bullets.length) return toast.error('No bullets detected')
     try {
       const res = await enhanceBullets(bullets)
       const enhanced = res?.data?.enhanced_bullets || res?.data?.data || []
       if (enhanced.length) {
-        updateExp(i, 'bullets_raw', enhanced.map(b => `• ${b}`).join('\n'))
+        updateExp(i, 'bullets_raw', enhanced.map(b => `- ${b}`).join('\n'))
         toast.success('Bullets enhanced!')
       }
     } catch {
@@ -251,17 +251,17 @@ const StepExperience = ({ form, update, enhanceBullets, enhancing }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Company"  icon={Building2} value={exp.company}  onChange={v => updateExp(i, 'company', v)}  placeholder="Tech Innovators Inc." />
                 <Field label="Role"     icon={Briefcase} value={exp.role}     onChange={v => updateExp(i, 'role', v)}     placeholder="Software Engineer" />
-                <Field label="Duration" icon={Calendar}  value={exp.duration} onChange={v => updateExp(i, 'duration', v)} placeholder="Jan 2022 – Present" />
+                <Field label="Duration" icon={Calendar}  value={exp.duration} onChange={v => updateExp(i, 'duration', v)} placeholder="Jan 2022 - Present" />
                 <Field label="Location" icon={MapPin}    value={exp.location} onChange={v => updateExp(i, 'location', v)} placeholder="Hyderabad, TS (Remote)" />
               </div>
               <div>
                 <TextArea
-                  label="What you did (raw bullets — AI rewrites them powerfully)"
+                  label="What you did (raw bullets - AI rewrites them powerfully)"
                   value={exp.bullets_raw}
                   onChange={v => updateExp(i, 'bullets_raw', v)}
-                  placeholder={"• Developed and maintained scalable microservices\n• Optimized database queries improving performance by 30%\n• Led a team of 3 junior developers"}
+                  placeholder={"- Developed and maintained scalable microservices\n- Optimized database queries improving performance by 30%\n- Led a team of 3 junior developers"}
                   rows={4}
-                  hint="Type rough bullet points. Even vague inputs work — AI adds action verbs, tech names, and metrics."
+                  hint="Type rough bullet points. Even vague inputs work - AI adds action verbs, tech names, and metrics."
                 />
                 <button
                   onClick={() => handleEnhance(i)}
@@ -299,7 +299,7 @@ const StepExperience = ({ form, update, enhanceBullets, enhancing }) => {
                 <Field label="Tech Stack"   icon={Cpu}    value={proj.tech} onChange={v => updateProj(i, 'tech', v)} placeholder="Node.js, React, AWS, MongoDB" />
               </div>
               <TextArea
-                label="Description (1-3 lines — AI expands to 2 full bullets)"
+                label="Description (1-3 lines - AI expands to 2 full bullets)"
                 value={proj.description}
                 onChange={v => updateProj(i, 'description', v)}
                 placeholder="A real-time analytics dashboard for e-commerce platforms to track user engagement and sales metrics."
@@ -316,9 +316,9 @@ const StepExperience = ({ form, update, enhanceBullets, enhancing }) => {
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STEP 2 — Education
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// STEP 2 - Education
+// -----------------------------------------------------------------------------
 
 const StepEducation = ({ form, update }) => {
   const addEdu    = () => update('education', [...form.education, emptyEdu()])
@@ -346,7 +346,7 @@ const StepEducation = ({ form, update }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Degree"      icon={BookOpen}      value={edu.degree}      onChange={v => updateEdu(i, 'degree', v)}      placeholder="B.S. in Computer Science" className="sm:col-span-2" />
               <Field label="Institution" icon={GraduationCap} value={edu.institution} onChange={v => updateEdu(i, 'institution', v)} placeholder="University of Technology" className="sm:col-span-2" />
-              <Field label="Year"        icon={Calendar}      value={edu.year}        onChange={v => updateEdu(i, 'year', v)}        placeholder="2018 – 2022" />
+              <Field label="Year"        icon={Calendar}      value={edu.year}        onChange={v => updateEdu(i, 'year', v)}        placeholder="2018 - 2022" />
               <Field label="CGPA / %"    icon={Award}         value={edu.cgpa}        onChange={v => updateEdu(i, 'cgpa', v)}        placeholder="3.8 / 4.0" />
             </div>
           </div>
@@ -359,37 +359,37 @@ const StepEducation = ({ form, update }) => {
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STEP 3 — Skills + Certifications
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// STEP 3 - Skills + Certifications
+// -----------------------------------------------------------------------------
 
 const StepSkills = ({ form, update }) => (
   <div className="space-y-6">
-    <SectionTitle icon={Cpu} title="Skills & Certifications" subtitle="Paste all your skills — AI categorizes them into domain-appropriate groups automatically." />
+    <SectionTitle icon={Cpu} title="Skills & Certifications" subtitle="Paste all your skills - AI categorizes them into domain-appropriate groups automatically." />
     <TextArea
       label="All Skills (comma-separated)"
       icon={Cpu}
       value={form.skills_raw}
       onChange={v => update('skills_raw', v)}
-      placeholder="JavaScript, TypeScript, React, Node.js, Python, SQL, Docker, AWS, Git, Agile Methodologies, REST APIs…"
+      placeholder="JavaScript, TypeScript, React, Node.js, Python, SQL, Docker, AWS, Git, Agile Methodologies, REST APIs..."
       rows={5}
-      hint="Don't worry about organizing — paste everything. AI groups them into 5 categories like Languages, Frameworks, Tools, etc."
+      hint="Don't worry about organizing - paste everything. AI groups them into 5 categories like Languages, Frameworks, Tools, etc."
     />
     <TextArea
-      label="Certifications (one per line: Name · Issuer · Year)"
+      label="Certifications (one per line: Name -+ Issuer -+ Year)"
       icon={Award}
       value={form.certifications_raw}
       onChange={v => update('certifications_raw', v)}
-      placeholder={"AWS Certified Solutions Architect · Amazon Web Services · 2023\nProfessional Scrum Master I · Scrum.org · 2022"}
+      placeholder={"AWS Certified Solutions Architect -+ Amazon Web Services -+ 2023\nProfessional Scrum Master I -+ Scrum.org -+ 2022"}
       rows={4}
-      hint="Separate each certification with a bullet (·) or dash. AI formats them professionally."
+      hint="Separate each certification with a bullet (-+) or dash. AI formats them professionally."
     />
   </div>
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STEP 4 — Template Picker
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// STEP 4 - Template Picker
+// -----------------------------------------------------------------------------
 
 const TEMPLATE_INFO = {
   template_01_modern_blue:   { label: 'Modern Blue', category: 'Modern' },
@@ -407,6 +407,7 @@ const TEMPLATE_INFO = {
   template_13_crimson_double:{ label: 'Crimson Double', category: 'Traditional' },
   template_14_purple_tri:    { label: 'Purple Tri', category: 'Modern' },
   template_15_slate_ruled:   { label: 'Slate Ruled', category: 'Clean' },
+   template_16_kunal_ml:      { label: 'Machine Learning Pro', category: 'Data Science' },
 }
 
 const TemplateCard = ({ template, selected, onSelect }) => {
@@ -423,7 +424,7 @@ const TemplateCard = ({ template, selected, onSelect }) => {
           : 'border-[#e4e4e4] hover:border-[#c4c4c4]'
       }`}
     >
-      {/* Preview area — realistic SVG mockup with actual PNG overlay */}
+      {/* Preview area - realistic SVG mockup with actual PNG overlay */}
       <div className="h-56 w-full relative overflow-hidden bg-[#f3f4f6] flex items-center justify-center p-4">
         <TemplateMockup templateId={slug} isSelected={isSelected} />
         
@@ -455,7 +456,7 @@ const TemplateCard = ({ template, selected, onSelect }) => {
 
 const StepTemplate = ({ form, update, templates, loadingTemplates }) => (
   <div className="space-y-6">
-    <SectionTitle icon={LayoutIcon} title="Choose Your Template" subtitle="Pick a design. AI generates the same content for any template — only the layout changes." />
+    <SectionTitle icon={LayoutIcon} title="Choose Your Template" subtitle="Pick a design. AI generates the same content for any template - only the layout changes." />
     {loadingTemplates ? (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={24} className="animate-spin text-[#a3a3a3]" />
@@ -477,9 +478,9 @@ const StepTemplate = ({ form, update, templates, loadingTemplates }) => (
   </div>
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // SHARED UI
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const SectionTitle = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-start gap-3">
@@ -493,9 +494,9 @@ const SectionTitle = ({ icon: Icon, title, subtitle }) => (
   </div>
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // BUILDER RESULT SCREEN
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const BuildResult = ({ result, onReset, onEdit, onOpenLatex  }) => (
   <div className="space-y-6">
@@ -505,11 +506,11 @@ const BuildResult = ({ result, onReset, onEdit, onOpenLatex  }) => (
       </div>
       <h2 className="text-2xl font-serif text-[#0a0a0a] tracking-tight text-[#0a0a0a] mb-2">Your Resume is Ready!</h2>
       <p className="text-[#6b6b6b] text-sm font-light">
-        AI generated a full ATS-optimized resume · LaTeX compiled via Tectonic
+        AI generated a full ATS-optimized resume -+ LaTeX compiled via Tectonic
       </p>
       {result.word_count > 0 && (
         <span className="inline-block mt-3 text-xs font-mono text-emerald-600/70 bg-emerald-50 px-3 py-1 rounded-full">
-          ~{result.word_count} words · Full A4 page
+          ~{result.word_count} words -+ Full A4 page
         </span>
       )}
     </div>
@@ -537,7 +538,7 @@ const BuildResult = ({ result, onReset, onEdit, onOpenLatex  }) => (
       <Wand2 size={14} /> Edit & Regenerate
     </button>
 
-    {/* Open in LaTeX Editor — NEW */}
+    {/* Open in LaTeX Editor - NEW */}
     <button
       onClick={onOpenLatex}
       className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#f9f9f9] hover:bg-[#e4e4e4] border border-[#e4e4e4] text-blue-600 hover:text-blue-300 text-sm font-semibold rounded-xl transition-all"
@@ -581,9 +582,9 @@ const BuildResult = ({ result, onReset, onEdit, onOpenLatex  }) => (
   </div>
 )
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BUILDER — MAIN
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// BUILDER - MAIN
+// -----------------------------------------------------------------------------
 
 const ResumeBuilder = ({ openInLatexEditor }) => {
   const [step, setStep]             = useState(0)
@@ -631,7 +632,7 @@ const ResumeBuilder = ({ openInLatexEditor }) => {
     const res = await buildResumeAPI(form)
     const data = res.data?.data || res.data
     setResult(data)
-    setResumeId(data.resume_id)  // ← was missing
+    setResumeId(data.resume_id)  // - was missing
     localStorage.setItem('nirvexa_last_latex', data.latex_code || '') 
     toast.success('Resume generated successfully!')
   } catch (err) {
@@ -744,7 +745,7 @@ if (result) return (
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-2.5 bg-[#0a0a0a] text-[#fafafa] hover:bg-[#222222] hover:shadow-lg hover:-translate-y-0.5 disabled:bg-[#e4e4e4] disabled:text-[#8b8b8b] disabled:cursor-not-allowed text-[#0a0a0a] text-sm font-semibold rounded-xl transition-all shadow-lg shadow-md shadow-black/10 disabled:shadow-none"
 >
   {building ? (
-    <><Loader2 size={16} className="animate-spin" /> {resumeId ? 'Regenerating…' : 'Generating Resume…'}</>
+    <><Loader2 size={16} className="animate-spin" /> {resumeId ? 'Regenerating...' : 'Generating Resume...'}</>
   ) : (
     <><Sparkles size={16} /> {resumeId ? 'Regenerate Resume' : 'Generate Resume'}</>
   )}
@@ -755,7 +756,7 @@ if (result) return (
       {building && (
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
           <p className="text-blue-700 font-medium text-sm animate-pulse">
-            ✨ AI is crafting your professional resume and formatting the PDF... This usually takes 15-20 seconds.
+            - AI is crafting your professional resume and formatting the PDF... This usually takes 15-20 seconds.
           </p>
         </div>
       )}
@@ -763,9 +764,9 @@ if (result) return (
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ANALYZER — MAIN (JD-aware)
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// ANALYZER - MAIN (JD-aware)
+// -----------------------------------------------------------------------------
 
 const ResumeAnalyzer = () => {
   const [file, setFile]         = useState(null)
@@ -847,7 +848,7 @@ const ResumeAnalyzer = () => {
             icon={FileText}
             value={jdText}
             onChange={setJdText}
-            placeholder="Paste the full job description here. AI will score your resume specifically against this JD, show matched/missing keywords, and recommend exact lines to add…"
+            placeholder="Paste the full job description here. AI will score your resume specifically against this JD, show matched/missing keywords, and recommend exact lines to add..."
             rows={6}
             hint="JD-Match mode returns: jd_match_score, matched_keywords, missing_keywords, ats_issues, and recommended_additions."
           />
@@ -887,13 +888,13 @@ const ResumeAnalyzer = () => {
                 disabled={loading}
                 className="flex items-center gap-2 bg-[#0a0a0a] text-[#fafafa] hover:bg-[#222222] hover:shadow-lg hover:-translate-y-0.5 disabled:from-gray-800 disabled:text-[#8b8b8b] disabled:cursor-not-allowed text-[#0a0a0a] font-semibold px-7 py-3 rounded-xl transition-all shadow-lg shadow-md shadow-black/10"
               >
-                {loading ? <><Loader2 size={16} className="animate-spin" /> Analyzing…</> : <><Sparkles size={16} /> Analyze Resume</>}
+                {loading ? <><Loader2 size={16} className="animate-spin" /> Analyzing...</> : <><Sparkles size={16} /> Analyze Resume</>}
               </button>
               {!loading && (
                 <button onClick={() => { setFile(null); setResult(null) }} className="text-[#8b8b8b] hover:text-[#0a0a0a] text-sm transition-colors px-3 py-2">Cancel</button>
               )}
             </div>
-            {loading && <p className="text-[#a3a3a3] text-xs mt-4 animate-pulse">AI analysis usually takes ~15 seconds…</p>}
+            {loading && <p className="text-[#a3a3a3] text-xs mt-4 animate-pulse">AI analysis usually takes ~15 seconds...</p>}
           </>
         )}
       </div>
@@ -910,7 +911,7 @@ const ResumeAnalyzer = () => {
                 </h3>
                 <p className="text-[#6b6b6b] text-sm font-light leading-relaxed">
                   {result.overall_score >= 80 ? 'Strong and competitive for most roles.'
-                    : result.overall_score >= 60 ? 'Good — a few improvements will make it stand out.'
+                    : result.overall_score >= 60 ? 'Good - a few improvements will make it stand out.'
                     : 'Needs work before applying to competitive roles.'}
                 </p>
                 {result.jd_mode && result.jd_match_score != null && (
@@ -1072,7 +1073,7 @@ const ResumeAnalyzer = () => {
               </h3>
               <ul className="space-y-1.5">
                 {result.ats_issues.map((issue, i) => (
-                  <li key={i} className="text-amber-300/80 text-xs">⚠ {issue}</li>
+                  <li key={i} className="text-amber-300/80 text-xs">- {issue}</li>
                 ))}
               </ul>
             </div>
@@ -1126,13 +1127,13 @@ const ResumeAnalyzer = () => {
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // ROOT PAGE
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // LaTeX Function
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 const STARTER_TEX = `\\documentclass[10pt, letterpaper]{article}
 \\usepackage[margin=1in]{geometry}
 \\usepackage[T1]{fontenc}
@@ -1279,7 +1280,7 @@ const startDrag = (e) => {
           disabled={compiling}
           className="flex items-center gap-2 bg-[#0a0a0a] text-[#fafafa] hover:bg-[#222222] hover:shadow-lg hover:-translate-y-0.5 disabled:from-gray-800 disabled:text-[#8b8b8b] text-[#0a0a0a] text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-sm shadow-black/10"
         >
-          {compiling ? <><Loader2 size={14} className="animate-spin" /> Compiling…</> : <><Zap size={14} /> Compile PDF</>}
+          {compiling ? <><Loader2 size={14} className="animate-spin" /> Compiling...</> : <><Zap size={14} /> Compile PDF</>}
         </button>
         <button
           onClick={handleLoadLast}
@@ -1309,7 +1310,7 @@ const startDrag = (e) => {
         className="flex gap-0 rounded-2xl overflow-hidden border border-[#e4e4e4]"
         style={{ height: '80vh' }}
       >
-        {/* Left — Editor */}
+        {/* Left - Editor */}
         <div
           style={{ width: `${splitPct}%`, minWidth: '20%', maxWidth: '80%' }}
           className="bg-[#0d0d0f] flex flex-col overflow-hidden"
@@ -1330,7 +1331,7 @@ const startDrag = (e) => {
           <div className="w-0.5 h-8 bg-white/20 rounded-full group-hover:bg-blue-400 transition-colors" />
         </div>
 
-        {/* Right — Preview */}
+        {/* Right - Preview */}
         <div className="bg-[#0d0d0f] flex flex-col overflow-hidden flex-1">
           <div className="px-4 py-2 border-b border-[#e4e4e4] flex items-center gap-2 shrink-0">
             <Eye size={13} className="text-purple-600" />
@@ -1396,7 +1397,7 @@ export default function Resume() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-serif text-[#0a0a0a] tracking-tight text-[#0a0a0a] tracking-tight">Resume Suite</h1>
           <p className="text-[#4a4a4a] text-base font-medium max-w-2xl">
-            Analyze your existing resume for ATS compatibility — or build a new one from scratch with our AI Engine.
+            Analyze your existing resume for ATS compatibility - or build a new one from scratch with our AI Engine.
           </p>
         </div>
 

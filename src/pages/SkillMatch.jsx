@@ -41,17 +41,7 @@ export default function SkillMatch() {
   }
 
   const handleAnalyze = async () => {
-    let currentSkills = [...skills]
-    if (inputVal.trim()) {
-      const newSkill = inputVal.trim().replace(/,$/, '')
-      if (!currentSkills.includes(newSkill)) {
-        currentSkills.push(newSkill)
-      }
-      setSkills(currentSkills)
-      setInputVal('')
-    }
-
-    if (currentSkills.length === 0 || !targetJob.trim()) {
+    if (skills.length === 0 || !targetJob.trim()) {
       toast.error('Add at least one skill and a target job title')
       return
     }
@@ -59,7 +49,7 @@ export default function SkillMatch() {
     setResult(null)
     try {
       const res = await api.post('/career/skill-gap', {
-        user_skills:      currentSkills,
+        user_skills:      skills,
         target_job_title: targetJob.trim(),
       })
       setResult(res.data.skill_gap)
@@ -155,7 +145,7 @@ export default function SkillMatch() {
 
           <button
             onClick={handleAnalyze}
-            disabled={(skills.length === 0 && !inputVal.trim()) || !targetJob.trim() || loading}
+            disabled={skills.length === 0 || !targetJob.trim() || loading}
             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#0a0a0a] text-white hover:bg-[#222222] disabled:bg-[#e4e4e4] disabled:text-[#a3a3a3] disabled:cursor-not-allowed font-semibold px-8 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:shadow-none disabled:transform-none text-sm"
           >
             {loading
