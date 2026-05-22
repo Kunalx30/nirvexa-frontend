@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import SkillMatch from './pages/SkillMatch'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword  from './pages/ResetPassword'
+import { PageStateProvider } from './context/PageStateContext'
 
 
 // Pages
@@ -79,6 +80,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <PageStateProvider> 
         <AppRoutes />
         <Toaster
           position="top-right"
@@ -92,7 +94,9 @@ export default function App() {
             error:   { iconTheme: { primary: '#CF222E', secondary: '#fff' } },
           }}
         />
+        </PageStateProvider>
       </AuthProvider>
     </BrowserRouter>
   )
 }
+

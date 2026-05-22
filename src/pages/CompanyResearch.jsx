@@ -1,5 +1,6 @@
 import Layout from '../components/layout/Layout'
 import { useState } from 'react'
+import { usePagePersistedState } from '../context/PageStateContext'
 import {
   Building2, Loader2, Code2, Users, MessageSquare,
   Star, MapPin, Globe, ExternalLink,
@@ -176,11 +177,11 @@ function StatCard({ icon: Icon, label, value, iconColor, bg, border }) {
 
 /* ── main page ── */
 export default function CompanyResearch() {
-  const [company, setCompany]     = useState('')
-  const [location, setLocation]   = useState('')
+  const [company, setCompany]     = usePagePersistedState('company_research_company', '')
+  const [location, setLocation]   = usePagePersistedState('company_research_location', '')
   const [loading, setLoading]     = useState(false)
-  const [result, setResult]       = useState(null)
-  const [companyName, setCompanyName] = useState('')
+  const [result, setResult]       = usePagePersistedState('company_research_result', null)
+  const [companyName, setCompanyName] = usePagePersistedState('company_research_name', '')
 
   const handleResearch = async () => {
     if (!company.trim()) { toast.error('Enter a company name'); return }

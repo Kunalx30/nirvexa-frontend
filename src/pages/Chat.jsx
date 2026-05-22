@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { usePagePersistedState } from '../context/PageStateContext'
 import { useAuth } from '../context/AuthContext'
 import { chatService } from '../services/chat'
 import Layout from '../components/layout/Layout'
@@ -49,9 +50,9 @@ const CodeBlock = ({ inline, className, children, ...props }) => {
 export default function Chat() {
   const { user } = useAuth()
   const [sessions, setSessions] = useState([])
-  const [activeSessionId, setActiveSessionId] = useState(null)
+  const [activeSessionId, setActiveSessionId] = usePagePersistedState('chat_active_session_id', null)
   const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
+  const [input, setInput] = usePagePersistedState('chat_input', '')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -72,7 +73,7 @@ export default function Chat() {
         const loaded = data.sessions || []
         setSessions(loaded)
         if (loaded.length > 0) {
-          setActiveSessionId(loaded[0].id)
+          setActiveSessionId(prev => prev || loaded[0].id)
         } else {
           setFetching(false)
         }

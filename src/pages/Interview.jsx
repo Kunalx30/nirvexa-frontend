@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { playInterviewTTS, stopInterviewTTS } from '../services/ttsService'
+import { usePagePersistedState } from '../context/PageStateContext'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const FILLER_TERMS = ['um', 'uh', 'umm', 'uhh', 'like', 'you know', 'basically', 'literally', 'actually', 'right', 'so']
@@ -103,22 +104,22 @@ export default function Interview() {
   const { user } = useAuth()
   const userFirstName = getDisplayName(user)
   // ── View state: 'setup' | 'interview' | 'report'
-  const [view, setView]           = useState('setup')
+  const [view, setView]           = usePagePersistedState('interview_view', 'setup')
 
   // ── Setup
-  const [mode, setMode]           = useState('')
-  const [level, setLevel]         = useState('')
-  const [role, setRole]           = useState('')
+  const [mode, setMode]           = usePagePersistedState('interview_mode', '')
+  const [level, setLevel]         = usePagePersistedState('interview_level', '')
+  const [role, setRole]           = usePagePersistedState('interview_role', '')
 
   // ── Session
-  const [sessionId, setSessionId] = useState(null)
-  const [questions, setQuestions] = useState([])
-  const [qIndex, setQIndex]       = useState(0)
+  const [sessionId, setSessionId] = usePagePersistedState('interview_session_id', null)
+  const [questions, setQuestions] = usePagePersistedState('interview_questions', [])
+  const [qIndex, setQIndex]       = usePagePersistedState('interview_q_index', 0)
   const [loading, setLoading]     = useState(false)
 
   // ── Recording
   const [isListening, setIsListening] = useState(false)
-  const [transcript, setTranscript]   = useState('')
+  const [transcript, setTranscript]   = usePagePersistedState('interview_transcript', '')
   const [liveText, setLiveText]       = useState('')
   const startTimeRef  = useRef(null)
   const recognitionRef = useRef(null)
@@ -127,12 +128,12 @@ export default function Interview() {
   const shouldKeepListeningRef = useRef(false)
 
   // ── Per-question results
-  const [evaluation, setEvaluation]   = useState(null)
+  const [evaluation, setEvaluation]   = usePagePersistedState('interview_evaluation', null)
   const [evaluating, setEvaluating]   = useState(false)
-  const [answered, setAnswered]       = useState(false)
+  const [answered, setAnswered]       = usePagePersistedState('interview_answered', false)
 
   // ── Session-level aggregates
-  const [allEvals, setAllEvals]       = useState([])
+  const [allEvals, setAllEvals]       = usePagePersistedState('interview_all_evals', [])
   const metricAvg = useCallback((key) => allEvals.length
     ? Math.round(allEvals.reduce((s, e) => s + (e[key] || 0), 0) / allEvals.length)
     : 0, [allEvals])

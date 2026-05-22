@@ -1,5 +1,6 @@
 import Layout from '../components/layout/Layout'
 import { useState } from 'react'
+import { usePagePersistedState } from '../context/PageStateContext'
 import {
   Sparkles, Map, AlertTriangle, BookOpen, Loader2, Target,
   Compass, CheckCircle2, Clock, ExternalLink,
@@ -492,14 +493,14 @@ async function generatePDF({ result, currentRole, targetRole, userName }) {
 }
 
 export default function CareerPath() {
-  const [currentRole, setCurrentRole] = useState('')
-  const [targetRole, setTargetRole]   = useState('')
-  const [skills, setSkills]           = useState('')
-  const [experience, setExperience]   = useState(0)
+  const [currentRole, setCurrentRole] = usePagePersistedState('career_path_current_role', '')
+  const [targetRole, setTargetRole]   = usePagePersistedState('career_path_target_role', '')
+  const [skills, setSkills]           = usePagePersistedState('career_path_skills', '')
+  const [experience, setExperience]   = usePagePersistedState('career_path_experience', 0)
   const [loading, setLoading]         = useState(false)
   const [pdfLoading, setPdfLoading]   = useState(false)
-  const [result, setResult]           = useState(null)
-  const [activeStep, setActiveStep]   = useState(0)
+  const [result, setResult]           = usePagePersistedState('career_path_result', null)
+  const [activeStep, setActiveStep]   = usePagePersistedState('career_path_active_step', 0)
   const { user } = useAuth()
 
   const handleGenerate = async () => {

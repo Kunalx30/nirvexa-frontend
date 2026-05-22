@@ -20,6 +20,7 @@ import {
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { usePagePersistedState } from '../context/PageStateContext'
 
 // -----------------------------------------------------------------------------
 // API CALLS
@@ -625,12 +626,12 @@ const BuildResult = ({ result, onReset, onEdit, onOpenLatex  }) => (
 // -----------------------------------------------------------------------------
 
 const ResumeBuilder = ({ openInLatexEditor }) => {
-  const [step, setStep]             = useState(0)
-  const [form, setForm]             = useState(initialForm)
+  const [step, setStep]             = usePagePersistedState('resume_builder_step', 0)
+  const [form, setForm]             = usePagePersistedState('resume_builder_form', initialForm)
   const [building, setBuilding]     = useState(false)
   const [enhancing, setEnhancing]   = useState(false)
-  const [result, setResult]         = useState(null)
-  const [resumeId, setResumeId]     = useState(null) 
+  const [result, setResult]         = usePagePersistedState('resume_builder_result', null)
+  const [resumeId, setResumeId]     = usePagePersistedState('resume_builder_id', null) 
   const [templates, setTemplates]   = useState([])
   const [loadingTpl, setLoadingTpl] = useState(false)
 
@@ -807,15 +808,15 @@ if (result) return (
 // -----------------------------------------------------------------------------
 
 const ResumeAnalyzer = () => {
-  const [file, setFile]         = useState(null)
-  const [jdText, setJdText]     = useState('')
-  const [jdMode, setJdMode]     = useState(false)
+  const [file, setFile]         = usePagePersistedState('resume_analyzer_file', null)
+  const [jdText, setJdText]     = usePagePersistedState('resume_analyzer_jd_text', '')
+  const [jdMode, setJdMode]     = usePagePersistedState('resume_analyzer_jd_mode', false)
   const [loading, setLoading]   = useState(false)
-  const [result, setResult]     = useState(null)
+  const [result, setResult]     = usePagePersistedState('resume_analyzer_result', null)
   const [dragging, setDragging] = useState(false)
   const [history, setHistory]           = useState([])
   const [historyLoading, setHistLoading] = useState(true)
-  const [showHistory, setShowHistory]   = useState(false)
+  const [showHistory, setShowHistory]   = usePagePersistedState('resume_analyzer_show_history', false)
 
   useEffect(() => {
     fetchHistoryAPI()
@@ -1450,8 +1451,8 @@ const startDrag = (e) => {
 }
 
 export default function Resume() {
-  const [activeTab, setActiveTab] = useState('analyzer')
-  const [latexToLoad, setLatexToLoad] = useState(null)
+  const [activeTab, setActiveTab] = usePagePersistedState('resume_active_tab', 'analyzer')
+  const [latexToLoad, setLatexToLoad] = usePagePersistedState('resume_latex_to_load', null)
 
   const openInLatexEditor = (latexCode) => {
     setLatexToLoad(latexCode)

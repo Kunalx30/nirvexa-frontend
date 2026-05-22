@@ -1,5 +1,6 @@
 import Layout from '../components/layout/Layout'
 import { useMemo, useState } from 'react'
+import { usePagePersistedState } from '../context/PageStateContext'
 import {
   Sparkles, Target, Loader2, CheckCircle2, XCircle,
   TrendingUp, BookOpen, Zap, Plus, X, ExternalLink,
@@ -46,11 +47,11 @@ function scoreTone(score) {
 }
 
 export default function SkillMatch() {
-  const [skills, setSkills] = useState([])
-  const [inputVal, setInputVal] = useState('')
-  const [targetJob, setTargetJob] = useState('')
+  const [skills, setSkills] = usePagePersistedState('skill_match_skills', [])
+  const [inputVal, setInputVal] = usePagePersistedState('skill_match_input_val', '')
+  const [targetJob, setTargetJob] = usePagePersistedState('skill_match_target_job', '')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
+  const [result, setResult] = usePagePersistedState('skill_match_result', null)
 
   const addSkill = (s) => {
     const trimmed = s.trim()

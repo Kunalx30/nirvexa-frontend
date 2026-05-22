@@ -1,6 +1,7 @@
 import Layout from '../components/layout/Layout'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { usePagePersistedState } from '../context/PageStateContext'
 import { Search, MapPin, Bookmark, Briefcase, DollarSign, IndianRupee, Clock, Globe, Loader2, AlertCircle, ChevronDown } from 'lucide-react'
 import { fetchJobs, saveJob, deleteSavedJob, fetchJobFilterOptions } from '../services/jobs'
 import toast from 'react-hot-toast'
@@ -59,12 +60,12 @@ export default function Jobs() {
   const navigate = useNavigate()
 
   // ── Search & Filter State ──────────────────────────────────────────────────
-  const [searchQuery, setSearchQuery]        = useState('')
-  const [filterLocation, setFilterLocation]  = useState('')
-  const [filterCompany, setFilterCompany]    = useState('')
-  const [filterSource, setFilterSource]      = useState('all')
-  const [filterPostedWithin, setFilterPostedWithin] = useState('all')
-  const [filterType, setFilterType]          = useState('all')
+  const [searchQuery, setSearchQuery]        = usePagePersistedState('jobs_search_query', '')
+  const [filterLocation, setFilterLocation]  = usePagePersistedState('jobs_filter_location', '')
+  const [filterCompany, setFilterCompany]    = usePagePersistedState('jobs_filter_company', '')
+  const [filterSource, setFilterSource]      = usePagePersistedState('jobs_filter_source', 'all')
+  const [filterPostedWithin, setFilterPostedWithin] = usePagePersistedState('jobs_filter_posted_within', 'all')
+  const [filterType, setFilterType]          = usePagePersistedState('jobs_filter_type', 'all')
   const debouncedSearch    = useDebounce(searchQuery, 500)
   const debouncedLocation  = useDebounce(filterLocation, 500)
   const debouncedCompany   = useDebounce(filterCompany, 500)
@@ -74,7 +75,7 @@ export default function Jobs() {
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)
   const [paginationError, setPaginationError] = useState(false)
-  const [page, setPage]       = useState(1)
+  const [page, setPage]       = usePagePersistedState('jobs_page', 1)
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [totalJobs, setTotalJobs] = useState(0)

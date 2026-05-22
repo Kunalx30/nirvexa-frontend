@@ -1,5 +1,6 @@
 import Layout from '../components/layout/Layout'
 import { useState } from 'react'
+import { usePagePersistedState } from '../context/PageStateContext'
 import {
   TrendingUp, MapPin, Loader2, Sparkles,
   Building2, BarChart3, AlertCircle
@@ -15,10 +16,10 @@ const POPULAR_ROLES = [
 const CITIES = ['Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Pune', 'Chennai', 'Noida']
 
 export default function SalaryInsights() {
-  const [role, setRole]         = useState('')
-  const [location, setLocation] = useState('')
+  const [role, setRole]         = usePagePersistedState('salary_insights_role', '')
+  const [location, setLocation] = usePagePersistedState('salary_insights_location', '')
   const [loading, setLoading]   = useState(false)
-  const [result, setResult]     = useState(null)
+  const [result, setResult]     = usePagePersistedState('salary_insights_result', null)
 
   const handleSearch = async () => {
     if (!role.trim()) { toast.error('Enter a job role'); return }
