@@ -12,8 +12,8 @@ const api = axios.create({
 // ── Token management (in-memory only) ────────────────────────────────────────
 let accessToken = null
 
-export const setAccessToken = (token) => { accessToken = token }
-export const getAccessToken = () => accessToken
+export const setAccessToken   = (token) => { accessToken = token }
+export const getAccessToken   = () => accessToken
 export const clearAccessToken = () => { accessToken = null }
 
 // ── Request interceptor — attach token ───────────────────────────────────────
@@ -27,12 +27,26 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// ── Response interceptor — handle 401, auto refresh ──────────────────────────
+// ── Response interceptor — handle 401, 429, auto refresh ─────────────────────
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
 
+    // ── 429 Rate limit exceeded — redirect to pricing ──────────────────────
+    if (error.response?.status === 429) {
+      const feature = error.response.data?.feature || ''
+      window.location.href = `/pricing?reason=${feature}`
+      return Promise.reject(error)
+    }
+
+    if (error.response?.status === 403 && error.response.data?.error === 'premium_required') {
+      const feature = error.response.data?.feature || ''
+      window.location.href = `/pricing?locked=${feature}`
+      return Promise.reject(error)
+    }
+
+    // ── 401 Unauthorized — try token refresh ───────────────────────────────
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
 

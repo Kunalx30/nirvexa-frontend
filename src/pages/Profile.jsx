@@ -181,7 +181,7 @@ export default function Profile() {
     fetchInterviewSessions()
       .then(res => {
         const data = res.data?.sessions || res.data?.data || []
-        setSessions(Array.isArray(data) ? data : [])
+        setSessions(Array.isArray(data) ? data.slice(0, 5) : [])
       })
       .catch(() => {})
       .finally(() => setSessionsLoading(false))
@@ -334,7 +334,16 @@ export default function Profile() {
                   <h2 className="text-2xl font-bold text-[#0a0a0a] tracking-tight">{user?.name || 'User'}</h2>
                   <p className="text-[#6b6b6b] text-base font-light">{user?.email || 'No email available'}</p>
                   <div className="flex items-center gap-2 mt-3">
-                    <span className="badge-blue text-xs px-3 py-1">Member</span>
+                    <span className="badge-blue text-xs px-3 py-1">
+                      {user?.is_premium ? 'Pro Member' : 'Free Member'}
+                    </span>
+                    <span className={`text-xs px-3 py-1 rounded-full border font-semibold ${
+                      user?.is_premium
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                        : 'bg-[#fcfcfc] border-[#e4e4e4] text-[#6b6b6b]'
+                    }`}>
+                      {user?.is_premium ? 'Premium tools unlocked' : 'Daily free limits active'}
+                    </span>
                     <span className="text-[#a3a3a3] text-xs font-medium">
                       {user?.experience_level ? user.experience_level.charAt(0).toUpperCase() + user.experience_level.slice(1) : 'Fresher'}
                     </span>
@@ -554,7 +563,7 @@ export default function Profile() {
               <div className="text-center py-8 px-4 bg-[#f9f9f9] border border-dashed border-[#c4c4c4] rounded-2xl">
                 <Bell size={32} className="text-[#c4c4c4] mx-auto mb-3" />
                 <p className="text-[#6b6b6b] text-sm font-medium">No alerts set up yet.</p>
-                <p className="text-[#a3a3a3] font-medium text-xs mt-1">Create one above to get daily job matches by email.</p>
+                <p className="text-[#a3a3a3] font-medium text-xs mt-1">Job alerts are included with Pro.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -600,6 +609,7 @@ export default function Profile() {
               <div className="flex items-center gap-3">
                 <History className="text-purple-600" size={20} />
                 <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight">Interview History</h3>
+                <span className="text-xs font-semibold text-[#8b8b8b]">Last 5 only</span>
               </div>
               <button onClick={loadSessions}
                 className="p-2 rounded-xl text-[#8b8b8b] hover:text-[#0a0a0a] hover:bg-[#f3f3f3] transition-colors">

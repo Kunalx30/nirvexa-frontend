@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
+import { useUsage } from '../hooks/useUsage'
 
 const STAGE_STYLES = [
   { ring: 'border-blue-200', dot: 'bg-blue-500', wash: 'bg-blue-50', text: 'text-blue-700', pdf: [37, 99, 235], soft: [239, 246, 255] },
@@ -272,6 +274,8 @@ function TopicNode({ node, depth = 0, activeLabel, onSelect, filterTerm }) {
 }
 
 export default function RoadmapGraph() {
+  const { isAuthenticated } = useAuth()
+  const { isPremium } = useUsage()
   const [query, setQuery] = useState('')
   const [allRoadmaps, setAllRoadmaps] = useState([])
   const [listLoaded, setListLoaded] = useState(false)
@@ -334,6 +338,14 @@ export default function RoadmapGraph() {
 
   const handlePDF = async () => {
     if (!roadmap) return
+    if (!isAuthenticated) {
+      window.location.href = '/login?redirect=/roadmap-graph'
+      return
+    }
+    if (!isPremium) {
+      window.location.href = '/pricing?locked=roadmap_pdf'
+      return
+    }
     setPdfLoading(true)
     try {
       let userName = ''

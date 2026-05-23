@@ -9,6 +9,7 @@ import {
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import { useUsage } from '../hooks/useUsage'
 
 const EXPERIENCE_OPTIONS = [
   { label: 'Fresher', value: 0 },
@@ -501,7 +502,8 @@ export default function CareerPath() {
   const [pdfLoading, setPdfLoading]   = useState(false)
   const [result, setResult]           = usePagePersistedState('career_path_result', null)
   const [activeStep, setActiveStep]   = usePagePersistedState('career_path_active_step', 0)
-  const { user } = useAuth()
+  const { user, isAuthenticated } = useAuth()
+  const { isPremium } = useUsage()
 
   const handleGenerate = async () => {
     if (!targetRole.trim() || !skills.trim()) {
@@ -529,6 +531,14 @@ export default function CareerPath() {
   }
 
   const handleDownloadPDF = async () => {
+    if (!isAuthenticated) {
+      window.location.href = '/login?redirect=/career'
+      return
+    }
+    if (!isPremium) {
+      window.location.href = '/pricing?locked=career_pdf'
+      return
+    }
     setPdfLoading(true)
     try {
       // Read name from context first, fall back to localStorage directly

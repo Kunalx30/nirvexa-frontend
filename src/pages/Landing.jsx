@@ -49,13 +49,15 @@ const STEPS = [
 ]
 
 const FREE_LIMITS = [
-  { feature: 'AI Career Chat', free: '5 messages / day', pro: 'Unlimited' },
-  { feature: 'Resume Analyzer', free: '1 resume / day', pro: 'Unlimited' },
-  { feature: 'Resume Tailor', free: '1 tailor / day', pro: 'Unlimited' },
-  { feature: 'Voice Interview AI', free: <><Lock size={12} /> Locked</>, pro: 'Unlimited rounds' },
-  { feature: 'Career Roadmap', free: 'View only', pro: 'Full AI guidance' },
-  { feature: 'Salary Insights', free: 'Basic data', pro: 'Detailed benchmarks' },
-  { feature: 'Company Research', free: '3 lookups / day', pro: 'Unlimited' },
+  { feature: 'AI Career Chat', free: '7 messages / day', pro: 'Unlimited' },
+  { feature: 'Resume Analyzer', free: '1 analysis / day', pro: 'Unlimited' },
+  { feature: 'Resume Builder PDF', free: <><Lock size={12} /> Locked</>, pro: 'Unlimited exports' },
+  { feature: 'Voice Interview AI', free: '3 sessions / day', pro: 'Unlimited rounds' },
+  { feature: 'Career Roadmap', free: '3 searches / day', pro: 'Unlimited' },
+  { feature: 'Skill Match', free: '3 analyses / day', pro: 'Unlimited' },
+  { feature: 'Salary Insights', free: '2 searches / day', pro: 'Unlimited' },
+  { feature: 'Company Research', free: '2 searches / day', pro: 'Unlimited' },
+  { feature: 'Job Alerts', free: <><Lock size={12} /> Locked</>, pro: 'Included' },
   { feature: 'Priority Support', free: '—', pro: '24/7 priority' },
 ]
 
@@ -66,7 +68,7 @@ const PRICE_COMPARE = [
   { feature: 'Salary Intelligence', us: '✦ Included', a: '₹199/mo', b: '₹399/mo' },
   { feature: 'Company Research', us: '✦ Included', a: '—', b: '₹299/mo' },
   { feature: 'Resume Tailor per JD', us: '✦ Included', a: '—', b: '—' },
-  { feature: 'Total monthly cost', us: '₹99/mo', a: '₹997+/mo', b: '₹1,697+/mo' },
+  { feature: 'Total monthly cost', us: '₹199/mo', a: '₹997+/mo', b: '₹1,697+/mo' },
 ]
 
 /* ─── HOOKS ─────────────────────────────────────────────────────── */
@@ -692,7 +694,7 @@ export default function Landing() {
               <div className="price-card pro">
                 <div className="price-pop"><Sparkles size={12} /> Most popular</div>
                 <div className="price-badge pro-badge">Pro</div>
-                <div className="price-amount">₹99</div>
+                <div className="price-amount">₹199</div>
                 <div className="price-period">/ month</div>
                 <div className="price-divider" />
                 <ul className="price-list">
