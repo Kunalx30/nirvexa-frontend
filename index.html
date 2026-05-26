@@ -1,61 +1,183 @@
 <!doctype html>
 <html lang="en">
   <head>
-  <meta
-    name="google-site-verification"
-    content="hrxgz2xEqwST1zIUZ5ACCyZ56oujZNSkQPiFbe57v_s"
-  />
+    <meta
+      name="google-site-verification"
+      content="hrxgz2xEqwST1zIUZ5ACCyZ56oujZNSkQPiFbe57v_s"
+    />
 
-  <meta charset="UTF-8" />
+    <meta charset="UTF-8" />
 
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logo.png" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Nyrvexa — AI Career Platform for India</title>
+    <title>Nyrvexa — AI Career Platform for India</title>
 
-  <meta
-    name="description"
-    content="India's AI-powered career platform. Resume analyzer, ATS checker, AI interview coach, live job listings, tech news and career tools — all in one place."
-  />
+    <meta
+      name="description"
+      content="India's AI-powered career platform. Resume analyzer, ATS checker, AI interview coach, live job listings, tech news and career tools — all in one place."
+    />
 
-  <meta
-    name="keywords"
-    content="AI career platform India, ATS checker, resume analyzer, AI interview coach, tech jobs India, career tools"
-  />
+    <meta
+      name="keywords"
+      content="AI career platform India, ATS checker, resume analyzer, AI interview coach, tech jobs India, career tools, salary insights, roadmap, company research"
+    />
 
-  <meta name="author" content="Nyrvexa" />
+    <meta name="author" content="Nyrvexa" />
 
-  <!-- Open Graph -->
-  <meta
-    property="og:title"
-    content="Nyrvexa — AI Career Platform for India"
-  />
+    <!-- ─── Canonical ─────────────────────────────────────── -->
+    <link rel="canonical" href="https://www.nyrvexa.in/" />
 
-  <meta
-    property="og:description"
-    content="Resume analyzer, ATS checker, AI interview coach, live job listings and more."
-  />
+    <!-- ─── Open Graph ────────────────────────────────────── -->
+    <meta property="og:title"       content="Nyrvexa — AI Career Platform for India" />
+    <meta property="og:description" content="Resume analyzer, ATS checker, AI interview coach, live job listings and more." />
+    <meta property="og:url"         content="https://www.nyrvexa.in" />
+    <meta property="og:type"        content="website" />
+    <meta property="og:image"       content="https://www.nyrvexa.in/og-image.png" />
+    <meta property="og:site_name"   content="Nyrvexa" />
 
-  <meta property="og:url" content="https://www.nyrvexa.in" />
+    <!-- ─── Twitter ──────────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="Nyrvexa — AI Career Platform for India" />
+    <meta name="twitter:description" content="AI-powered resume analyzer, ATS checker, interview coach and job platform." />
+    <meta name="twitter:image"       content="https://www.nyrvexa.in/og-image.png" />
 
-  <meta property="og:type" content="website" />
+    <!-- ─── Robots / Indexing ────────────────────────────── -->
+    <meta name="robots" content="index, follow" />
 
-  <meta property="og:image" content="https://www.nyrvexa.in/og-image.png" />
+    <!-- ═══════════════════════════════════════════════════════
+         STRUCTURED DATA — JSON-LD
+         (tells Google who you are + powers sitelinks search)
+    ═══════════════════════════════════════════════════════ -->
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
+    <!-- 1. WebSite — enables Sitelinks Searchbox in Google results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Nyrvexa",
+      "url": "https://www.nyrvexa.in/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.nyrvexa.in/jobs?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 
-  <meta
-    name="twitter:title"
-    content="Nyrvexa — AI Career Platform for India"
-  />
+    <!-- 2. Organization — powers the Knowledge Panel (logo, links, description) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Nyrvexa",
+      "url": "https://www.nyrvexa.in",
+      "logo": "https://www.nyrvexa.in/logo.png",
+      "description": "India's AI-powered career platform. Resume analyzer, ATS checker, AI interview coach, live job listings, tech news and career tools — all in one place.",
+      "sameAs": [
+        "https://www.youtube.com/@nyrvexa"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://www.nyrvexa.in/support"
+      }
+    }
+    </script>
 
-  <meta
-    name="twitter:description"
-    content="AI-powered resume analyzer, ATS checker, interview coach and job platform."
-  />
-</head>
+    <!-- 3. Sitelinks — all key pages listed explicitly -->
+    <!--    Google picks sitelinks algorithmically, but listing
+            these as SiteNavigationElement strongly hints at them. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Nyrvexa Quick Links",
+      "itemListElement": [
+        {
+          "@type": "SiteLinksSearchBox",
+          "name": "Jobs",
+          "url": "https://www.nyrvexa.in/jobs"
+        },
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "AI Resume Builder",
+          "url": "https://www.nyrvexa.in/resume",
+          "description": "Build an ATS-optimized resume with AI."
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "AI Interview Coach",
+          "url": "https://www.nyrvexa.in/interview",
+          "description": "Practice mock interviews with our AI coach."
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Career Roadmap",
+          "url": "https://www.nyrvexa.in/career",
+          "description": "Explore AI-generated career roadmaps."
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Roadmap Graph",
+          "url": "https://www.nyrvexa.in/roadmap-graph",
+          "description": "Interactive visual career roadmap graph."
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Tech News",
+          "url": "https://www.nyrvexa.in/news",
+          "description": "Latest technology and career news."
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "Salary Insights",
+          "url": "https://www.nyrvexa.in/salary",
+          "description": "Explore salary data across roles and companies."
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Company Research",
+          "url": "https://www.nyrvexa.in/company",
+          "description": "Deep dive into company cultures, reviews and roles."
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "Pricing",
+          "url": "https://www.nyrvexa.in/pricing",
+          "description": "View Nyrvexa plans and pricing."
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "Sign In",
+          "url": "https://www.nyrvexa.in/login",
+          "description": "Log in to your Nyrvexa account."
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Create Account",
+          "url": "https://www.nyrvexa.in/register",
+          "description": "Register for free on Nyrvexa."
+        }
+      ]
+    }
+    </script>
+
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
