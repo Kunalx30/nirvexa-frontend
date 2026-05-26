@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { chatService } from '../services/chat'
 import Layout from '../components/layout/Layout'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
-import { Send, Trash2, Bot, User, Sparkles, Copy, Check, Plus, MessageSquare, Pencil, Menu, X } from 'lucide-react'
+import { Send, Trash2, Bot, User, Sparkles, Copy, Check, Plus, MessageSquare, Pencil, Menu, X, ChevronRight, FileText, Mic, GitBranch, Briefcase } from 'lucide-react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -231,11 +231,15 @@ export default function Chat() {
     <Layout>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
-        .chat-shell{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;overflow:hidden;background:#fafafa;font-family:'DM Sans',system-ui,sans-serif;height:calc(100dvh - 64px);-webkit-font-smoothing:antialiased}
-        .chat-side{width:286px;flex-shrink:0;border-right:1px solid #e4e4e4;background:#fff;display:flex;flex-direction:column;z-index:35}
-        .chat-side-top{padding:14px;border-bottom:1px solid #ededed;display:flex;align-items:center;gap:10px}
-        .chat-new{height:40px;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;background:#0a0a0a;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
-        .chat-mobile-close{display:none;width:40px;height:40px;align-items:center;justify-content:center;border:1px solid #e4e4e4;border-radius:8px;background:#fff;color:#555}
+        .chat-shell{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;overflow:hidden;background:#fafafa;font-family:'DM Sans',system-ui,sans-serif;height:calc(100dvh - 58px);-webkit-font-smoothing:antialiased}
+        .chat-dim{position:absolute;inset:0;background:rgba(0,0,0,.28);backdrop-filter:blur(4px);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s ease}
+        .chat-dim.on{opacity:1;pointer-events:auto}
+        .chat-drawer{position:absolute;top:0;bottom:0;left:0;width:min(360px,88vw);background:#fff;border-right:1px solid #e4e4e4;z-index:45;transform:translateX(-102%);transition:transform .22s cubic-bezier(.25,1.1,.5,1);display:flex;flex-direction:column;box-shadow:20px 0 60px rgba(0,0,0,.10)}
+        .chat-drawer.open{transform:translateX(0)}
+        .chat-drawer-top{padding:14px;border-bottom:1px solid #ededed;display:flex;align-items:center;gap:10px;justify-content:space-between}
+        .chat-drawer-title{display:flex;align-items:center;gap:10px;font-weight:700;color:#0a0a0a;letter-spacing:-.3px}
+        .chat-drawer-close{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid #e4e4e4;border-radius:10px;background:#fff;color:#444}
+        .chat-new{height:40px;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;background:#0a0a0a;color:#fff;font-size:13px;font-weight:650;cursor:pointer;padding:0 14px;width:100%}
         .chat-list{flex:1;overflow-y:auto;padding:10px}
         .chat-list::-webkit-scrollbar{width:4px}.chat-list::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:4px}
         .chat-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:transparent;border-radius:8px;padding:9px 8px;color:#4b5563;cursor:pointer;text-align:left}
@@ -245,20 +249,33 @@ export default function Chat() {
         .chat-icon-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:none;border-radius:7px;background:transparent;color:#8a8a8a;cursor:pointer}.chat-icon-btn:hover{background:#fff;color:#111}.chat-icon-btn.danger:hover{color:#ef4444}
         .chat-empty-list{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#a3a3a3;font-size:13px;padding:20px}
         .chat-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
-        .chat-hdr{flex-shrink:0;width:100%;border-bottom:1px solid #e4e4e4;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);z-index:30;padding:10px 24px}
-        .chat-hdr-in{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
-        .chat-hdr-left{display:flex;align-items:center;gap:12px;min-width:0}.chat-menu{display:none;width:34px;height:34px;align-items:center;justify-content:center;border:1px solid #e4e4e4;border-radius:9px;background:#fff;color:#333}
+        .chat-hdr{flex-shrink:0;width:100%;border-bottom:1px solid #e4e4e4;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(20px);z-index:30;padding:10px 24px}
+        .chat-hdr-in{max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
+        .chat-hdr-left{display:flex;align-items:center;gap:12px;min-width:0}.chat-menu{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid #e4e4e4;border-radius:11px;background:#fff;color:#333}
         .chat-hdr-icon{width:34px;height:34px;border-radius:10px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-shrink:0}.chat-hdr-icon svg{color:#fafafa}
         .chat-hdr h1{font-size:16px;font-weight:600;color:#0a0a0a;letter-spacing:0;line-height:1.2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(520px,55vw)}
         .chat-hdr p{font-size:12px;color:#a3a3a3;margin:0;font-weight:400}
-        .chat-clear{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#a3a3a3;background:#fafafa;border:1px solid #e4e4e4;border-radius:8px;padding:7px 10px;cursor:pointer;transition:all .2s;flex-shrink:0}.chat-clear:hover{color:#ef4444;border-color:#fecaca;background:#fef2f2}
+        .chat-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+        .chat-clear{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#6b6b6b;background:#fafafa;border:1px solid #e4e4e4;border-radius:10px;padding:9px 12px;cursor:pointer;transition:all .2s;flex-shrink:0}.chat-clear:hover{color:#ef4444;border-color:#fecaca;background:#fef2f2}
+        .chat-new-top{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:#fff;background:#0a0a0a;border:1px solid #0a0a0a;border-radius:10px;padding:9px 12px;cursor:pointer;transition:opacity .2s,transform .2s;flex-shrink:0}
+        .chat-new-top:hover{opacity:.86;transform:translateY(-1px)}
         .chat-msgs{flex:1;overflow-y:auto;width:100%;padding:20px 24px;z-index:10}.chat-msgs::-webkit-scrollbar{width:4px}.chat-msgs::-webkit-scrollbar-track{background:transparent}.chat-msgs::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:4px}
-        .chat-msgs-in{max-width:900px;margin:0 auto;height:100%;display:flex;flex-direction:column}
-        .chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:24px;max-width:640px;margin:0 auto}
+        .chat-msgs-in{max-width:980px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+        .chat-empty{height:100%;display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center;max-width:980px;margin:0 auto}
+        @media(max-width:960px){.chat-empty{grid-template-columns:1fr}}
+        .chat-empty-hero{background:#fff;border:1px solid #e4e4e4;border-radius:18px;padding:22px;box-shadow:0 16px 50px rgba(0,0,0,.06)}
+        .chat-empty-side{background:#fff;border:1px solid #e4e4e4;border-radius:18px;padding:18px;box-shadow:0 16px 50px rgba(0,0,0,.04)}
         .chat-empty-icon{width:56px;height:56px;border-radius:16px;background:#f3f3f3;border:1px solid #e4e4e4;display:flex;align-items:center;justify-content:center}.chat-empty-icon svg{color:#0a0a0a}
         .chat-empty h2{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(24px,4vw,32px);letter-spacing:0;color:#0a0a0a;text-align:center;margin:0}.chat-empty h2 em{font-style:italic;color:#3b82f6}
         .chat-empty-sub{font-size:15px;color:#6b6b6b;text-align:center;max-width:420px;line-height:1.6;margin:0}
-        .chat-suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:8px}.chat-sug{text-align:left;padding:14px 16px;background:#fff;border:1px solid #e4e4e4;border-radius:8px;font-size:13px;color:#6b6b6b;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;line-height:1.5}.chat-sug:hover{border-color:#0a0a0a;color:#0a0a0a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+        .chat-suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:14px}.chat-sug{text-align:left;padding:14px 16px;background:#fff;border:1px solid #e4e4e4;border-radius:12px;font-size:13px;color:#6b6b6b;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s;line-height:1.5}.chat-sug:hover{border-color:#0a0a0a;color:#0a0a0a;transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+        .chat-quick{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+        .chat-q{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:#fafafa;border:1px solid #e4e4e4;border-radius:14px;cursor:pointer;transition:all .2s;text-decoration:none}
+        .chat-q:hover{background:#fff;border-color:#c4c4c4;transform:translateY(-1px)}
+        .chat-q-left{display:flex;align-items:center;gap:10px}
+        .chat-q-ic{width:34px;height:34px;border-radius:12px;background:#0a0a0a;color:#fff;display:flex;align-items:center;justify-content:center}
+        .chat-q-title{font-size:13px;font-weight:650;color:#0a0a0a}
+        .chat-q-sub{font-size:12px;color:#8b8b8b;margin-top:2px}
         .msg-list{display:flex;flex-direction:column;gap:20px;padding-bottom:8px}.msg-row{display:flex;gap:12px;animation:msgIn .35s ease}.msg-row.user{flex-direction:row-reverse}@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
         .msg-av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}.msg-av.ai{background:#0a0a0a}.msg-av.ai svg{color:#fafafa}.msg-av.hu{background:#f3f3f3;border:1px solid #e4e4e4}.msg-av.hu svg{color:#6b6b6b}
         .msg-content{display:flex;flex-direction:column;gap:4px;min-width:0}.msg-row.user .msg-content{align-items:flex-end;max-width:80%}.msg-row:not(.user) .msg-content{align-items:flex-start;width:100%}
@@ -268,17 +285,23 @@ export default function Chat() {
         .typing{display:flex;gap:12px;animation:msgIn .35s ease}.typing-dots{display:flex;align-items:center;gap:5px;padding:14px 18px;background:#fff;border:1px solid #e4e4e4;border-radius:12px 12px 12px 4px}.typing-dot{width:7px;height:7px;border-radius:50%;background:#d4d4d4;animation:bounce .6s infinite alternate}.typing-dot:nth-child(2){animation-delay:.15s;background:#a3a3a3}.typing-dot:nth-child(3){animation-delay:.3s;background:#6b6b6b}@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-6px)}}
         .chat-input-area{flex-shrink:0;width:100%;background:rgba(255,255,255,.9);backdrop-filter:blur(16px);border-top:1px solid #e4e4e4;padding:12px 24px 16px;z-index:20}.chat-input-in{max-width:900px;margin:0 auto}.chat-input-row{display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid #e4e4e4;border-radius:12px;padding:6px;transition:border-color .2s,box-shadow .2s}.chat-input-row:focus-within{border-color:#0a0a0a;box-shadow:0 0 0 3px rgba(10,10,10,.04)}
         .chat-ta{flex:1;background:transparent;color:#0a0a0a;resize:none;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;border:none;outline:none;padding:8px 12px;max-height:30vh;min-height:44px}.chat-ta::placeholder{color:#b0b0b0}.chat-send{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#fafafa;border:none;border-radius:10px;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s}.chat-send:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.15)}.chat-send:disabled{opacity:.3;cursor:not-allowed}.chat-hint{text-align:center;font-size:11px;color:#c4c4c4;margin-top:8px}.chat-loading{display:flex;align-items:center;justify-content:center;height:100%}
-        @media(max-width:820px){.chat-side{position:absolute;inset:0 auto 0 0;transform:translateX(-100%);transition:transform .2s;width:min(84vw,320px);box-shadow:16px 0 40px rgba(0,0,0,.12)}.chat-side.open{transform:translateX(0)}.chat-mobile-close,.chat-menu{display:flex}.chat-hdr{padding:10px 16px}.chat-msgs{padding:16px}.chat-input-area{padding:10px 16px 14px}.chat-suggestions{grid-template-columns:1fr}.msg-row.user .msg-content{max-width:90%}.chat-hdr h1{max-width:48vw}}
+        @media(max-width:820px){.chat-hdr{padding:10px 16px}.chat-msgs{padding:16px}.chat-input-area{padding:10px 16px 14px}.chat-suggestions{grid-template-columns:1fr}.msg-row.user .msg-content{max-width:90%}.chat-hdr h1{max-width:48vw}}
       `}</style>
 
       <div className="chat-shell">
-        <aside className={`chat-side${sidebarOpen ? ' open' : ''}`}>
-          <div className="chat-side-top">
+        <button className={`chat-dim${sidebarOpen ? ' on' : ''}`} onClick={() => setSidebarOpen(false)} aria-label="Close drawer" />
+        <aside className={`chat-drawer${sidebarOpen ? ' open' : ''}`}>
+          <div className="chat-drawer-top">
+            <div className="chat-drawer-title">
+              <MessageSquare size={16} /> Chats
+            </div>
+            <button className="chat-drawer-close" onClick={() => setSidebarOpen(false)} title="Close">
+              <X size={18} />
+            </button>
+          </div>
+          <div style={{ padding: 10 }}>
             <button className="chat-new" onClick={handleNewChat}>
               <Plus size={16} /> New chat
-            </button>
-            <button className="chat-mobile-close" onClick={() => setSidebarOpen(false)} title="Close chats">
-              <X size={18} />
             </button>
           </div>
           <div className="chat-list">
@@ -309,7 +332,7 @@ export default function Chat() {
           <div className="chat-hdr">
             <div className="chat-hdr-in">
               <div className="chat-hdr-left">
-                <button className="chat-menu" onClick={() => setSidebarOpen(true)} title="Open chats">
+                <button className="chat-menu" onClick={() => setSidebarOpen(true)} title="Chats">
                   <Menu size={18} />
                 </button>
                 <div className="chat-hdr-icon"><Sparkles size={16} /></div>
@@ -318,12 +341,17 @@ export default function Chat() {
                   <p>Your intelligent career strategist</p>
                 </div>
               </div>
-              {messages.length > 0 && (
-                <button onClick={handleClearHistory} className="chat-clear">
-                  <Trash2 size={14} />
-                  <span className="hidden sm:inline">Clear</span>
+              <div className="chat-actions">
+                <button onClick={handleNewChat} className="chat-new-top" title="New chat">
+                  <Plus size={14} /> New
                 </button>
-              )}
+                {messages.length > 0 && (
+                  <button onClick={handleClearHistory} className="chat-clear">
+                    <Trash2 size={14} />
+                    <span className="hidden sm:inline">Clear</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -333,19 +361,74 @@ export default function Chat() {
                 <div className="chat-loading"><LoadingSpinner text="Syncing workspace..." /></div>
               ) : messages.length === 0 ? (
                 <div className="chat-empty">
-                  <div className="chat-empty-icon"><Bot size={28} /></div>
-                  <div style={{ textAlign: 'center' }}>
-                    <h2>Hi {user?.name?.split(' ')[0] || 'there'}! <em>Let's begin.</em></h2>
-                    <p className="chat-empty-sub">
-                      Ask about resume optimization, interview prep, salary insights, or career roadmaps.
-                    </p>
+                  <div className="chat-empty-hero">
+                    <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                      <div className="chat-empty-icon"><Bot size={28} /></div>
+                      <div>
+                        <h2 style={{ textAlign: 'left' }}>Hi {user?.name?.split(' ')[0] || 'there'}! <em>Let’s begin.</em></h2>
+                        <p className="chat-empty-sub" style={{ textAlign: 'left', maxWidth: 560 }}>
+                          Ask about resume optimization, interview prep, salary insights, jobs, and interactive roadmaps.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="chat-suggestions">
+                      {suggestedQuestions.map((q, i) => (
+                        <button key={i} onClick={() => { setInput(q); inputRef.current?.focus() }} className="chat-sug">
+                          {q}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="chat-suggestions">
-                    {suggestedQuestions.map((q, i) => (
-                      <button key={i} onClick={() => { setInput(q); inputRef.current?.focus() }} className="chat-sug">
-                        {q}
+
+                  <div className="chat-empty-side">
+                    <p style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase', color: '#8b8b8b' }}>
+                      Quick actions
+                    </p>
+                    <div className="chat-quick">
+                      <button className="chat-q" onClick={() => window.location.href = '/resume'}>
+                        <span className="chat-q-left">
+                          <span className="chat-q-ic"><FileText size={16} /></span>
+                          <span>
+                            <div className="chat-q-title">Resume suite</div>
+                            <div className="chat-q-sub">Analyze or generate a strong resume</div>
+                          </span>
+                        </span>
+                        <ChevronRight size={18} color="#a3a3a3" />
                       </button>
-                    ))}
+
+                      <button className="chat-q" onClick={() => window.location.href = '/roadmap-graph'}>
+                        <span className="chat-q-left">
+                          <span className="chat-q-ic"><GitBranch size={16} /></span>
+                          <span>
+                            <div className="chat-q-title">Roadmap graph</div>
+                            <div className="chat-q-sub">Explore roles and skill trees</div>
+                          </span>
+                        </span>
+                        <ChevronRight size={18} color="#a3a3a3" />
+                      </button>
+
+                      <button className="chat-q" onClick={() => window.location.href = '/jobs'}>
+                        <span className="chat-q-left">
+                          <span className="chat-q-ic"><Briefcase size={16} /></span>
+                          <span>
+                            <div className="chat-q-title">Jobs</div>
+                            <div className="chat-q-sub">Search live roles and save the best</div>
+                          </span>
+                        </span>
+                        <ChevronRight size={18} color="#a3a3a3" />
+                      </button>
+
+                      <button className="chat-q" onClick={() => window.location.href = '/pricing?locked=interview'}>
+                        <span className="chat-q-left">
+                          <span className="chat-q-ic"><Mic size={16} /></span>
+                          <span>
+                            <div className="chat-q-title">Mock interviews</div>
+                            <div className="chat-q-sub">Pro-only voice rounds with scoring</div>
+                          </span>
+                        </span>
+                        <ChevronRight size={18} color="#a3a3a3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (

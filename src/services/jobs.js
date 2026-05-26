@@ -19,6 +19,14 @@ export const fetchJobFilterOptions = () => {
 }
 
 /**
+ * GET /jobs/premium
+ * Curated NirVexa Premium jobs (locked preview for free users)
+ */
+export const fetchPremiumJobs = () => {
+  return api.get('/jobs/premium')
+}
+
+/**
  * GET /jobs/:id
  * Single job with full description + ai_summary
  */

@@ -225,7 +225,7 @@ export default function NotFound() {
 
           {/* Logo */}
           <Link to="/" className="nf-logo">
-            <div className="nf-lsq">N</div>
+            <img src="/logo.png" alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
             <span className="nf-lname">Nyrvexa</span>
           </Link>
 

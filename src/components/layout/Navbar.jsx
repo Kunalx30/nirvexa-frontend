@@ -5,10 +5,21 @@ import {
   MessageSquare, Briefcase, FileText,
   Map, Mic, Bookmark, User, Newspaper,
   LogOut, Menu, X, Zap, TrendingUp, Building2,
-  ChevronDown, GitBranch
+  ChevronDown,   GitBranch, LifeBuoy, Mail
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import toast from 'react-hot-toast'
+
+const GRADIENT_PRESETS = [
+  { id: 'aurora', label: 'Deep Aurora', from: '#2563eb', to: '#a855f7', text: '#ffffff' },
+  { id: 'indigo', label: 'Indigo Twilight', from: '#4f46e5', to: '#06b6d4', text: '#ffffff' },
+  { id: 'emerald', label: 'Emerald Sea', from: '#059669', to: '#10b981', text: '#ffffff' },
+  { id: 'sunset', label: 'Warm Sunset', from: '#ea580c', to: '#e11d48', text: '#ffffff' },
+  { id: 'steel', label: 'Midnight Steel', from: '#374151', to: '#1f2937', text: '#ffffff' },
+  { id: 'rose', label: 'Rose Gold', from: '#db2777', to: '#fda4af', text: '#ffffff' },
+  { id: 'cosmic', label: 'Cosmic Nebula', from: '#7c3aed', to: '#c084fc', text: '#ffffff' },
+  { id: 'gold', label: 'Amber Gold', from: '#d97706', to: '#f59e0b', text: '#ffffff' },
+]
 
 const NAV_LINKS = [
   { to: '/chat',          label: 'AI Chat',     icon: MessageSquare },
@@ -30,6 +41,8 @@ export default function Navbar() {
   const [mobileOpen,  setMobileOpen]  = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
+  const avatarUrl = user?.avatar_url || user?.avatarUrl || null
+  const activePreset = GRADIENT_PRESETS.find(p => p.id === avatarUrl)
 
   const handleLogout = async () => {
     await logout()
@@ -93,21 +106,18 @@ export default function Navbar() {
 
         /* ── Each pill ── */
         .nb-link {
-          display:inline-flex;align-items:center;gap:0;
+          display:inline-flex;align-items:center;gap:8px;
           height:34px;
-          padding:0 8px;
-          border-radius:9px;
-          font-size:12.5px;font-weight:500;
+          padding:0 12px;
+          border-radius:10px;
+          font-size:13px;font-weight:550;
           color:#5a5a5a;
           text-decoration:none;
           white-space:nowrap;
-          overflow:hidden;
-          max-width:34px;
           transition:
-            max-width .26s cubic-bezier(.25,1.1,.5,1),
             background .18s ease,
             color .18s ease,
-            padding .22s cubic-bezier(.25,1.1,.5,1);
+            transform .18s ease;
           flex-shrink:0;
         }
 
@@ -118,39 +128,20 @@ export default function Navbar() {
         }
 
         .nb-link-label {
-          opacity:0;
-          max-width:0;
-          overflow:hidden;
-          transition:
-            opacity .18s ease .04s,
-            max-width .22s cubic-bezier(.25,1.1,.5,1);
           font-size:12.5px;font-weight:500;
-          margin-left:0;
+          opacity:.95;
           white-space:nowrap;
         }
 
         .nb-link:hover {
-          max-width:120px;
-          padding:0 10px 0 8px;
           background:#f0f0f0;
           color:#0a0a0a;
-        }
-        .nb-link:hover .nb-link-label {
-          opacity:1;
-          max-width:90px;
-          margin-left:6px;
+          transform:translateY(-1px);
         }
 
         .nb-link.active {
           color:#0a0a0a;
           background:#ececec;
-          max-width:120px;
-          padding:0 10px 0 8px;
-        }
-        .nb-link.active .nb-link-label {
-          opacity:1;
-          max-width:90px;
-          margin-left:6px;
         }
 
         /* ── Divider ── */
@@ -172,7 +163,9 @@ export default function Navbar() {
           width:28px;height:28px;border-radius:50%;background:#0a0a0a;
           display:flex;align-items:center;justify-content:center;
           font-size:11px;font-weight:700;color:#fafafa;
+          overflow:hidden;
         }
+        .nb-avatar-lottie { width:34px;height:34px; transform:translate(-3px,-3px); }
         .nb-profile-name { font-size:13px;font-weight:500;color:#0a0a0a;letter-spacing:-.2px; }
         .nb-profile-btn svg { color:#a3a3a3;transition:transform .2s; }
         .nb-profile-btn.open svg:last-child { transform:rotate(180deg); }
@@ -226,7 +219,7 @@ export default function Navbar() {
 
           {/* Logo — left */}
           <Link to="/" className="nb-logo">
-            <div className="nb-lsq">N</div>
+            <img src="/logo.png" alt="Nyrvexa Logo" className="nb-logo-img" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
             <span className="nb-lname">Nyrvexa</span>
           </Link>
 
@@ -259,7 +252,17 @@ export default function Navbar() {
                   className={`nb-profile-btn${profileOpen ? ' open' : ''}`}
                   onClick={() => setProfileOpen(!profileOpen)}
                 >
-                  <div className="nb-avatar">{getInitials(user?.name)}</div>
+                  <div
+                    className="nb-avatar"
+                    style={{
+                      background: activePreset
+                        ? `linear-gradient(135deg, ${activePreset.from}, ${activePreset.to})`
+                        : 'linear-gradient(135deg, #2563eb, #a855f7)',
+                      color: activePreset ? activePreset.text : '#ffffff',
+                    }}
+                  >
+                    {getInitials(user?.name)}
+                  </div>
                   <span className="nb-profile-name">{user?.name?.split(' ')[0]}</span>
                   <ChevronDown size={13} />
                 </button>
@@ -270,6 +273,13 @@ export default function Navbar() {
                     </Link>
                     <Link to="/saved" className="nb-drop-item" onClick={() => setProfileOpen(false)}>
                       <Bookmark size={15} /> Saved Jobs
+                    </Link>
+                    <Link
+                      to="/support"
+                      className="nb-drop-item"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      <LifeBuoy size={15} /> Support
                     </Link>
                     <div className="nb-drop-sep" />
                     <button className="nb-drop-item danger" onClick={() => { setProfileOpen(false); handleLogout() }}>
@@ -311,6 +321,13 @@ export default function Navbar() {
               <Link to="/saved" onClick={() => setMobileOpen(false)}
                 className={`nb-mobile-link${location.pathname === '/saved' ? ' active' : ''}`}>
                 <Bookmark size={15} /> Saved Jobs
+              </Link>
+              <Link
+                to="/support"
+                className={`nb-mobile-link${location.pathname === '/support' ? ' active' : ''}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <LifeBuoy size={15} /> Support
               </Link>
             </div>
             <button className="nb-mobile-logout" onClick={handleLogout}>

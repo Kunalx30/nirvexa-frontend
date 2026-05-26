@@ -29,6 +29,10 @@ export function AuthProvider({ children }) {
           if (res.ok) {
             const data = await res.json()
             setAccessToken(data.data.access_token)
+            if (data.data.user) {
+              setUser(data.data.user)
+              localStorage.setItem('nirvexa_user', JSON.stringify(data.data.user))
+            }
           } else {
             throw new Error('Refresh failed')
           }

@@ -6,7 +6,6 @@ import toast from 'react-hot-toast'
 import { useState, useEffect } from 'react'
 import { fetchAlerts, createAlert, deleteAlert } from '../services/jobs'
 import { updateProfile, changePassword, fetchInterviewSessions } from '../services/api'
-
 import {
   Settings, MapPin, Briefcase, Zap, ShieldCheck, History,
   ArrowRight, BrainCircuit, Plus, Trash2, Loader2, Bell,
@@ -19,6 +18,17 @@ const FREQUENCIES = ['daily', 'weekly']
 const JOB_TYPES = ['full-time', 'part-time', 'internship', 'freelance', 'remote']
 const EXP_LEVELS = ['fresher', 'junior', 'mid', 'senior', 'lead']
 const LOCATIONS   = ['Remote', 'Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Pune', 'Chennai', 'Noida']
+
+const GRADIENT_PRESETS = [
+  { id: 'aurora', label: 'Deep Aurora', from: '#2563eb', to: '#a855f7', text: '#ffffff' },
+  { id: 'indigo', label: 'Indigo Twilight', from: '#4f46e5', to: '#06b6d4', text: '#ffffff' },
+  { id: 'emerald', label: 'Emerald Sea', from: '#059669', to: '#10b981', text: '#ffffff' },
+  { id: 'sunset', label: 'Warm Sunset', from: '#ea580c', to: '#e11d48', text: '#ffffff' },
+  { id: 'steel', label: 'Midnight Steel', from: '#374151', to: '#1f2937', text: '#ffffff' },
+  { id: 'rose', label: 'Rose Gold', from: '#db2777', to: '#fda4af', text: '#ffffff' },
+  { id: 'cosmic', label: 'Cosmic Nebula', from: '#7c3aed', to: '#c084fc', text: '#ffffff' },
+  { id: 'gold', label: 'Amber Gold', from: '#d97706', to: '#f59e0b', text: '#ffffff' },
+]
 
 // ── Password Change Modal ─────────────────────────────────────────────────────
 function PasswordModal({ onClose }) {
@@ -133,6 +143,16 @@ function PasswordModal({ onClose }) {
 // ── Main Profile Component ────────────────────────────────────────────────────
 export default function Profile() {
   const { user, setUser } = useAuth()
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || user?.avatarUrl || '')
+  const [userName, setUserName] = useState(user?.name || '')
+  const [savingName, setSavingName] = useState(false)
+  const [nameEdited, setNameEdited] = useState(false)
+
+  useEffect(() => {
+    if (user?.name) setUserName(user.name)
+  }, [user?.name])
+
+  const activePreset = GRADIENT_PRESETS.find(p => p.id === avatarUrl)
 
   // ── Password modal ─────────────────────────────────────────────────────────
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -243,6 +263,76 @@ export default function Profile() {
     }
   }
 
+  const saveAvatar = async (src) => {
+    setAvatarUrl(src)
+    const nextUser = { ...(user || {}), avatar_url: src }
+    setUser?.(nextUser)
+    try { localStorage.setItem('nirvexa_user', JSON.stringify(nextUser)) } catch {}
+    try {
+      await updateProfile({ avatar_url: src })
+      toast.success('Avatar updated')
+    } catch (err) {
+      toast.error('Could not sync avatar with server')
+    }
+  }
+
+  const saveBasicDetails = async () => {
+    if (!userName.trim()) {
+      toast.error('Name cannot be empty')
+      return
+    }
+    setSavingName(true)
+    try {
+      const res = await updateProfile({ name: userName.trim() })
+      if (setUser) setUser(res.data?.data?.user || res.data?.user)
+      toast.success('Name updated successfully!')
+      setNameEdited(false)
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Could not save basic details')
+    } finally {
+      setSavingName(false)
+    }
+  }
+
+  const calculateProfileStrength = () => {
+    let score = 0
+    let reasons = []
+
+    if (userName.trim().length >= 2) {
+      score += 15
+    } else {
+      reasons.push('Add your name')
+    }
+
+    if (avatarUrl) {
+      score += 15
+    } else {
+      reasons.push('Select an avatar gradient')
+    }
+
+    if (skills && skills.length > 0) {
+      score += 25
+    } else {
+      reasons.push('Add core technical skills')
+    }
+
+    if (prefLocation && expLevel && jobType) {
+      score += 20
+    } else {
+      reasons.push('Set your preferred location, job type, and experience')
+    }
+
+    if (alerts && alerts.length > 0) {
+      score += 25
+    } else {
+      reasons.push('Set up at least one AI Job Alert')
+    }
+
+    return { score, reasons }
+  }
+
+  const { score: profileStrength, reasons: pendingTasks } = calculateProfileStrength()
+
   // ── Alert handlers ─────────────────────────────────────────────────────────
   const handleCreateAlert = async () => {
     const keywords = keywordsInput.split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
@@ -327,8 +417,15 @@ export default function Profile() {
           <div className="md:col-span-2 bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-[#0a0a0a] font-bold text-3xl shadow-lg shadow-purple-500/20 border border-[#e4e4e4]">
-                  {getInitials(user?.name || 'U')}
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg border border-[#e4e4e4] transition-all duration-300 hover:scale-105"
+                  style={{
+                    background: activePreset
+                      ? `linear-gradient(135deg, ${activePreset.from}, ${activePreset.to})`
+                      : 'linear-gradient(135deg, #2563eb, #a855f7)',
+                  }}
+                >
+                  {getInitials(userName || user?.name || 'U')}
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-[#0a0a0a] tracking-tight">{user?.name || 'User'}</h2>
@@ -351,23 +448,152 @@ export default function Profile() {
                 </div>
               </div>
             </div>
+
+            {/* Editable basic details */}
+            <div className="space-y-4 mt-6 pt-6 border-t border-[#ededed]">
+              <h3 className="text-[#0a0a0a] font-bold text-base tracking-tight">Basic Account Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-[#8b8b8b] mb-1.5 block">Full Name</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={userName}
+                      onChange={(e) => {
+                        setUserName(e.target.value)
+                        setNameEdited(true)
+                      }}
+                      className="flex-1 bg-[#fafafa] border border-[#e4e4e4] text-[#3a3a3a] rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition-all"
+                      placeholder="Your name"
+                    />
+                    {nameEdited && (
+                      <button
+                        onClick={saveBasicDetails}
+                        disabled={savingName}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
+                      >
+                        {savingName ? 'Saving...' : 'Save'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-[#8b8b8b] mb-1.5 block">Email Address</label>
+                  <input
+                    type="text"
+                    value={user?.email || ''}
+                    disabled
+                    className="w-full bg-[#f3f3f3] border border-[#e4e4e4] text-[#8b8b8b] rounded-xl px-4 py-2 text-sm cursor-not-allowed"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Premium presets selection */}
+            <div className="mt-6 pt-6 border-t border-[#ededed]">
+              <div className="flex items-center justify-between gap-4 mb-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#8b8b8b]">Profile Theme Gradient</p>
+                  <p className="text-sm text-[#6b6b6b] mt-1">Select a premium, professional gradient for your account's visual identity.</p>
+                </div>
+                {avatarUrl && (
+                  <button
+                    onClick={() => saveAvatar('')}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-[#e4e4e4] text-[#6b6b6b] hover:text-[#0a0a0a] hover:bg-[#f3f3f3]"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
+                {GRADIENT_PRESETS.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => saveAvatar(p.id)}
+                    title={p.label}
+                    className={`h-11 w-full rounded-xl border flex items-center justify-center transition-all ${
+                      avatarUrl === p.id
+                        ? 'border-indigo-600 ring-2 ring-indigo-500/20 scale-95 shadow-inner'
+                        : 'border-[#e4e4e4] bg-white hover:border-[#a3a3a3] hover:-translate-y-px'
+                    }`}
+                    style={{
+                      background: `linear-gradient(135deg, ${p.from}, ${p.to})`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* ── SECURITY ── */}
-          <div className="bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col justify-between transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <ShieldCheck className="text-emerald-600" size={20} />
-                <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight tracking-tight">Security</h3>
+          {/* ── PROFILE STRENGTH & SECURITY ── */}
+          <div className="flex flex-col gap-6">
+            {/* Profile strength indicator card */}
+            <div className="bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <Zap className="text-indigo-600" size={20} />
+                  <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight">Profile Strength</h3>
+                </div>
+
+                <div className="relative pt-1 mb-4">
+                  <div className="flex mb-2 items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold inline-block py-1 px-2.5 uppercase rounded-full text-indigo-600 bg-indigo-50">
+                        {profileStrength}% Complete
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold text-indigo-600">
+                        {profileStrength === 100 ? 'Expert' : profileStrength >= 75 ? 'Professional' : profileStrength >= 40 ? 'Intermediate' : 'Beginner'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2.5 text-xs flex rounded-full bg-[#f3f3f3]">
+                    <div
+                      style={{ width: `${profileStrength}%` }}
+                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-700 ease-out rounded-full"
+                    />
+                  </div>
+                </div>
+
+                {pendingTasks.length > 0 ? (
+                  <div className="space-y-2 mt-4">
+                    <p className="text-xs font-bold text-[#8b8b8b] uppercase tracking-wider">Next steps:</p>
+                    <ul className="space-y-1 text-xs text-[#6b6b6b]">
+                      {pendingTasks.map((t) => (
+                        <li key={t} className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-xs text-emerald-600 font-semibold mt-4 flex items-center gap-1.5">
+                    <CheckCircle2 size={12} />
+                    Your profile is fully optimized for AI recommendations!
+                  </p>
+                )}
               </div>
-              <p className="text-[#6b6b6b] text-sm font-light mb-5">
-                Keep your account secure. We recommend changing passwords regularly.
-              </p>
             </div>
-            <Button variant="secondary" className="w-full justify-center"
-              onClick={() => setShowPasswordModal(true)}>
-              Change Password
-            </Button>
+
+            {/* Security Card */}
+            <div className="bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col justify-between transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <ShieldCheck className="text-emerald-600" size={20} />
+                  <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight">Security</h3>
+                </div>
+                <p className="text-[#6b6b6b] text-sm font-light mb-5">
+                  Keep your account secure. We recommend changing passwords regularly.
+                </p>
+              </div>
+              <Button variant="secondary" className="w-full justify-center"
+                onClick={() => setShowPasswordModal(true)}>
+                Change Password
+              </Button>
+            </div>
           </div>
 
           {/* ── PROFESSIONAL SKILLS ── */}

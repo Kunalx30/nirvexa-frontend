@@ -13,6 +13,7 @@ import Login      from './pages/Login'
 import Register   from './pages/Register'
 import Chat       from './pages/Chat'
 import Jobs       from './pages/Jobs'
+import PremiumJobs from './pages/PremiumJobs'
 import JobDetail  from './pages/JobDetail'
 import Resume     from './pages/Resume'
 import CareerPath from './pages/CareerPath'
@@ -24,6 +25,8 @@ import NotFound   from './pages/NotFound'
 import SalaryInsights   from './pages/SalaryInsights'
 import CompanyResearch  from './pages/CompanyResearch'
 import RoadmapGraph from './pages/RoadmapGraph'
+import Support from './pages/Support'
+import UserAdmin from './pages/UserAdmin'
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -54,14 +57,18 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password"  element={<ResetPassword />} />
       <Route path="/pricing"  element={<Pricing />} />
+      <Route path="/support"  element={<Support />} />
+      <Route path="/useradmin" element={<UserAdmin />} />
+      <Route path="/teamadmin" element={<UserAdmin />} />
 
       {/* Protected */}
       <Route path="/chat"        element={<ProtectedRoute><Chat /></ProtectedRoute>} />
       <Route path="/jobs"        element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
       <Route path="/jobs/:id"    element={<ProtectedRoute><JobDetail /></ProtectedRoute>} />
+      <Route path="/premium-jobs" element={<ProtectedRoute><PremiumJobs /></ProtectedRoute>} />
       <Route path="/resume"      element={<Resume />} />
       <Route path="/career"      element={<CareerPath />} />
-      <Route path="/interview"   element={<ProtectedRoute><Interview /></ProtectedRoute>} />
+      <Route path="/interview"   element={<Interview />} />
       <Route path="/saved"       element={<ProtectedRoute><SavedJobs /></ProtectedRoute>} />
       <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/skills"      element={<SkillMatch />} />

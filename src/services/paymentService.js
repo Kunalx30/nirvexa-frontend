@@ -105,6 +105,12 @@ export async function initiatePayment({ plan, user, onSuccess, onFailure }) {
   rzp.open();
 }
 
+/** Public plan catalog (prices from backend) */
+export async function fetchPlans() {
+  const res = await api.get("/payment/plans");
+  return res.data;
+}
+
 /** Fetch current user's premium status */
 export async function fetchPremiumStatus() {
   const res = await api.get("/payment/status");

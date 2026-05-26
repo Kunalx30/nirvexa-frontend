@@ -21,6 +21,9 @@ import api from '../services/api'
 import toast from 'react-hot-toast'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { usePagePersistedState } from '../context/PageStateContext'
+import { useAuth } from '../context/AuthContext'
+import { useAuthPrompt } from '../hooks/useAuthPrompt'
+import AuthPromptModal from '../components/AuthPromptModal'
 
 // -----------------------------------------------------------------------------
 // API CALLS
@@ -625,7 +628,8 @@ const BuildResult = ({ result, onReset, onEdit, onOpenLatex  }) => (
 // BUILDER - MAIN
 // -----------------------------------------------------------------------------
 
-const ResumeBuilder = ({ openInLatexEditor }) => {
+const ResumeBuilder = ({ openInLatexEditor, requireAuth }) => {
+  const { isAuthenticated } = useAuth()
   const [step, setStep]             = usePagePersistedState('resume_builder_step', 0)
   const [form, setForm]             = usePagePersistedState('resume_builder_form', initialForm)
   const [building, setBuilding]     = useState(false)
@@ -635,9 +639,9 @@ const ResumeBuilder = ({ openInLatexEditor }) => {
   const [templates, setTemplates]   = useState([])
   const [loadingTpl, setLoadingTpl] = useState(false)
 
-  // Load templates when reaching step 4
+  // Load templates when reaching step 4 (authenticated only)
   useEffect(() => {
-    if (step === 4 && templates.length === 0) {
+    if (step === 4 && templates.length === 0 && isAuthenticated) {
       setLoadingTpl(true)
       fetchTemplatesAPI()
         .then(res => {
@@ -648,7 +652,7 @@ const ResumeBuilder = ({ openInLatexEditor }) => {
         .catch(() => toast.error('Could not load templates'))
         .finally(() => setLoadingTpl(false))
     }
-  }, [step])
+  }, [step, isAuthenticated])
 
   const update = useCallback((key, val) => setForm(f => ({ ...f, [key]: val })), [])
 
@@ -664,15 +668,14 @@ const ResumeBuilder = ({ openInLatexEditor }) => {
     return true
   }
 
-  const handleBuild = async () => {
-  if (!form.template_id) { toast.error('Select a template first'); return }
+  const runBuild = async () => {
   setBuilding(true)
   try {
     const res = await buildResumeAPI(form)
     const data = res.data?.data || res.data
     setResult(data)
-    setResumeId(data.resume_id)  // - was missing
-    localStorage.setItem('nirvexa_last_latex', data.latex_code || '') 
+    setResumeId(data.resume_id)
+    localStorage.setItem('nirvexa_last_latex', data.latex_code || '')
     toast.success('Resume generated successfully!')
   } catch (err) {
     const msg = err.response?.data?.error || 'Resume generation failed. Please try again.'
@@ -682,13 +685,17 @@ const ResumeBuilder = ({ openInLatexEditor }) => {
   }
 }
 
+  const handleBuild = () => {
+  if (!form.template_id) { toast.error('Select a template first'); return }
+  requireAuth(runBuild)
+}
+
 const handleEdit = () => {
   setResult(null)
   setStep(0)
 }
 
-const handleRegenerate = async () => {
-  if (!form.template_id) { toast.error('Select a template first'); return }
+const runRegenerate = async () => {
   setBuilding(true)
   try {
     const res = await regenerateResumeAPI(resumeId, form)
@@ -701,6 +708,11 @@ const handleRegenerate = async () => {
   } finally {
     setBuilding(false)
   }
+}
+
+const handleRegenerate = () => {
+  if (!form.template_id) { toast.error('Select a template first'); return }
+  requireAuth(runRegenerate)
 }
 
 const handleReset = () => {
@@ -807,7 +819,8 @@ if (result) return (
 // ANALYZER - MAIN (JD-aware)
 // -----------------------------------------------------------------------------
 
-const ResumeAnalyzer = () => {
+const ResumeAnalyzer = ({ requireAuth }) => {
+  const { isAuthenticated } = useAuth()
   const [file, setFile]         = usePagePersistedState('resume_analyzer_file', null)
   const [jdText, setJdText]     = usePagePersistedState('resume_analyzer_jd_text', '')
   const [jdMode, setJdMode]     = usePagePersistedState('resume_analyzer_jd_mode', false)
@@ -819,6 +832,10 @@ const ResumeAnalyzer = () => {
   const [showHistory, setShowHistory]   = usePagePersistedState('resume_analyzer_show_history', false)
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setHistLoading(false)
+      return
+    }
     fetchHistoryAPI()
       .then(res => {
         const d = res.data?.analyses || res.data?.data || res.data || []
@@ -826,7 +843,7 @@ const ResumeAnalyzer = () => {
       })
       .catch(() => {})
       .finally(() => setHistLoading(false))
-  }, [])
+  }, [isAuthenticated])
 
   const handleFile = (f) => {
     if (!f) return
@@ -840,8 +857,7 @@ const ResumeAnalyzer = () => {
     handleFile(e.dataTransfer.files[0])
   }
 
-  const analyze = async () => {
-    if (!file) return
+  const runAnalyze = async () => {
     setLoading(true); setResult(null)
     try {
       const res  = await analyzeResumeAPI(file, jdMode ? jdText : '')
@@ -857,6 +873,11 @@ const ResumeAnalyzer = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const analyze = () => {
+    if (!file) return
+    requireAuth(runAnalyze)
   }
 
   const atsStyles = result ? getAtsStyles(result.ats_status) : null
@@ -1453,6 +1474,11 @@ const startDrag = (e) => {
 export default function Resume() {
   const [activeTab, setActiveTab] = usePagePersistedState('resume_active_tab', 'analyzer')
   const [latexToLoad, setLatexToLoad] = usePagePersistedState('resume_latex_to_load', null)
+  const { requireAuth, authPromptProps } = useAuthPrompt({
+    redirectTo: '/resume',
+    title: 'Sign in to run resume AI',
+    subtitle: 'Upload and fill forms without an account. Sign in when you analyze or generate — your inputs stay on this page.',
+  })
 
   const openInLatexEditor = (latexCode) => {
     setLatexToLoad(latexCode)
@@ -1466,6 +1492,8 @@ export default function Resume() {
   ]
 
   return (
+    <>
+      <AuthPromptModal {...authPromptProps} />
     <Layout>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
@@ -1508,8 +1536,8 @@ export default function Resume() {
         </div>
 
         <div className="relative z-10">
-          {activeTab === 'analyzer' && <ResumeAnalyzer />}
-          {activeTab === 'builder'  && <ResumeBuilder openInLatexEditor={openInLatexEditor} />}
+          {activeTab === 'analyzer' && <ResumeAnalyzer requireAuth={requireAuth} />}
+          {activeTab === 'builder'  && <ResumeBuilder requireAuth={requireAuth} openInLatexEditor={openInLatexEditor} />}
           {activeTab === 'latex'    && (
             <LaTeXEditor
               key={latexToLoad || 'empty'}
@@ -1521,5 +1549,6 @@ export default function Resume() {
 
       </div>
     </Layout>
+    </>
   )
 }

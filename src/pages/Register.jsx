@@ -50,7 +50,7 @@ By creating an account, accessing, or using the Platform, you acknowledge that y
 
 4.1. Free Tier: Free accounts are subject to daily usage limits including restricted resume analyses, limited chat messages, and locked premium features such as Voice Interview AI.
 
-4.2. Pro Subscription: The Pro plan is available at ₹99 per month and provides unlimited access to all Platform features. Billing occurs on a monthly recurring basis.
+4.2. Pro Subscription: The Pro plan is available at ₹199 per month (or yearly billing as shown on the pricing page) and provides unlimited access to all Platform features. Billing is for the selected period; see pricing for details.
 
 4.3. You may cancel your Pro subscription at any time through your account settings. Cancellation takes effect at the end of the current billing cycle; no partial refunds are issued.
 
@@ -482,7 +482,7 @@ export default function Register() {
 
           {/* Logo + Header */}
           <Link to="/" className="reg-logo">
-            <div className="reg-lsq">N</div>
+            <img src="/logo.png" alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
             <span className="reg-lname">Nyrvexa</span>
           </Link>
 

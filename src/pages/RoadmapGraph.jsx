@@ -8,6 +8,8 @@ import {
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import { useAuthPrompt } from '../hooks/useAuthPrompt'
+import AuthPromptModal from '../components/AuthPromptModal'
 import { useUsage } from '../hooks/useUsage'
 
 const STAGE_STYLES = [
@@ -276,6 +278,11 @@ function TopicNode({ node, depth = 0, activeLabel, onSelect, filterTerm }) {
 export default function RoadmapGraph() {
   const { isAuthenticated } = useAuth()
   const { isPremium } = useUsage()
+  const { requireAuth, authPromptProps } = useAuthPrompt({
+    redirectTo: '/roadmap-graph',
+    title: 'Sign in to explore roadmaps',
+    subtitle: 'Browse and search freely. Sign in when you are ready to load or search roles on the server.',
+  })
   const [query, setQuery] = useState('')
   const [allRoadmaps, setAllRoadmaps] = useState([])
   const [listLoaded, setListLoaded] = useState(false)
@@ -289,7 +296,7 @@ export default function RoadmapGraph() {
   const inputRef = useRef(null)
 
   const loadList = useCallback(async () => {
-    if (listLoaded) return
+    if (listLoaded || !isAuthenticated) return
     try {
       const res = await api.get('/roadmap-graph/list')
       setAllRoadmaps(res.data.roadmaps || [])
@@ -297,9 +304,11 @@ export default function RoadmapGraph() {
     } catch {
       toast.error('Could not load roadmap list. Check backend is running.')
     }
-  }, [listLoaded])
+  }, [listLoaded, isAuthenticated])
 
-  useEffect(() => { loadList() }, [loadList])
+  useEffect(() => {
+    if (isAuthenticated) loadList()
+  }, [loadList, isAuthenticated])
 
   const loadRoadmap = async (id) => {
     setLoading(true)
@@ -319,8 +328,7 @@ export default function RoadmapGraph() {
     }
   }
 
-  const handleSearch = async () => {
-    if (!query.trim()) return
+  const runSearch = async () => {
     setSearching(true)
     setSearchResults([])
     try {
@@ -335,6 +343,13 @@ export default function RoadmapGraph() {
       setSearching(false)
     }
   }
+
+  const handleSearch = () => {
+    if (!query.trim()) return
+    requireAuth(runSearch)
+  }
+
+  const openRoadmap = (id) => requireAuth(() => loadRoadmap(id))
 
   const handlePDF = async () => {
     if (!roadmap) return
@@ -367,7 +382,11 @@ export default function RoadmapGraph() {
   const totalResources = roadmap ? countResources(roadmap.topics) : 0
   const popularRoadmaps = allRoadmaps.slice(0, 20)
 
+  const sampleRoles = ['Software Engineer', 'Data Analyst', 'DevOps Engineer', 'Product Manager', 'ML Engineer', 'Frontend Developer']
+
   return (
+    <>
+      <AuthPromptModal {...authPromptProps} />
     <Layout>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
@@ -428,7 +447,7 @@ export default function RoadmapGraph() {
               {searchResults.length > 1 && (
                 <div className="mt-3 space-y-1">
                   {searchResults.map(r => (
-                    <button key={r.id} onClick={() => loadRoadmap(r.id)} className="flex w-full items-center gap-2 rounded-lg border border-[#e4e4e4] bg-white px-3 py-2 text-left text-sm font-semibold text-[#111] transition hover:border-blue-300 hover:bg-blue-50">
+                    <button key={r.id} onClick={() => openRoadmap(r.id)} className="flex w-full items-center gap-2 rounded-lg border border-[#e4e4e4] bg-white px-3 py-2 text-left text-sm font-semibold text-[#111] transition hover:border-blue-300 hover:bg-blue-50">
                       <ChevronRight size={14} className="text-blue-600" />
                       {r.title}
                     </button>
@@ -445,10 +464,10 @@ export default function RoadmapGraph() {
             Role library
           </div>
           <div className="roadmap-scroll flex gap-2 overflow-x-auto pb-2">
-            {popularRoadmaps.map(r => (
+            {(popularRoadmaps.length ? popularRoadmaps : sampleRoles.map((title, i) => ({ id: `sample-${i}`, title }))).map(r => (
               <button
                 key={r.id}
-                onClick={() => loadRoadmap(r.id)}
+                onClick={() => (popularRoadmaps.length ? openRoadmap(r.id) : requireAuth(() => setQuery(r.title)))}
                 className={`shrink-0 rounded-lg border px-3.5 py-2 text-sm font-semibold transition hover:-translate-y-px ${
                   roadmap?.id === r.id
                     ? 'border-[#0a0a0a] bg-[#0a0a0a] text-white shadow-md'
@@ -459,6 +478,9 @@ export default function RoadmapGraph() {
               </button>
             ))}
           </div>
+          {!isAuthenticated && (
+            <p className="mt-2 text-xs text-[#6b6b6b]">Sign in to load the full role library from the server.</p>
+          )}
         </section>
 
         {loading && (
@@ -669,5 +691,6 @@ export default function RoadmapGraph() {
         )}
       </div>
     </Layout>
+    </>
   )
 }

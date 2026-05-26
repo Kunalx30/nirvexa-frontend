@@ -2,7 +2,8 @@ import Layout from '../components/layout/Layout'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePagePersistedState } from '../context/PageStateContext'
-import { Search, MapPin, Bookmark, Briefcase, DollarSign, IndianRupee, Clock, Globe, Loader2, AlertCircle, ChevronDown } from 'lucide-react'
+import { Search, MapPin, Bookmark, Briefcase, DollarSign, IndianRupee, Clock, Globe, Loader2, AlertCircle, ChevronDown, Crown, ChevronRight } from 'lucide-react'
+import { useUsage } from '../hooks/useUsage'
 import { fetchJobs, saveJob, deleteSavedJob, fetchJobFilterOptions } from '../services/jobs'
 import toast from 'react-hot-toast'
 
@@ -58,6 +59,7 @@ function timeAgo(dateString) {
 
 export default function Jobs() {
   const navigate = useNavigate()
+  const { isPremium } = useUsage()
 
   // ── Search & Filter State ──────────────────────────────────────────────────
   const [searchQuery, setSearchQuery]        = usePagePersistedState('jobs_search_query', '')
@@ -188,100 +190,135 @@ export default function Jobs() {
           color: #0a0a0a;
           max-width: 1100px;
           margin: 0 auto;
-          padding: 40px 0 80px;
+          padding: 40px 20px 80px;
+          min-height: 100vh;
+          position: relative;
+        }
+
+        .jobs-grid-bg {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(228,228,228,.28) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(228,228,228,.28) 1px, transparent 1px);
+          background-size: 28px 28px;
+          background-position: -1px -1px;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .jobs-content-wrap {
+          position: relative;
+          z-index: 10;
         }
 
         /* Header */
         .jh-pill {
           display: inline-flex; align-items: center; gap: 6px;
-          padding: 6px 12px; border-radius: 20px;
-          background: #fff; border: 1px solid #e4e4e4;
-          font-size: 12px; font-weight: 600; color: #0a0a0a;
+          padding: 6px 14px; border-radius: 20px;
+          background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(228, 228, 228, 0.8);
+          font-size: 11.5px; font-weight: 600; color: #4b5563;
           margin-bottom: 16px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+          backdrop-filter: blur(8px);
         }
         .jh-title {
           font-family: 'DM Serif Display', Georgia, serif;
-          font-size: clamp(32px, 5vw, 48px);
-          line-height: 1.1; letter-spacing: -1px; margin: 0 0 8px;
+          font-size: clamp(34px, 5vw, 50px);
+          line-height: 1.1; letter-spacing: -1.5px; margin: 0 0 8px;
+          color: #0a0a0a;
         }
         .jh-sub {
-          font-size: 16px; color: #6b6b6b; margin: 0 0 32px;
+          font-size: 15px; color: #6b6b6b; margin: 0 0 32px;
           line-height: 1.5;
         }
 
-        /* Filters */
+        /* Filters Panel */
         .jf-container {
-          background: #fff; border: 1px solid #e4e4e4;
+          background: rgba(255, 255, 255, 0.8); 
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(228, 228, 228, 0.7);
           border-radius: 24px; padding: 24px; margin-bottom: 40px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
         }
         .jf-search-row {
           position: relative; margin-bottom: 16px;
         }
         .jf-icon {
           position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-          color: #a3a3a3;
+          color: #6b7280;
         }
         .jf-input-main {
-          width: 100%; background: #f9f9f9; border: 1px solid #e4e4e4;
+          width: 100%; background: rgba(249, 249, 249, 0.8); border: 1px solid rgba(228, 228, 228, 0.8);
           border-radius: 16px; padding: 14px 16px 14px 44px;
           font-family: 'DM Sans', sans-serif; font-size: 15px; color: #0a0a0a;
-          outline: none; transition: all 0.2s;
+          outline: none; transition: all 0.25s ease;
         }
-        .jf-input-main:focus { border-color: #0a0a0a; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
-        .jf-input-main::placeholder { color: #a3a3a3; }
+        .jf-input-main:focus { border-color: #0a0a0a; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+        .jf-input-main::placeholder { color: #9ca3af; }
         
         .jf-spin { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #0a0a0a; }
 
         .jf-filters-row {
-          display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
           gap: 12px;
         }
         @media (max-width: 640px) {
           .jf-filters-row { grid-template-columns: 1fr; }
         }
         .jf-input-sub {
-          background: #f9f9f9; border: 1px solid #e4e4e4;
-          border-radius: 12px; padding: 10px 14px;
-          font-family: 'DM Sans', sans-serif; font-size: 14px; color: #0a0a0a;
-          outline: none; transition: all 0.2s; width: 100%;
+          background: rgba(249, 249, 249, 0.8); border: 1px solid rgba(228, 228, 228, 0.8);
+          border-radius: 12px; padding: 11px 14px;
+          font-family: 'DM Sans', sans-serif; font-size: 13.5px; color: #0a0a0a;
+          outline: none; transition: all 0.25s ease; width: 100%;
         }
-        .jf-input-sub:focus { border-color: #0a0a0a; background: #fff; }
+        .jf-input-sub:focus { border-color: #0a0a0a; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,0.04); }
         .jf-clear {
-          background: #fff; border: 1px solid #e4e4e4; color: #6b6b6b;
-          font-size: 14px; font-weight: 500; padding: 10px 20px;
+          background: #fff; border: 1px solid #e4e4e4; color: #4b5563;
+          font-size: 13.5px; font-weight: 600; padding: 11px 20px;
           border-radius: 12px; cursor: pointer; transition: all 0.2s;
         }
-        .jf-clear:hover { background: #f3f3f3; color: #0a0a0a; }
+        .jf-clear:hover { background: #f3f3f3; color: #0a0a0a; border-color: #c4c4c4; }
 
         /* Job Grid */
         .jg-grid {
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 24px;
         }
         
+        /* Job Card */
         .jc-card {
-          background: rgba(255, 255, 255, 0.7);
+          background: rgba(255, 255, 255, 0.65);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           border: 1px solid rgba(255, 255, 255, 0.5);
           border-radius: 24px;
           padding: 24px; 
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease, border-color 0.4s ease;
           display: flex; flex-direction: column; cursor: pointer;
           position: relative; overflow: hidden;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.03), inset 0 0 0 1px rgba(255,255,255,0.2);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.02), inset 0 0 0 1px rgba(255,255,255,0.2);
+          animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         .jc-card:hover {
-          transform: translateY(-6px) scale(1.01);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.5);
-          border-color: rgba(0,0,0,0.1);
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.4);
+          border-color: rgba(0, 0, 0, 0.08);
         }
+        
+        /* Glow top bar on hover */
         .jc-card::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 4px;
-          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+          background: linear-gradient(90deg, #2563eb, #7c3aed, #db2777);
           opacity: 0;
           transition: opacity 0.3s ease;
         }
@@ -289,109 +326,168 @@ export default function Jobs() {
           opacity: 1;
         }
 
-        .jc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .jc-company-info { display: flex; align-items: center; gap: 16px; }
+        .jc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .jc-company-info { display: flex; align-items: center; gap: 14px; }
+        
         .jc-logo {
-          width: 48px; height: 48px; flex-shrink: 0;
-          border-radius: 14px;
-          background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
-          color: #0d9488;
+          width: 44px; height: 44px; flex-shrink: 0;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+          color: #374151;
           display: flex; align-items: center; justify-content: center;
-          font-size: 22px; font-weight: 700; font-family: 'DM Serif Display', serif;
-          box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+          font-size: 20px; font-weight: 700; font-family: 'DM Serif Display', serif;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
-        .jc-title { font-size: 18px; font-weight: 700; color: #111827; line-height: 1.3; margin: 0 0 4px; font-family: 'DM Sans', sans-serif;}
-        .jc-company { font-size: 14px; color: #4b5563; font-weight: 500; display: flex; align-items: center; gap: 6px; margin: 0; }
-        .jc-time { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+        .jc-title { font-size: 16.5px; font-weight: 700; color: #111827; line-height: 1.35; margin: 0 0 3px; font-family: 'DM Sans', sans-serif;}
+        .jc-company { font-size: 13.5px; color: #4b5563; font-weight: 600; display: flex; align-items: center; gap: 6px; margin: 0; }
+        .jc-time { font-size: 11px; color: #9ca3af; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
 
         .jc-save-btn {
-          background: rgba(243, 244, 246, 0.8); border: none; cursor: pointer; padding: 10px;
-          color: #9ca3af; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%;
+          background: rgba(243, 244, 246, 0.8); border: none; cursor: pointer; padding: 9px;
+          color: #9ca3af; transition: all 0.25s ease; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
+          margin-left: 8px;
         }
-        .jc-save-btn:hover { background: #fee2e2; color: #ef4444; transform: scale(1.1); }
+        .jc-save-btn:hover { background: #fee2e2; color: #ef4444; transform: scale(1.08); }
         .jc-save-btn.saved { color: #ef4444; background: #fee2e2; }
         .jc-save-btn.saved svg { fill: #ef4444; }
 
         .jc-summary {
-          font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 20px;
+          font-size: 13.5px; color: #4b5563; line-height: 1.55; margin-bottom: 18px;
           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        .jc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .jc-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
         .jc-pill {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;
-          background: #f3f4f6; color: #374151;
+          display: inline-flex; align-items: center; gap: 5px;
+          padding: 5px 10px; border-radius: 10px; font-size: 12.5px; font-weight: 600;
+          background: rgba(243, 244, 246, 0.8); color: #4b5563;
           transition: all 0.2s ease;
         }
         .jc-pill:hover { background: #e5e7eb; }
         .jc-pill.salary { color: #047857; background: #d1fae5; }
         .jc-pill.type { color: #1d4ed8; background: #dbeafe; }
 
-        .jc-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; flex: 1; }
+        .jc-skills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; flex: 1; }
         .jc-skill {
-          font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-          padding: 6px 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; color: #6b7280;
+          font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+          padding: 4px 8px; background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; color: #6b7280;
           transition: all 0.2s ease;
         }
-        .jc-skill:hover { border-color: #d1d5db; color: #374151; background: #f9fafb; }
+        .jc-skill:hover { border-color: #cbd5e1; color: #1f2937; background: #f9fafb; }
 
         .jc-footer {
           display: flex; justify-content: space-between; align-items: center; margin-top: auto;
-          padding-top: 16px; border-top: 1px dashed #e5e7eb;
+          padding-top: 14px; border-top: 1px dashed rgba(229, 231, 235, 0.8);
         }
 
-        .jc-source-tag { display: inline-flex; align-items: center; gap: 6px; color: #6b7280; font-size: 13px; font-weight: 500;}
+        .jc-source-tag { display: inline-flex; align-items: center; gap: 6px; color: #6b7280; font-size: 12px; font-weight: 500;}
 
         .jc-btn {
-          background: #111827; color: #f9fafb; border: none;
-          padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600;
-          cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px;
+          background: #f3f4f6; color: #374151; border: none;
+          padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+          cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 6px;
         }
-        .jc-card:hover .jc-btn { background: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .jc-card:hover .jc-btn { background: #0a0a0a; color: #fafafa; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-        /* Loading / Error / Empty */
+        /* Loading / Error / Empty states */
         .js-empty {
-          text-align: center; padding: 60px 20px; background: #fff; border: 1px dashed #c4c4c4;
-          border-radius: 24px; margin-top: 20px;
+          text-align: center; padding: 60px 20px; background: rgba(255, 255, 255, 0.8); border: 1px dashed #c4c4c4;
+          border-radius: 24px; margin-top: 20px; backdrop-filter: blur(8px);
         }
         .js-empty svg { color: #a3a3a3; margin: 0 auto 16px; }
-        .js-empty h3 { font-size: 20px; font-weight: 600; color: #0a0a0a; margin: 0 0 8px; }
-        .js-empty p { font-size: 15px; color: #6b6b6b; margin: 0; }
+        .js-empty h3 { font-size: 18px; font-weight: 600; color: #0a0a0a; margin: 0 0 6px; }
+        .js-empty p { font-size: 14px; color: #6b6b6b; margin: 0; }
 
         .js-load-more {
           display: flex; justify-content: center; margin-top: 40px;
         }
         .js-lm-btn {
           background: #fff; border: 1px solid #0a0a0a; color: #0a0a0a;
-          padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600;
+          padding: 12px 24px; border-radius: 30px; font-size: 13.5px; font-weight: 650;
           cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
-        .js-lm-btn:hover:not(:disabled) { background: #0a0a0a; color: #fafafa; }
+        .js-lm-btn:hover:not(:disabled) { background: #0a0a0a; color: #fafafa; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .js-lm-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #e4e4e4; color: #a3a3a3; }
         
         .js-loading-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .js-skeleton {
-          background: #fff; border: 1px solid #e4e4e4; border-radius: 20px; padding: 24px;
+          background: rgba(255,255,255,0.7); border: 1px solid rgba(228,228,228,0.6); border-radius: 24px; padding: 24px;
           animation: pulse 1.5s infinite ease-in-out;
         }
         .js-sk-bar { background: #f0f0f0; border-radius: 4px; margin-bottom: 12px; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        /* Layout headers */
+        .jobs-header-row {
+          display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+          gap: 20px; margin-bottom: 32px;
+        }
+        .jobs-header-text { flex: 1; min-width: 240px; }
+        
+        .premium-entry-btn {
+          display: flex; align-items: center; gap: 14px;
+          padding: 14px 20px; border-radius: 16px; border: none; cursor: pointer;
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+          color: #fafafa; text-align: left;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          flex-shrink: 0; max-width: 100%;
+        }
+        .premium-entry-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+        }
+        .premium-entry-icon {
+          width: 42px; height: 42px; border-radius: 11px;
+          background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35);
+          display: flex; align-items: center; justify-content: center; color: #fbbf24;
+          flex-shrink: 0;
+        }
+        .premium-entry-label {
+          font-size: 10px; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.08em; color: #fbbf24; margin: 0 0 3px;
+        }
+        .premium-entry-title { font-size: 14.5px; font-weight: 700; margin: 0; line-height: 1.3; }
+        .premium-entry-sub { font-size: 11.5px; color: rgba(250,250,250,0.65); margin: 3px 0 0; }
+        .premium-entry-arrow { color: rgba(250,250,250,0.5); flex-shrink: 0; margin-left: auto; }
       `}</style>
 
       <div className="jobs-page">
-        {/* Header */}
-        <div className="jh-pill">
-          <Briefcase size={14} /> AI Job Aggregator
+        <div className="jobs-header-row">
+          <div className="jobs-header-text">
+            <div className="jh-pill">
+              <Briefcase size={14} /> AI Job Aggregator
+            </div>
+            <h1 className="jh-title">Discover Opportunities</h1>
+            <p className="jh-sub" style={{ marginBottom: 0 }}>
+              {loading
+                ? 'Searching live job data...'
+                : 'Curated live roles matching your criteria.'}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="premium-entry-btn"
+            onClick={() => navigate('/premium-jobs')}
+            aria-label="Open Nyrvexa Premium Jobs"
+          >
+            <div className="premium-entry-icon">
+              <Crown size={22} />
+            </div>
+            <div>
+              <p className="premium-entry-label">Nyrvexa Premium</p>
+              <p className="premium-entry-title">Premium Jobs</p>
+              <p className="premium-entry-sub">
+                {isPremium ? 'Curated roles · Pro access' : 'Exclusive hand-picked roles'}
+              </p>
+            </div>
+            <ChevronRight size={20} className="premium-entry-arrow" />
+          </button>
         </div>
-        <h1 className="jh-title">Discover Opportunities</h1>
-        <p className="jh-sub">
-          {loading 
-            ? 'Searching live job data...' 
-            : `Showing ${animatedTotal.toLocaleString()}${!totalJobs || totalJobs % LIMIT === 0 ? '+' : ''} open roles matching your criteria.`
-          }
-        </p>
 
         {/* Filters */}
         <div className="jf-container">

@@ -9,6 +9,8 @@ import {
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import { useAuthPrompt } from '../hooks/useAuthPrompt'
+import AuthPromptModal from '../components/AuthPromptModal'
 import { useUsage } from '../hooks/useUsage'
 
 const EXPERIENCE_OPTIONS = [
@@ -504,12 +506,13 @@ export default function CareerPath() {
   const [activeStep, setActiveStep]   = usePagePersistedState('career_path_active_step', 0)
   const { user, isAuthenticated } = useAuth()
   const { isPremium } = useUsage()
+  const { requireAuth, authPromptProps } = useAuthPrompt({
+    redirectTo: '/career',
+    title: 'Sign in to generate your roadmap',
+    subtitle: 'Fill in your details freely. We only call the server when you submit — sign in then to run the AI.',
+  })
 
-  const handleGenerate = async () => {
-    if (!targetRole.trim() || !skills.trim()) {
-      toast.error('Please fill in target role and current skills')
-      return
-    }
+  const runGenerate = async () => {
     setLoading(true)
     setResult(null)
     setActiveStep(0)
@@ -528,6 +531,14 @@ export default function CareerPath() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleGenerate = () => {
+    if (!targetRole.trim() || !skills.trim()) {
+      toast.error('Please fill in target role and current skills')
+      return
+    }
+    requireAuth(runGenerate)
   }
 
   const handleDownloadPDF = async () => {
@@ -573,6 +584,8 @@ export default function CareerPath() {
   const totalResources   = countStepResources(steps)
 
   return (
+    <>
+      <AuthPromptModal {...authPromptProps} />
     <Layout>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
@@ -944,6 +957,7 @@ export default function CareerPath() {
         )}
       </div>
     </Layout>
+    </>
   )
 }
 

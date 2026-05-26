@@ -1,0 +1,429 @@
+/* Nyrvexa Premium Jobs — full-page Pro experience */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display&display=swap');
+
+.pj-page {
+  --pj-bg: #09090b;
+  --pj-surface: #121218;
+  --pj-surface-2: #18181f;
+  --pj-border: rgba(255, 255, 255, 0.07);
+  --pj-gold: #e8b84a;
+  --pj-gold-soft: rgba(232, 184, 74, 0.12);
+  --pj-text: #fafafa;
+  --pj-muted: #9ca3af;
+  --pj-green: #34d399;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: var(--pj-text);
+  background: var(--pj-bg);
+  margin: 0 -24px;
+  min-height: calc(100vh - 58px);
+  display: flex;
+  flex-direction: column;
+}
+
+.pj-topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--pj-border);
+  background: rgba(9, 9, 11, 0.95);
+  backdrop-filter: blur(12px);
+}
+
+.pj-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pj-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pj-border);
+  background: var(--pj-surface);
+  color: var(--pj-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.pj-back:hover {
+  color: var(--pj-text);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.pj-topbar-title {
+  min-width: 0;
+}
+
+.pj-topbar-title h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pj-topbar-title p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--pj-muted);
+}
+
+.pj-pro-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--pj-gold-soft);
+  border: 1px solid rgba(232, 184, 74, 0.35);
+  color: var(--pj-gold);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.pj-btn-upgrade-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: var(--pj-gold);
+  color: #0a0a0a;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.pj-workspace {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pj-list-pane {
+  width: 100%;
+  max-width: 420px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--pj-border);
+  display: flex;
+  flex-direction: column;
+  background: var(--pj-surface);
+}
+
+.pj-list-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--pj-border);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pj-muted);
+}
+
+.pj-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.pj-list-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 16px 20px;
+  border: none;
+  border-bottom: 1px solid var(--pj-border);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.pj-list-item:hover {
+  background: var(--pj-surface-2);
+}
+
+.pj-list-item.active {
+  background: var(--pj-surface-2);
+}
+
+.pj-list-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--pj-gold);
+}
+
+.pj-list-item-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  line-height: 1.35;
+  padding-right: 56px;
+}
+
+.pj-list-item-meta {
+  font-size: 13px;
+  color: var(--pj-muted);
+  margin: 0;
+}
+
+.pj-list-item-salary {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pj-green);
+  margin: 8px 0 0;
+}
+
+.pj-featured-tag {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: var(--pj-gold);
+  color: #0a0a0a;
+}
+
+.pj-detail-pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--pj-bg);
+  overflow: hidden;
+}
+
+.pj-detail-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 32px 40px 48px;
+}
+
+.pj-detail-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  text-align: center;
+  color: var(--pj-muted);
+}
+
+.pj-detail-empty h2 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  color: var(--pj-text);
+  margin: 16px 0 8px;
+}
+
+.pj-detail-head h2 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 0 0 12px;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+
+.pj-detail-company {
+  font-size: 16px;
+  color: var(--pj-muted);
+  margin: 0 0 8px;
+}
+
+.pj-detail-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--pj-muted);
+  margin-bottom: 20px;
+}
+
+.pj-detail-salary {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--pj-green);
+  margin: 0 0 24px;
+}
+
+.pj-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.pj-meta-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--pj-surface);
+  border: 1px solid var(--pj-border);
+  color: var(--pj-muted);
+}
+
+.pj-apply-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--pj-border);
+}
+
+.pj-btn-apply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #e8b84a, #d4a017);
+  color: #0a0a0a;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.pj-btn-apply:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.pj-section {
+  margin-bottom: 28px;
+}
+
+.pj-section h3 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pj-muted);
+  margin: 0 0 12px;
+}
+
+.pj-section p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(250, 250, 250, 0.9);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.pj-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pj-skill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  color: var(--pj-green);
+}
+
+.pj-upgrade-panel {
+  margin: auto;
+  max-width: 400px;
+  padding: 40px 32px;
+  text-align: center;
+  background: var(--pj-surface);
+  border: 1px solid var(--pj-border);
+  border-radius: 20px;
+}
+
+.pj-upgrade-panel h2 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  margin: 16px 0 8px;
+}
+
+.pj-upgrade-panel p {
+  color: var(--pj-muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.pj-btn-upgrade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: var(--pj-gold);
+  color: #0a0a0a;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.pj-center-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--pj-muted);
+}
+
+.pj-center-state p {
+  margin-top: 12px;
+  font-size: 15px;
+}
+
+@media (max-width: 900px) {
+  .pj-workspace {
+    flex-direction: column;
+  }
+
+  .pj-list-pane {
+    max-width: none;
+    max-height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--pj-border);
+  }
+
+  .pj-detail-scroll {
+    padding: 24px 20px 40px;
+  }
+
+  .pj-topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+}

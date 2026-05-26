@@ -5,7 +5,7 @@ import {
   MessageSquare, Briefcase, FileText, Map, Mic, Newspaper,
   ArrowRight, CheckCircle, X, Minus, ChevronRight,
   Shield, Globe, Scissors, Building2, DollarSign,
-  Lock, Sparkles, Mail,
+  Lock, Sparkles, Mail, GitBranch,
 } from 'lucide-react'
 
 /* ─── DATA ─────────────────────────────────────────────────────── */
@@ -16,7 +16,8 @@ const FEATURES = [
   { icon: FileText, title: 'Resume Analyzer', desc: 'Instant ATS score, keyword gap report, and section-by-section improvement suggestions on your PDF.', tag: 'AI' },
   { icon: Scissors, title: 'Resume Tailor', desc: 'Paste a job description — get your resume rewritten to match it and beat the ATS, every time.', tag: 'New' },
   { icon: Map, title: 'Career Path AI', desc: 'Skill gap analysis and a week-by-week learning roadmap from your current role to your target.', tag: 'AI' },
-  { icon: Mic, title: 'Voice Interview AI', desc: 'Speak your answers. The AI listens, transcribes, and scores content, clarity, and confidence live.', tag: 'Voice' },
+  { icon: GitBranch, title: 'Interactive Roadmaps', desc: 'Explore role-based skill trees — stages, topics, and resources in one visual graph you can export.', tag: 'Pro' },
+  { icon: Mic, title: 'Voice Interview AI', desc: 'Full mock rounds with live scoring — HR, technical, and stress modes. Included with Nyrvexa Pro.', tag: 'Pro' },
   { icon: Building2, title: 'Company Research', desc: 'Culture signals, funding stage, recent news, interview difficulty, and insider Q&A for any company.', tag: 'New' },
   { icon: DollarSign, title: 'Salary Insights', desc: 'Real compensation data by role, city, experience and company — negotiate with numbers, not guesses.', tag: 'New' },
   { icon: Newspaper, title: 'Tech & Career News', desc: 'Premium publications aggregated and AI-summarised — stay sharp in under 60 seconds a day.', tag: 'Curated' },
@@ -28,6 +29,7 @@ const COMPARISON = [
   { feature: 'Resume Tailor per JD', us: true, a: false, b: false, c: false },
   { feature: 'Voice Interview Coach', us: true, a: false, b: false, c: false },
   { feature: 'Career Roadmap AI', us: true, a: false, b: false, c: false },
+  { feature: 'Interactive Roadmap Graph', us: true, a: false, b: false, c: false },
   { feature: 'Company Deep Research', us: true, a: 'partial', b: false, c: false },
   { feature: 'Salary Intelligence', us: true, a: 'partial', b: 'partial', c: false },
   { feature: 'Live Job Aggregation', us: true, a: true, b: true, c: false },
@@ -36,10 +38,10 @@ const COMPARISON = [
 ]
 
 const STATS = [
-  { end: 10000, suffix: '+', label: 'Jobs aggregated', note: 'Updated daily' },
-  { end: 9, suffix: '', label: 'AI tools', note: 'All-in-one suite' },
-  { end: 3, prefix: '< ', suffix: 's', label: 'Resume analysis', note: 'Instant results' },
-  { end: 24, suffix: '/7', label: 'Career support', note: 'Always available' },
+  { display: 'Full suite', label: 'Career operating system', note: 'One platform, every stage' },
+  { display: 'Pro-grade', label: 'AI intelligence', note: 'Built for serious job seekers' },
+  { display: 'Instant', label: 'Resume & roadmap insights', note: 'Actionable in minutes' },
+  { display: '24/7', label: 'Practice & prep', note: 'Interview when you are ready' },
 ]
 
 const STEPS = [
@@ -49,26 +51,25 @@ const STEPS = [
 ]
 
 const FREE_LIMITS = [
-  { feature: 'AI Career Chat', free: '7 messages / day', pro: 'Unlimited' },
-  { feature: 'Resume Analyzer', free: '1 analysis / day', pro: 'Unlimited' },
-  { feature: 'Resume Builder PDF', free: <><Lock size={12} /> Locked</>, pro: 'Unlimited exports' },
-  { feature: 'Voice Interview AI', free: '3 sessions / day', pro: 'Unlimited rounds' },
-  { feature: 'Career Roadmap', free: '3 searches / day', pro: 'Unlimited' },
-  { feature: 'Skill Match', free: '3 analyses / day', pro: 'Unlimited' },
-  { feature: 'Salary Insights', free: '2 searches / day', pro: 'Unlimited' },
-  { feature: 'Company Research', free: '2 searches / day', pro: 'Unlimited' },
-  { feature: 'Job Alerts', free: <><Lock size={12} /> Locked</>, pro: 'Included' },
-  { feature: 'Priority Support', free: '—', pro: '24/7 priority' },
+  { feature: 'AI Career Chat', free: 'Limited', pro: 'Unlimited' },
+  { feature: 'Resume Analyzer', free: 'Limited', pro: 'Unlimited' },
+  { feature: 'Resume Builder PDF', free: 'Locked', pro: 'Unlimited exports' },
+  { feature: 'Voice Interview AI', free: 'Locked', pro: 'Unlimited mock rounds' },
+  { feature: 'Career Roadmap', free: 'Limited', pro: 'Unlimited' },
+  { feature: 'Skill Match', free: 'Limited', pro: 'Unlimited' },
+  { feature: 'Salary Insights', free: 'Limited', pro: 'Unlimited' },
+  { feature: 'Company Research', free: 'Limited', pro: 'Unlimited' },
+  { feature: 'Job Alerts', free: 'Locked', pro: 'Included' },
+  { feature: 'Priority Support', free: 'Locked', pro: '24/7 priority' },
 ]
 
 const PRICE_COMPARE = [
-  { feature: 'AI Career Chat', us: '✦ Included', a: '₹499/mo', b: '₹999/mo' },
-  { feature: 'Resume ATS Analysis', us: '✦ Included', a: '₹299/mo', b: '—' },
-  { feature: 'Voice Interview Coach', us: '✦ Included', a: '—', b: '₹599/mo' },
-  { feature: 'Salary Intelligence', us: '✦ Included', a: '₹199/mo', b: '₹399/mo' },
-  { feature: 'Company Research', us: '✦ Included', a: '—', b: '₹299/mo' },
-  { feature: 'Resume Tailor per JD', us: '✦ Included', a: '—', b: '—' },
-  { feature: 'Total monthly cost', us: '₹199/mo', a: '₹997+/mo', b: '₹1,697+/mo' },
+  { feature: 'AI Career Chat', us: '✦ Included in Pro', a: 'Separate subscription', b: 'Separate subscription' },
+  { feature: 'Resume ATS + Builder', us: '✦ Included in Pro', a: 'Paid add-ons', b: 'Limited free tier' },
+  { feature: 'Voice Interview Coach', us: '✦ Pro exclusive', a: 'Not offered', b: 'Premium tier only' },
+  { feature: 'Salary Intelligence', us: '✦ Included in Pro', a: 'Partial / paid', b: 'Partial / paid' },
+  { feature: 'Roadmap Graph + Career Path', us: '✦ Included in Pro', a: 'Generic courses', b: '—' },
+  { feature: 'Your monthly stack', us: 'One Pro membership', a: 'Multiple tools & logins', b: 'Multiple tools & logins' },
 ]
 
 /* ─── HOOKS ─────────────────────────────────────────────────────── */
@@ -104,12 +105,15 @@ function useCountUp(end, duration = 2000, trigger = false) {
   return value
 }
 
-function AnimatedStat({ end, suffix = '', prefix = '', label, note, trigger }) {
-  const val = useCountUp(end, 2000, trigger)
-  const formatted = end >= 1000 ? `${(val / 1000).toFixed(val >= end ? 0 : 1)}K` : val
+function AnimatedStat({ display, end, suffix = '', prefix = '', label, note, trigger }) {
+  const val = useCountUp(end ?? 0, 2000, trigger && end != null)
+  const formatted = end != null
+    ? (end >= 1000 ? `${(val / 1000).toFixed(val >= end ? 0 : 1)}K` : val)
+    : null
+  const shown = display ?? `${prefix || ''}${formatted}${suffix || ''}`
   return (
     <div className="stat-cell">
-      <div className="sv">{prefix}{formatted}{suffix}</div>
+      <div className="sv">{shown}</div>
       <div className="sl">{label}</div>
       <div className="sn">{note}</div>
     </div>
@@ -398,23 +402,38 @@ export default function Landing() {
 
         /* PRICING */
         .pricing-sec{padding:96px 0;border-top:1px solid var(--line)}
-        .price-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:780px;margin:0 auto}
-        .price-card{border:1px solid var(--line);border-radius:18px;padding:32px 28px;background:var(--paper);position:relative;transition:transform .3s,box-shadow .3s}
-        .price-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.08)}
-        .price-card.pro{border-color:var(--ink);box-shadow:0 4px 24px rgba(0,0,0,.1)}
-        .price-card.pro:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.14)}
-        .price-pop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:11px;font-weight:600;padding:4px 14px;border-radius:20px;display:flex;align-items:center;gap:5px;letter-spacing:.3px;white-space:nowrap}
-        .price-badge{font-size:13px;font-weight:600;color:var(--mid);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
-        .pro-badge{color:var(--ink)}
-        .price-amount{font-family:'DM Serif Display',serif;font-size:clamp(42px,6vw,56px);letter-spacing:-2px;color:var(--ink);line-height:1}
-        .price-period{font-size:14px;color:var(--mid);margin-bottom:4px}
-        .price-divider{height:1px;background:var(--line);margin:20px 0}
-        .price-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
-        .price-item{display:flex;align-items:center;justify-content:space-between;gap:12px}
-        .price-feat{font-size:14px;color:var(--ink);font-weight:450}
-        .price-val{font-size:13px;font-weight:500;color:var(--mid);display:flex;align-items:center;gap:4px;white-space:nowrap}
-        .free-val{color:var(--no)}
-        .pro-val{color:var(--yes)}
+        .price-cards{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:820px;margin:0 auto;align-items:stretch}
+        .price-card{border:1px solid var(--line);border-radius:24px;padding:36px;background:#fff;position:relative;transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s,border-color .3s;display:flex;flex-direction:column;height:100%;box-shadow:0 4px 6px rgba(0,0,0,.02),0 20px 48px rgba(0,0,0,.04)}
+        .price-card:hover{transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,.08)}
+        .price-card.pro{border-color:#0d0e12;background:#0d0e12;color:#fff;box-shadow:0 30px 80px rgba(13,14,18,.18)}
+        .price-card.pro:hover{border-color:#4f46e5;box-shadow:0 30px 80px rgba(79,70,229,.15)}
+        .lp-pop{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#4f46e5,#9333ea);color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 16px;border-radius:20px;display:flex;align-items:center;gap:5px;box-shadow:0 8px 24px rgba(79,70,229,.25);border:1px solid rgba(255,255,255,.15);white-space:nowrap}
+        .lp-tier{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;color:var(--mid);margin-bottom:0}
+        .price-card.pro .lp-tier{color:#a5b4fc}
+        .lp-price-row{display:flex;align-items:baseline;gap:8px;margin:16px 0 6px}
+        .lp-price{font-family:'DM Serif Display',Georgia,serif;font-size:54px;letter-spacing:-2px;line-height:1;color:var(--ink)}
+        .price-card.pro .lp-price{background:linear-gradient(120deg,#ffffff 40%,#c7d2fe 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .lp-period{font-size:14.5px;color:var(--mid)}
+        .price-card.pro .lp-period{color:#94a3b8}
+        .lp-subhead{color:var(--mid);font-size:13px;margin-bottom:24px}
+        .price-card.pro .lp-subhead{color:#94a3b8}
+        .lp-divider{height:1px;background:var(--line);margin:24px 0}
+        .price-card.pro .lp-divider{background:rgba(255,255,255,.08)}
+        .lp-sec-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;color:var(--ink)}
+        .price-card.pro .lp-sec-title{color:#a5b4fc}
+        .lp-limit-row{display:flex;justify-content:space-between;font-size:13.5px;padding:10px 0;border-bottom:1px solid var(--bg2)}
+        .lp-limit-row:last-child{border:none}
+        .lp-limit-name{color:var(--mid)}
+        .lp-badge.locked{color:#ef4444;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+        .lp-badge.limited{color:#f59e0b;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+        .lp-feat-item{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;margin-bottom:12px;color:#e2e8f0;line-height:1.5}
+        .lp-feat-item svg{flex-shrink:0;margin-top:3px;color:#34d399}
+        .lp-pay-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+        .lp-pay-tags span{font-size:10.5px;font-weight:500;border:1px solid rgba(255,255,255,.08);padding:4px 8px;border-radius:6px;color:#94a3b8;background:rgba(255,255,255,.03)}
+        .lp-cta{width:100%;padding:14px 24px;border-radius:16px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-family:'DM Sans',sans-serif;letter-spacing:-.2px}
+        .lp-cta.primary{background:#fff;color:#0d0e12;box-shadow:0 4px 12px rgba(255,255,255,.05)}
+        .lp-cta.primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,70,229,.3);background:#4f46e5;color:#fff}
+        .lp-cta.ghost{background:var(--bg2);color:var(--mid);border:1px solid var(--line);opacity:.6;pointer-events:none}
 
         /* PRICE COMPARISON */
         .pcmp-sec{padding:96px 0;background:#0a0a0a;position:relative;z-index:10;border-top:1px solid #262626}
@@ -465,14 +484,16 @@ export default function Landing() {
       <div className="land">
         <CursorEffect />
 
-        {/* NAV */}
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          {/* NAV */}
         <nav className={`nav${scrolled ? ' on' : ''}`}>
           <div className="nw">
             <Link to="/" className="logo">
-              <div className="lsq">N</div>
+              <img src="/logo.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
               <span className="lname">Nyrvexa</span>
             </Link>
             <div className="nr">
+              <Link to="/pricing" className="nl">Pricing</Link>
               <Link to="/login" className="nl">Sign In</Link>
               <Link to="/register" className="nc">Get Started</Link>
             </div>
@@ -513,8 +534,8 @@ export default function Landing() {
         <div ref={statRef} className={`fs${statOn ? ' on' : ''}`}>
           <div className="w">
             <div className="stat-row">
-              {STATS.map(({ end, suffix, prefix, label, note }) => (
-                <AnimatedStat key={label} end={end} suffix={suffix} prefix={prefix || ''} label={label} note={note} trigger={statOn} />
+              {STATS.map(({ display, end, suffix, prefix, label, note }) => (
+                <AnimatedStat key={label} display={display} end={end} suffix={suffix} prefix={prefix || ''} label={label} note={note} trigger={statOn} />
               ))}
             </div>
           </div>
@@ -528,7 +549,7 @@ export default function Landing() {
             <div className="feat-hd">
               <div>
                 <span className="badge">Platform</span>
-                <h2 className="sh2">Nine tools.<br /><em>One suite.</em></h2>
+                <h2 className="sh2">Ten tools.<br /><em>One suite.</em></h2>
                 <p className="ssub">Built to take you from scattered job hunting to a clear, confident career path.</p>
               </div>
               <Link to="/register" className="see-link">
@@ -548,6 +569,27 @@ export default function Landing() {
             </div>
           </div>
         </div>
+
+        {/* ROADMAP GRAPH */}
+        <div className="w" style={{ padding: '64px 0' }}>
+          <div>
+            <span className="badge">Roadmap Graph</span>
+            <h2 className="sh2" style={{ marginTop: 12 }}>See the full path <em>before you start.</em></h2>
+            <p className="ssub" style={{ marginBottom: 28, maxWidth: 520 }}>
+              Interactive skill trees for dozens of roles — expand topics, filter resources, and export when you are ready.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Link to="/roadmap-graph" className="bb" style={{ display: 'inline-flex' }}>
+                Explore roadmaps <ArrowRight size={15} />
+              </Link>
+              <Link to="/career" className="bo" style={{ display: 'inline-flex' }}>
+                Career path AI <ChevronRight size={15} />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <hr />
 
         {/* COMPARISON */}
         <div ref={cmpRef} className={`cmp-sec fs${cmpOn ? ' on' : ''}`}>
@@ -629,8 +671,8 @@ export default function Landing() {
                     </div>
                   ))}
                 </div>
-                <Link to="/register" className="bb" style={{ marginTop: 32, display: 'inline-flex' }}>
-                  Try a mock interview <ArrowRight size={15} />
+                <Link to="/pricing?locked=interview" className="bb" style={{ marginTop: 32, display: 'inline-flex' }}>
+                  Unlock mock interviews <ArrowRight size={15} />
                 </Link>
               </div>
             </div>
@@ -671,43 +713,69 @@ export default function Landing() {
             </div>
 
             <div className="price-cards">
-              {/* FREE */}
+              {/* FREE / EXPLORER */}
               <div className="price-card">
-                <div className="price-badge">Free</div>
-                <div className="price-amount">₹0</div>
-                <div className="price-period">forever</div>
-                <div className="price-divider" />
-                <ul className="price-list">
+                <p className="lp-tier">Explorer</p>
+                <div className="lp-price-row">
+                  <span className="lp-price">₹0</span>
+                  <span className="lp-period">forever</span>
+                </div>
+                <p className="lp-subhead">Preview the tools with daily basic limits.</p>
+                <div className="lp-divider" />
+                <p className="lp-sec-title">Limits &amp; Access</p>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {FREE_LIMITS.map(({ feature, free }) => (
-                    <li key={feature} className="price-item">
-                      <span className="price-feat">{feature}</span>
-                      <span className="price-val free-val">{free}</span>
-                    </li>
+                    <div key={feature} className="lp-limit-row">
+                      <span className="lp-limit-name">{feature}</span>
+                      <span className={`lp-badge ${free === 'Locked' ? 'locked' : 'limited'}`}>{free}</span>
+                    </div>
                   ))}
-                </ul>
-                <Link to="/register" className="bo" style={{ width: '100%', justifyContent: 'center', marginTop: 20 }}>
-                  Get started <ArrowRight size={15} />
-                </Link>
+                </div>
+                <button type="button" className="lp-cta ghost" disabled>
+                  Current Tier
+                </button>
               </div>
 
-              {/* PRO */}
+              {/* PRO / PROFESSIONAL */}
               <div className="price-card pro">
-                <div className="price-pop"><Sparkles size={12} /> Most popular</div>
-                <div className="price-badge pro-badge">Pro</div>
-                <div className="price-amount">₹199</div>
-                <div className="price-period">/ month</div>
-                <div className="price-divider" />
-                <ul className="price-list">
-                  {FREE_LIMITS.map(({ feature, pro }) => (
-                    <li key={feature} className="price-item">
-                      <span className="price-feat">{feature}</span>
-                      <span className="price-val pro-val"><CheckCircle size={12} strokeWidth={2.5} /> {pro}</span>
-                    </li>
+                <span className="lp-pop"><Sparkles size={11} strokeWidth={2.5} /> Most popular</span>
+                <p className="lp-tier">Professional</p>
+                <div className="lp-price-row">
+                  <span className="lp-price">₹199</span>
+                  <span className="lp-period">/ month</span>
+                </div>
+                <p className="lp-subhead">Complete, unrestricted access to the suite.</p>
+                <div className="lp-divider" />
+                <p className="lp-sec-title">Everything Unlocked</p>
+                <div style={{ padding: 0, margin: 0 }}>
+                  {[
+                    'Unlimited AI career chat',
+                    'Unlimited ATS resume analysis',
+                    'Resume builder PDF exports',
+                    'Voice mock interviews (Pro exclusive)',
+                    'Unlimited career \u0026 roadmap graphs',
+                    'Unlimited skill match, salary \u0026 company research',
+                    'Premium job alerts (rolling out)',
+                    'Priority support',
+                  ].map(f => (
+                    <div key={f} className="lp-feat-item">
+                      <CheckCircle size={15} strokeWidth={2.5} />
+                      <span>{f}</span>
+                    </div>
                   ))}
-                </ul>
-                <Link to="/register" className="bb" style={{ width: '100%', justifyContent: 'center', marginTop: 20 }}>
-                  Upgrade to Pro <ArrowRight size={15} />
+                </div>
+                <div className="lp-pay-tags">
+                  {['UPI', 'Google Pay', 'PhonePe', 'Cards', 'Netbanking'].map(m => (
+                    <span key={m}>{m}</span>
+                  ))}
+                </div>
+                <Link to="/pricing" className="lp-cta primary">
+                  Upgrade to Pro — ₹199 <ArrowRight size={15} />
                 </Link>
+                <p style={{ textAlign: 'center', fontSize: 11, color: '#64748b', marginTop: 14 }}>
+                  <Shield size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                  Secured by Razorpay · Tax invoice available
+                </p>
               </div>
             </div>
           </div>
@@ -718,9 +786,9 @@ export default function Landing() {
           <div className="w">
             <div style={{ textAlign: 'center', marginBottom: 48 }}>
               <span className="badge">Value comparison</span>
-              <h2 className="sh2" style={{ margin: '0 auto 8px' }}>Save over <em>₹1,500/month.</em></h2>
+              <h2 className="sh2" style={{ margin: '0 auto 8px' }}>Replace the <em>tool stack.</em></h2>
               <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
-                What you'd pay across multiple platforms vs. one Nyrvexa Pro subscription.
+                One Pro membership vs. juggling separate subscriptions for chat, resume, interview, and research tools.
               </p>
             </div>
             <div className="tbl-wrap">
@@ -778,7 +846,7 @@ export default function Landing() {
             <div className="foot-top">
               <div className="foot-brand">
                 <Link to="/" className="logo" style={{ marginBottom: 14 }}>
-                  <div className="lsq">N</div>
+                  <img src="/logo.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
                   <span className="lname">Nyrvexa</span>
                 </Link>
                 <p className="foot-desc">The intelligent career platform built for modern professionals. Designed for results.</p>
@@ -801,7 +869,8 @@ export default function Landing() {
               </div>
               <div className="foot-col">
                 <h4 className="foot-colh">Resources</h4>
-                <Link to="/register" className="foot-link">Career Roadmap</Link>
+                <Link to="/roadmap-graph" className="foot-link">Interactive Roadmaps</Link>
+                <Link to="/career" className="foot-link">Career Path AI</Link>
                 <Link to="/register" className="foot-link">Salary Insights</Link>
                 <Link to="/register" className="foot-link">Company Research</Link>
                 <Link to="/register" className="foot-link">Tech News</Link>
@@ -821,6 +890,7 @@ export default function Landing() {
           </div>
         </footer>
 
+        </div>
       </div>
     </>
   )
