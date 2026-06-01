@@ -727,7 +727,7 @@ export default function Pricing() {
           <header className="pr-nav on">
             <div className="pr-nw">
               <Link to="/" className="pr-logo">
-                <img src="/logo.png" alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+                <img src="/logos.png" alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
                 <span className="pr-lname">Nyrvexa</span>
               </Link>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>

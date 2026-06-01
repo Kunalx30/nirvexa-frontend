@@ -463,7 +463,7 @@ export default function UserAdmin() {
       <div className="ta-root ta-auth">
         <div className="ta-auth-card">
           <div className="ta-auth-brand">
-            <img src="/logo.png" alt="Logo" className="ta-auth-logo" style={{ objectFit: 'contain' }} />
+            <img src="/logos.png" alt="Logo" className="ta-auth-logo" style={{ objectFit: 'contain' }} />
             <h1 className="ta-auth-title">Nyrvexa Operations</h1>
             <p className="ta-auth-sub">
               Secure internal console for team members.
@@ -587,7 +587,7 @@ export default function UserAdmin() {
 
       <aside className="ta-sidebar">
         <div className="ta-sidebar-brand">
-          <img src="/logo.png" alt="Logo" className="ta-auth-logo" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+          <img src="/logos.png" alt="Logo" className="ta-auth-logo" style={{ width: 36, height: 36, objectFit: 'contain' }} />
           <h1>Nyrvexa Ops</h1>
           <p>Internal console</p>
         </div>

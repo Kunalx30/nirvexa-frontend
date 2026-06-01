@@ -153,7 +153,7 @@ export default function Login() {
 
           {/* Logo */}
           <Link to="/" className="log-logo">
-            <img src="/logo.png" alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
+            <img src="/logos.png" alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
             <span className="log-lname">Nyrvexa</span>
           </Link>
 

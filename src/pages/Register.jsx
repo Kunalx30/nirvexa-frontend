@@ -482,7 +482,7 @@ export default function Register() {
 
           {/* Logo + Header */}
           <Link to="/" className="reg-logo">
-            <img src="/logo.png" alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
+            <img src="/logos.png" alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
             <span className="reg-lname">Nyrvexa</span>
           </Link>
 

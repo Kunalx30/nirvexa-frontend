@@ -489,7 +489,7 @@ export default function Landing() {
         <nav className={`nav${scrolled ? ' on' : ''}`}>
           <div className="nw">
             <Link to="/" className="logo">
-              <img src="/logo.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+              <img src="/logos.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
               <span className="lname">Nyrvexa</span>
             </Link>
             <div className="nr">
@@ -846,7 +846,7 @@ export default function Landing() {
             <div className="foot-top">
               <div className="foot-brand">
                 <Link to="/" className="logo" style={{ marginBottom: 14 }}>
-                  <img src="/logo.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+                  <img src="/logos.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
                   <span className="lname">Nyrvexa</span>
                 </Link>
                 <p className="foot-desc">The intelligent career platform built for modern professionals. Designed for results.</p>

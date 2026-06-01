@@ -219,7 +219,7 @@ export default function Navbar() {
 
           {/* Logo — left */}
           <Link to="/" className="nb-logo">
-            <img src="/logo.png" alt="Nyrvexa Logo" className="nb-logo-img" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+            <img src="/logos.png" alt="Nyrvexa Logo" className="nb-logo-img" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
             <span className="nb-lname">Nyrvexa</span>
           </Link>
 
