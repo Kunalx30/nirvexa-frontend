@@ -460,13 +460,18 @@ export default function Jobs() {
           <div className="jobs-header-text">
             <div className="jh-pill">
               <Briefcase size={14} /> AI Job Aggregator
-            </div>
-            <h1 className="jh-title">Discover Opportunities</h1>
+            </div>            <h1 className="jh-title">Discover Opportunities</h1>
             <p className="jh-sub" style={{ marginBottom: 0 }}>
               {loading
                 ? 'Searching live job data...'
                 : 'Curated live roles matching your criteria.'}
             </p>
+            {/* Dynamic job count */}
+            {!loading && totalJobs > 0 && (
+              <p className="jh-sub" style={{ marginTop: 4, fontWeight: '600' }}>
+                {animatedTotal.toLocaleString()} jobs available
+              </p>
+            )}
           </div>
 
           <button

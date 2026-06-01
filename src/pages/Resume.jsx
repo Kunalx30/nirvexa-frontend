@@ -1,4 +1,4 @@
-/**
+﻿/**
  * src/pages/Resume.jsx
  * NirVexa - Resume Suite (Phase 6.0)
  *
@@ -446,7 +446,8 @@ const TEMPLATE_INFO = {
   template_13_crimson_double:{ label: 'Crimson Double', category: 'Traditional' },
   template_14_purple_tri:    { label: 'Purple Tri', category: 'Modern' },
   template_15_slate_ruled:   { label: 'Slate Ruled', category: 'Clean' },
-   template_16_kunal_ml:      { label: 'Machine Learning Pro', category: 'Data Science' },
+   template_16_kunal_ml:      { label: 'Machine Learning Professional', category: 'Data Science' },
+  template_17_ai_data_purple: { label: 'AI Data Specialist', category: 'Data Science' },
 }
 
 const TemplateCard = ({ template, selected, onSelect }) => {
@@ -1477,7 +1478,7 @@ export default function Resume() {
   const { requireAuth, authPromptProps } = useAuthPrompt({
     redirectTo: '/resume',
     title: 'Sign in to run resume AI',
-    subtitle: 'Upload and fill forms without an account. Sign in when you analyze or generate — your inputs stay on this page.',
+    subtitle: 'Upload and fill forms without an account. Sign in when you analyze or generate â€” your inputs stay on this page.',
   })
 
   const openInLatexEditor = (latexCode) => {
@@ -1552,3 +1553,4 @@ export default function Resume() {
     </>
   )
 }
+
