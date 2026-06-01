@@ -469,14 +469,8 @@ export default function Jobs() {
             <p className="jh-sub" style={{ marginBottom: 0 }}>
               {loading
                 ? 'Searching live job data...'
-                : 'Curated live roles matching your criteria.'}
+                : `Curated live roles matching your criteria. ${animatedTotal > 0 ? `${animatedTotal.toLocaleString()} jobs available` : ''}`}
             </p>
-            {/* Dynamic job count */}
-            {!loading && totalJobs > 0 && (
-              <p className="jh-sub" style={{ marginTop: 4, fontWeight: '600' }}>
-                {animatedTotal.toLocaleString()} jobs available
-              </p>
-            )}
           </div>
 
           <button
@@ -498,33 +492,6 @@ export default function Jobs() {
             <ChevronRight size={20} className="premium-entry-arrow" />
           </button>
         </div>
-
-        {/* Aggregated Source Stats */}
-        {Object.keys(sourceCounts).length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6 relative z-10 animate-fade-in">
-            {Object.entries(sourceCounts).map(([src, count]) => {
-              const isSelected = filterSource === src;
-              return (
-                <button
-                  key={src}
-                  type="button"
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-2xs backdrop-blur-md cursor-pointer transition-all duration-200 ${
-                    isSelected
-                      ? "border-blue-500 bg-blue-50/80 text-blue-700 font-bold scale-[1.03]"
-                      : "border-slate-200 bg-white/70 text-slate-600 hover:bg-slate-50 hover:border-slate-350"
-                  }`}
-                  onClick={() => setFilterSource(isSelected ? 'all' : src)}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-blue-600' : 'bg-slate-400'}`} />
-                  <span className="capitalize">{src}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${isSelected ? 'bg-blue-200 text-blue-800' : 'bg-slate-100 text-slate-700'}`}>
-                    {count.toLocaleString()}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
 
         {/* Filters */}
         <div className="jf-container">

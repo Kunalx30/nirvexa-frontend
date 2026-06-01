@@ -2,6 +2,7 @@
 // Avatar: Premium CSS-based illustrated girl face with lip-sync
 // Audio: Web Audio API decodeAudioData (immune to Chrome autoplay policy)
 import { useState, useRef, useEffect, useCallback, useMemo } from "react"
+import Layout from '../components/layout/Layout'
 import {
   startInterview, reactToAnswer, evaluateInterview, fetchTTSAudio,
   createMainSession, finalizeMainSession, resolvePremiumAccess, buildPricingUrl,
@@ -523,23 +524,31 @@ export default function App() {
 
   /* ── render ──────────────────────────────────────────────────────────────── */
   if (phase === PHASE.SETUP || phase === PHASE.LOADING) {
-    return <SetupScreen
-      jobRole={jobRole} setJobRole={setJobRole}
-      customRole={customRole} setCustomRole={setCustomRole}
-      expLevel={expLevel} setExpLevel={setExpLevel}
-      onStart={handleStart}
-      loading={phase === PHASE.LOADING || premiumChecking}
-      checkingPremium={premiumChecking}
-      error={setupError}
-      userName={userName}
-      isPremiumLocked={premiumLocked}
-    />
+    return (
+      <Layout>
+        <SetupScreen
+          jobRole={jobRole} setJobRole={setJobRole}
+          customRole={customRole} setCustomRole={setCustomRole}
+          expLevel={expLevel} setExpLevel={setExpLevel}
+          onStart={handleStart}
+          loading={phase === PHASE.LOADING || premiumChecking}
+          checkingPremium={premiumChecking}
+          error={setupError}
+          userName={userName}
+          isPremiumLocked={premiumLocked}
+        />
+      </Layout>
+    )
   }
 
   if (phase === PHASE.EVALUATING) return <EvaluatingScreen />
 
   if (phase === PHASE.RESULTS && evaluation)
-    return <ResultsScreen evaluation={evaluation} jobRole={plan?.job_role||""} allQA={allQA} />
+    return (
+      <Layout>
+        <ResultsScreen evaluation={evaluation} jobRole={plan?.job_role||""} allQA={allQA} />
+      </Layout>
+    )
 
   /* ── INTERVIEWING ─────────────────────────────────────────────────────────── */
   const progress = plan ? (currentQIndex / plan.total) * 100 : 0
@@ -550,6 +559,20 @@ export default function App() {
       {/* Dynamic Header */}
       <header className="h-14 bg-white border-b border-[#e4e4e4] flex items-center justify-between px-4 sm:px-6 relative z-20 shadow-sm shrink-0">
         <div className="flex items-center gap-2.5">
+          <button 
+            type="button"
+            onClick={() => {
+              if (window.confirm("Are you sure you want to exit the interview? Your progress will not be saved.")) {
+                setPhase(PHASE.SETUP)
+                stopAudio()
+                stopSTT()
+              }
+            }}
+            className="mr-2 p-1 rounded-lg hover:bg-slate-100 transition-colors flex items-center justify-center"
+            title="Exit interview"
+          >
+            <ChevronLeft size={20} className="text-[#0a0a0a]" />
+          </button>
           <div className="w-7 h-7 bg-[#0a0a0a] rounded-md flex items-center justify-center text-white font-bold text-xs">N</div>
           <span className="font-bold text-[#0a0a0a] text-sm">Nyrvexa AI</span>
           <span className="text-[#e4e4e4] text-md">·</span>
@@ -779,7 +802,7 @@ function ThinkingBubble() {
 /* ─── SETUP SCREEN ───────────────────────────────────────────────────────────*/
 function SetupScreen({ jobRole, setJobRole, customRole, setCustomRole, expLevel, setExpLevel, onStart, loading, checkingPremium, error, userName, isPremiumLocked }) {
   return (
-    <div className="rg min-h-screen bg-[#fcfcfc] rg-grid-bg flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="rg py-12 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-lg bg-white border border-[#e4e4e4] rounded-2xl p-6 sm:p-8 shadow-md relative z-10 rg-fade">
         
         {/* Brand Header */}
@@ -990,21 +1013,10 @@ function ResultsScreen({ evaluation, jobRole, allQA }) {
   const theme = recColors[hire_recommendation] || { border: "border-[#e4e4e4]", bg: "bg-slate-50", text: "text-[#525252]" }
 
   return (
-    <div className="rg min-h-screen overflow-x-hidden bg-[#fcfcfc] pb-20">
+    <div className="rg pb-20">
       
-      {/* Results Header */}
-      <header className="h-14 bg-white border-b border-[#e4e4e4] flex items-center justify-between gap-3 px-4 sm:px-6 shadow-sm overflow-hidden">
-        <div className="flex min-w-0 items-center gap-2">
-          <div className="w-7 h-7 bg-[#0a0a0a] rounded-md flex items-center justify-center text-white font-bold text-xs">N</div>
-          <span className="min-w-0 truncate font-bold text-sm text-[#0a0a0a]">Interview Results</span>
-        </div>
-        <span className="max-w-[42vw] truncate rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-semibold text-blue-700 uppercase">
-          {jobRole}
-        </span>
-      </header>
-
       {/* Main Score Widget Card */}
-      <div className="mx-auto mt-8 w-full max-w-4xl space-y-6 px-4 sm:px-6">
+      <div className="mx-auto mt-8 w-full max-w-4xl space-y-6">
         
         <div className="w-full max-w-[calc(100vw-32px)] min-w-0 bg-white border border-[#e4e4e4] rounded-2xl p-6 sm:max-w-none sm:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6 sm:gap-8 rg-fade">
           
@@ -1027,6 +1039,11 @@ function ResultsScreen({ evaluation, jobRole, allQA }) {
           <div className="min-w-0 flex-1 text-center md:text-left space-y-2">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
               <h2 className="rg-serif text-2xl text-[#111]">Anya's Assessment</h2>
+              {jobRole && (
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-semibold text-blue-700 uppercase">
+                  {jobRole}
+                </span>
+              )}
               <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${theme.border} ${theme.bg} ${theme.text}`}>
                 {hire_recommendation}
               </span>
