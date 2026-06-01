@@ -1,4 +1,4 @@
-﻿/**
+/**
  * src/pages/Resume.jsx
  * NirVexa - Resume Suite (Phase 6.0)
  *
@@ -647,7 +647,7 @@ const ResumeBuilder = ({ openInLatexEditor, requireAuth }) => {
       fetchTemplatesAPI()
         .then(res => {
           const fetched = res.data?.templates || res.data?.data || []
-          // Filter out any "fake" or extra templates not in our official 15
+          // Only show templates that have a known slug in TEMPLATE_INFO (all 17 official templates)
           setTemplates(fetched.filter(t => TEMPLATE_INFO[t.slug || t.id]))
         })
         .catch(() => toast.error('Could not load templates'))
@@ -693,6 +693,7 @@ const ResumeBuilder = ({ openInLatexEditor, requireAuth }) => {
 
 const handleEdit = () => {
   setResult(null)
+  setResumeId(null)   // clear so next build goes to /build, not /regenerate
   setStep(0)
 }
 
@@ -721,6 +722,7 @@ const handleReset = () => {
   setResumeId(null)
   setStep(0)
   setForm(initialForm)
+  setTemplates([])   // clear cache so templates reload fresh on next visit to step 4
 }
 
 if (result) return (

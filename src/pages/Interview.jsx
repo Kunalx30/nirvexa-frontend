@@ -724,8 +724,9 @@ function ChatBubble({ msg, speakingMessageId, captionProgress, captionSlice }) {
   }
 
   if (ai && !msg.spoken && !isLiveCaption) {
-    body = <span className="text-[#8b8b8b]">Anya is preparing to speak...</span>
+    body = <span className="opacity-60">{msg.text}</span>
   }
+
 
   return (
     <div className={`flex ${ai ? "justify-start" : "justify-end"} mb-4 anim-bubble-in`}>

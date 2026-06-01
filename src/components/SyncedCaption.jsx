@@ -2,6 +2,7 @@ import { useMemo } from "react"
 
 /**
  * Smooth word-by-word captions synced to TTS (minimal lag).
+ * Keeps future/pending text visible in a low-opacity style to prevent layout shift and text disappearing.
  */
 export default function SyncedCaption({
   text,
@@ -10,14 +11,17 @@ export default function SyncedCaption({
   charStart = 0,
   charEnd = null,
 }) {
-  const { prefix, slice, visible } = useMemo(() => {
-    if (!text) return { prefix: "", slice: "", visible: "" }
+  const { prefix, built, pending } = useMemo(() => {
+    if (!text) return { prefix: "", built: "", pending: "" }
 
     const end = charEnd ?? text.length
     const pre = charStart > 0 ? text.slice(0, charStart) : ""
     const sl = text.slice(charStart, end)
+    const suffix = text.slice(end)
 
-    if (!isActive) return { prefix: pre, slice: sl, visible: pre + sl }
+    if (!isActive) {
+      return { prefix: pre + sl + suffix, built: "", pending: "" }
+    }
 
     const p = Math.min(1, Math.max(0, progress))
     // Slight lead + linear — keeps pace with voice without feeling behind
@@ -25,26 +29,32 @@ export default function SyncedCaption({
     const words = sl.split(/(\s+)/)
     let charBudget = Math.floor(target * sl.length)
 
-    let built = ""
+    let activeBuilt = ""
     for (const part of words) {
-      if (built.length + part.length <= charBudget) built += part
-      else if (built.length === 0 && part.trim()) {
-        built = part.slice(0, charBudget)
+      if (activeBuilt.length + part.length <= charBudget) activeBuilt += part
+      else if (activeBuilt.length === 0 && part.trim()) {
+        activeBuilt = part.slice(0, charBudget)
         break
       } else break
     }
 
-    return { prefix: pre, slice: sl, visible: pre + built }
+    const activePending = sl.slice(activeBuilt.length)
+
+    return {
+      prefix: pre,
+      built: activeBuilt,
+      pending: activePending + suffix,
+    }
   }, [text, progress, isActive, charStart, charEnd])
 
   if (!text) return null
-  if (!isActive) return <span>{visible}</span>
+  if (!isActive) return <span>{prefix}</span>
 
-  const done = visible.length >= (charEnd ?? text.length)
+  const done = (prefix + built).length >= text.length
 
   return (
     <span style={{ transition: "opacity 0.08s ease" }}>
-      {visible}
+      <span>{prefix}{built}</span>
       {!done && (
         <span
           style={{
@@ -52,6 +62,7 @@ export default function SyncedCaption({
             width: 2,
             height: "1em",
             marginLeft: 2,
+            marginRight: 2,
             background: "#8b5cf6",
             opacity: 0.55,
             animation: "blink 0.9s step-end infinite",
@@ -60,6 +71,8 @@ export default function SyncedCaption({
           aria-hidden
         />
       )}
+      <span className="opacity-35 select-none">{pending}</span>
     </span>
   )
 }
+
