@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import SEO from '../components/SEO'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ArrowRight, CheckCircle, X, Shield, Clock, Sparkles,
@@ -712,6 +713,7 @@ export default function Pricing() {
       `}</style>
 
       <div className="pr">
+        <SEO title="Pricing | Nyrvexa Pro" description="Invest in clarity, not tool chaos. Upgrade to unlock all premium career tools." />
         <CursorEffect />
 
         <div style={{ position: 'relative', zIndex: 2 }}>

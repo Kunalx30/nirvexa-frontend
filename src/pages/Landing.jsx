@@ -261,7 +261,7 @@ export default function Landing() {
         .bwo:hover{border-color:rgba(255,255,255,.4);color:var(--paper)}
 
         /* CHAT PREVIEW */
-        .cp{max-width:580px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.04),0 24px 64px rgba(0,0,0,.09);transition:transform .5s cubic-bezier(.4,0,.2,1),box-shadow .5s}
+        .cp{width:100%;max-width:580px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.04),0 24px 64px rgba(0,0,0,.09);transition:transform .5s cubic-bezier(.4,0,.2,1),box-shadow .5s}
         .cp:hover{transform:translateY(-6px) scale(1.008);box-shadow:0 16px 40px rgba(0,0,0,.08),0 40px 80px rgba(0,0,0,.12)}
         .cp-bar{display:flex;align-items:center;gap:6px;padding:11px 16px;border-bottom:1px solid var(--bg2);background:var(--bg2)}
         .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
@@ -486,409 +486,409 @@ export default function Landing() {
 
         <div style={{ position: 'relative', zIndex: 2 }}>
           {/* NAV */}
-        <nav className={`nav${scrolled ? ' on' : ''}`}>
-          <div className="nw">
-            <Link to="/" className="logo">
-              <img src="/logos.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-              <span className="lname">Nyrvexa</span>
-            </Link>
-            <div className="nr">
-              <Link to="/pricing" className="nl">Pricing</Link>
-              <Link to="/login" className="nl">Sign In</Link>
-              <Link to="/register" className="nc">Get Started</Link>
-            </div>
-          </div>
-        </nav>
-
-        {/* HERO */}
-        <section ref={heroRef} className={`hero fs${heroOn ? ' on' : ''}`}>
-          <p className="hero-sub">Built for modern professionals.</p>
-
-          <h1 className="h1">
-            The intelligent platform<br /><em>for your</em> next career move.
-          </h1>
-
-          <p className="hsub">
-            AI-powered resume optimization, interview coaching, salary intelligence,
-            and company research — unified in one seamless experience.
-          </p>
-
-          <div className="hbtns">
-            <Link to="/register" className="bb">
-              Start for free <ArrowRight size={15} strokeWidth={2.5} />
-            </Link>
-            <Link to="/login" className="bo">
-              See the platform <ChevronRight size={15} strokeWidth={2} />
-            </Link>
-          </div>
-
-          <ChatPreview />
-          <div style={{ paddingBottom: 80 }} />
-        </section>
-
-
-
-        <hr />
-
-        {/* STATS */}
-        <div ref={statRef} className={`fs${statOn ? ' on' : ''}`}>
-          <div className="w">
-            <div className="stat-row">
-              {STATS.map(({ display, end, suffix, prefix, label, note }) => (
-                <AnimatedStat key={label} display={display} end={end} suffix={suffix} prefix={prefix || ''} label={label} note={note} trigger={statOn} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <hr />
-
-        {/* FEATURES */}
-        <div ref={featRef} className={`feat-sec fs${featOn ? ' on' : ''}`}>
-          <div className="w">
-            <div className="feat-hd">
-              <div>
-                <span className="badge">Platform</span>
-                <h2 className="sh2">Ten tools.<br /><em>One suite.</em></h2>
-                <p className="ssub">Built to take you from scattered job hunting to a clear, confident career path.</p>
+          <nav className={`nav${scrolled ? ' on' : ''}`}>
+            <div className="nw">
+              <Link to="/" className="logo">
+                <img src="/logos.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+                <span className="lname">Nyrvexa</span>
+              </Link>
+              <div className="nr">
+                <Link to="/pricing" className="nl">Pricing</Link>
+                <Link to="/login" className="nl">Sign In</Link>
+                <Link to="/register" className="nc">Get Started</Link>
               </div>
-              <Link to="/register" className="see-link">
-                Explore all <ChevronRight size={14} strokeWidth={2} />
+            </div>
+          </nav>
+
+          {/* HERO */}
+          <section ref={heroRef} className={`hero fs${heroOn ? ' on' : ''}`}>
+            <p className="hero-sub">Built for modern professionals.</p>
+
+            <h1 className="h1">
+              The intelligent platform<br /><em>for your</em> next career move.
+            </h1>
+
+            <p className="hsub">
+              AI-powered resume optimization, interview coaching, salary intelligence,
+              and company research — unified in one seamless experience.
+            </p>
+
+            <div className="hbtns">
+              <Link to="/register" className="bb">
+                Start for free <ArrowRight size={15} strokeWidth={2.5} />
+              </Link>
+              <Link to="/login" className="bo">
+                See the platform <ChevronRight size={15} strokeWidth={2} />
               </Link>
             </div>
 
-            <div className="feat-grid">
-              {FEATURES.map(({ icon: Icon, title, desc, tag }) => (
-                <div key={title} className="fc">
-                  <div className={`ftag${tag === 'New' ? ' nt' : ''}`}>{tag}</div>
-                  <div className="ficon"><Icon size={22} strokeWidth={1.5} /></div>
-                  <div className="ftitle">{title}</div>
-                  <p className="fdesc">{desc}</p>
+            <ChatPreview />
+            <div style={{ paddingBottom: 80 }} />
+          </section>
+
+
+
+          <hr />
+
+          {/* STATS */}
+          <div ref={statRef} className={`fs${statOn ? ' on' : ''}`}>
+            <div className="w">
+              <div className="stat-row">
+                {STATS.map(({ display, end, suffix, prefix, label, note }) => (
+                  <AnimatedStat key={label} display={display} end={end} suffix={suffix} prefix={prefix || ''} label={label} note={note} trigger={statOn} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <hr />
+
+          {/* FEATURES */}
+          <div ref={featRef} className={`feat-sec fs${featOn ? ' on' : ''}`}>
+            <div className="w">
+              <div className="feat-hd">
+                <div>
+                  <span className="badge">Platform</span>
+                  <h2 className="sh2">Ten tools.<br /><em>One suite.</em></h2>
+                  <p className="ssub">Built to take you from scattered job hunting to a clear, confident career path.</p>
                 </div>
-              ))}
+                <Link to="/register" className="see-link">
+                  Explore all <ChevronRight size={14} strokeWidth={2} />
+                </Link>
+              </div>
+
+              <div className="feat-grid">
+                {FEATURES.map(({ icon: Icon, title, desc, tag }) => (
+                  <div key={title} className="fc">
+                    <div className={`ftag${tag === 'New' ? ' nt' : ''}`}>{tag}</div>
+                    <div className="ficon"><Icon size={22} strokeWidth={1.5} /></div>
+                    <div className="ftitle">{title}</div>
+                    <p className="fdesc">{desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ROADMAP GRAPH */}
-        <div className="w" style={{ padding: '64px 0' }}>
-          <div>
-            <span className="badge">Roadmap Graph</span>
-            <h2 className="sh2" style={{ marginTop: 12 }}>See the full path <em>before you start.</em></h2>
-            <p className="ssub" style={{ marginBottom: 28, maxWidth: 520 }}>
-              Interactive skill trees for dozens of roles — expand topics, filter resources, and export when you are ready.
-            </p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <Link to="/roadmap-graph" className="bb" style={{ display: 'inline-flex' }}>
-                Explore roadmaps <ArrowRight size={15} />
-              </Link>
-              <Link to="/career" className="bo" style={{ display: 'inline-flex' }}>
-                Career path AI <ChevronRight size={15} />
-              </Link>
+          {/* ROADMAP GRAPH */}
+          <div className="w" style={{ padding: '64px 0' }}>
+            <div>
+              <span className="badge">Roadmap Graph</span>
+              <h2 className="sh2" style={{ marginTop: 12 }}>See the full path <em>before you start.</em></h2>
+              <p className="ssub" style={{ marginBottom: 28, maxWidth: 520 }}>
+                Interactive skill trees for dozens of roles — expand topics, filter resources, and export when you are ready.
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <Link to="/roadmap-graph" className="bb" style={{ display: 'inline-flex' }}>
+                  Explore roadmaps <ArrowRight size={15} />
+                </Link>
+                <Link to="/career" className="bo" style={{ display: 'inline-flex' }}>
+                  Career path AI <ChevronRight size={15} />
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
 
-        <hr />
+          <hr />
 
-        {/* COMPARISON */}
-        <div ref={cmpRef} className={`cmp-sec fs${cmpOn ? ' on' : ''}`}>
-          <div className="w">
-            <span className="badge">Why Nyrvexa</span>
-            <h2 className="sh2">See how we <em>compare.</em></h2>
-            <p className="ssub">We're not replacing any single tool — we're replacing all of them.</p>
-            <p className="disclaimer">
-              ✱ Comparison based on publicly known product offerings as of 2025–26. "Partial" indicates limited or paid-only access.
-              Column headers are generic categories, not specific company names. All trademarks belong to their respective owners.
-              This is provided for informational purposes only.
-            </p>
+          {/* COMPARISON */}
+          <div ref={cmpRef} className={`cmp-sec revert-dark fs${cmpOn ? ' on' : ''}`}>
+            <div className="w">
+              <span className="badge">Why Nyrvexa</span>
+              <h2 className="sh2">See how we <em>compare.</em></h2>
+              <p className="ssub">We're not replacing any single tool — we're replacing all of them.</p>
+              <p className="disclaimer">
+                ✱ Comparison based on publicly known product offerings as of 2025–26. "Partial" indicates limited or paid-only access.
+                Column headers are generic categories, not specific company names. All trademarks belong to their respective owners.
+                This is provided for informational purposes only.
+              </p>
 
-            <div className="tbl-wrap">
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th style={{ width: '32%' }}>Feature</th>
-                    <th className="us">
-                      <div className="us-wrap">
-                        <span className="us-b">✦ Nyrvexa</span>
+              <div className="tbl-wrap">
+                <table className="tbl">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '32%' }}>Feature</th>
+                      <th className="us">
+                        <div className="us-wrap">
+                          <span className="us-b">✦ Nyrvexa</span>
+                        </div>
+                      </th>
+                      <th>Job Boards</th>
+                      <th>Job Portals</th>
+                      <th>Resume Tools</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {COMPARISON.map(({ feature, us, a, b, c }) => (
+                      <tr key={feature}>
+                        <td>{feature}</td>
+                        <td className="us"><Ci v={us} /></td>
+                        <td><Ci v={a} /></td>
+                        <td><Ci v={b} /></td>
+                        <td><Ci v={c} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="legend">
+                <div className="leg"><CheckCircle size={13} color="#4ade80" strokeWidth={2.5} /> Available</div>
+                <div className="leg"><X size={13} color="rgba(255,255,255,.15)" strokeWidth={2.5} /> Not available</div>
+                <div className="leg"><Minus size={13} color="#fbbf24" strokeWidth={2.5} /> Partial / paid only</div>
+              </div>
+            </div>
+          </div>
+
+          {/* VOICE */}
+          <div ref={vRef} className={`v-sec fs${vOn ? ' on' : ''}`}>
+            <div className="w">
+              <div className="v-in">
+                <div className="v-vis">
+                  <div className="rings">
+                    <div className="ring ring-1" />
+                    <div className="ring ring-2" />
+                    <div className="mbtn"><Mic size={28} strokeWidth={1.5} /></div>
+                  </div>
+                  <div className="bars">
+                    {[22, 34, 18, 42, 28, 36, 16, 44, 30, 20, 40, 26, 32, 14, 44].map((h, i) => (
+                      <div key={i} className="bar" style={{ '--h': `${h}px`, animationDelay: `${i * 75}ms`, animationDuration: `${0.75 + (i % 4) * 0.13}s` }} />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <span className="badge">Voice Interview AI</span>
+                  <h2 className="sh2" style={{ fontSize: 'clamp(28px,3.5vw,42px)' }}>
+                    Practice until<br /><em>it's effortless.</em>
+                  </h2>
+                  <p className="ssub" style={{ marginBottom: 24 }}>
+                    A conversational AI conducts full mock rounds — HR, technical, case study — listens to your spoken answers, and scores you on content, clarity, and depth. Immediately.
+                  </p>
+                  <div className="vchips">
+                    {['HR & Technical Rounds', 'Adaptive Follow-ups', 'Live Transcripts', 'Instant Scoring'].map(c => (
+                      <div key={c} className="vchip">
+                        <CheckCircle size={13} strokeWidth={2.5} color={`var(--yes)`} />{c}
                       </div>
-                    </th>
-                    <th>Job Boards</th>
-                    <th>Job Portals</th>
-                    <th>Resume Tools</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON.map(({ feature, us, a, b, c }) => (
-                    <tr key={feature}>
-                      <td>{feature}</td>
-                      <td className="us"><Ci v={us} /></td>
-                      <td><Ci v={a} /></td>
-                      <td><Ci v={b} /></td>
-                      <td><Ci v={c} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="legend">
-              <div className="leg"><CheckCircle size={13} color="#4ade80" strokeWidth={2.5} /> Available</div>
-              <div className="leg"><X size={13} color="rgba(255,255,255,.15)" strokeWidth={2.5} /> Not available</div>
-              <div className="leg"><Minus size={13} color="#fbbf24" strokeWidth={2.5} /> Partial / paid only</div>
-            </div>
-          </div>
-        </div>
-
-        {/* VOICE */}
-        <div ref={vRef} className={`v-sec fs${vOn ? ' on' : ''}`}>
-          <div className="w">
-            <div className="v-in">
-              <div className="v-vis">
-                <div className="rings">
-                  <div className="ring ring-1" />
-                  <div className="ring ring-2" />
-                  <div className="mbtn"><Mic size={28} strokeWidth={1.5} /></div>
+                    ))}
+                  </div>
+                  <Link to="/pricing?locked=interview" className="bb" style={{ marginTop: 32, display: 'inline-flex' }}>
+                    Unlock mock interviews <ArrowRight size={15} />
+                  </Link>
                 </div>
-                <div className="bars">
-                  {[22, 34, 18, 42, 28, 36, 16, 44, 30, 20, 40, 26, 32, 14, 44].map((h, i) => (
-                    <div key={i} className="bar" style={{ '--h': `${h}px`, animationDelay: `${i * 75}ms`, animationDuration: `${0.75 + (i % 4) * 0.13}s` }} />
-                  ))}
-                </div>
-              </div>
-              <div>
-                <span className="badge">Voice Interview AI</span>
-                <h2 className="sh2" style={{ fontSize: 'clamp(28px,3.5vw,42px)' }}>
-                  Practice until<br /><em>it's effortless.</em>
-                </h2>
-                <p className="ssub" style={{ marginBottom: 24 }}>
-                  A conversational AI conducts full mock rounds — HR, technical, case study — listens to your spoken answers, and scores you on content, clarity, and depth. Immediately.
-                </p>
-                <div className="vchips">
-                  {['HR & Technical Rounds', 'Adaptive Follow-ups', 'Live Transcripts', 'Instant Scoring'].map(c => (
-                    <div key={c} className="vchip">
-                      <CheckCircle size={13} strokeWidth={2.5} color={`var(--yes)`} />{c}
-                    </div>
-                  ))}
-                </div>
-                <Link to="/pricing?locked=interview" className="bb" style={{ marginTop: 32, display: 'inline-flex' }}>
-                  Unlock mock interviews <ArrowRight size={15} />
-                </Link>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* STEPS */}
-        <div ref={stepRef} className={`st-sec fs${stepOn ? ' on' : ''}`}>
-          <div className="w">
-            <div style={{ textAlign: 'center' }}>
-              <span className="badge">How it works</span>
-              <h2 className="sh2" style={{ margin: '0 auto 8px' }}>Simple by design.</h2>
-              <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
-                From sign-up to signed offer — three clear steps.
-              </p>
-            </div>
-            <div className="st-grid">
-              {STEPS.map(({ n, title, desc }) => (
-                <div key={n} className="stc">
-                  <div className="stn">Step {n}</div>
-                  <div className="stt">{title}</div>
-                  <p className="std">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* PRICING */}
-        <div className={`pricing-sec fs${stepOn ? ' on' : ''}`}>
-          <div className="w">
-            <div style={{ textAlign: 'center', marginBottom: 52 }}>
-              <span className="badge">Pricing</span>
-              <h2 className="sh2" style={{ margin: '0 auto 8px' }}>One plan. <em>Everything unlocked.</em></h2>
-              <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
-                Start free with basic access. Upgrade to Pro for the full experience.
-              </p>
-            </div>
-
-            <div className="price-cards">
-              {/* FREE / EXPLORER */}
-              <div className="price-card">
-                <p className="lp-tier">Explorer</p>
-                <div className="lp-price-row">
-                  <span className="lp-price">₹0</span>
-                  <span className="lp-period">forever</span>
-                </div>
-                <p className="lp-subhead">Preview the tools with daily basic limits.</p>
-                <div className="lp-divider" />
-                <p className="lp-sec-title">Limits &amp; Access</p>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {FREE_LIMITS.map(({ feature, free }) => (
-                    <div key={feature} className="lp-limit-row">
-                      <span className="lp-limit-name">{feature}</span>
-                      <span className={`lp-badge ${free === 'Locked' ? 'locked' : 'limited'}`}>{free}</span>
-                    </div>
-                  ))}
-                </div>
-                <button type="button" className="lp-cta ghost" disabled>
-                  Current Tier
-                </button>
-              </div>
-
-              {/* PRO / PROFESSIONAL */}
-              <div className="price-card pro">
-                <span className="lp-pop"><Sparkles size={11} strokeWidth={2.5} /> Most popular</span>
-                <p className="lp-tier">Professional</p>
-                <div className="lp-price-row">
-                  <span className="lp-price">₹199</span>
-                  <span className="lp-period">/ month</span>
-                </div>
-                <p className="lp-subhead">Complete, unrestricted access to the suite.</p>
-                <div className="lp-divider" />
-                <p className="lp-sec-title">Everything Unlocked</p>
-                <div style={{ padding: 0, margin: 0 }}>
-                  {[
-                    'Unlimited AI career chat',
-                    'Unlimited ATS resume analysis',
-                    'Resume builder PDF exports',
-                    'Voice mock interviews (Pro exclusive)',
-                    'Unlimited career \u0026 roadmap graphs',
-                    'Unlimited skill match, salary \u0026 company research',
-                    'Premium job alerts (rolling out)',
-                    'Priority support',
-                  ].map(f => (
-                    <div key={f} className="lp-feat-item">
-                      <CheckCircle size={15} strokeWidth={2.5} />
-                      <span>{f}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="lp-pay-tags">
-                  {['UPI', 'Google Pay', 'PhonePe', 'Cards', 'Netbanking'].map(m => (
-                    <span key={m}>{m}</span>
-                  ))}
-                </div>
-                <Link to="/pricing" className="lp-cta primary">
-                  Upgrade to Pro — ₹199 <ArrowRight size={15} />
-                </Link>
-                <p style={{ textAlign: 'center', fontSize: 11, color: '#64748b', marginTop: 14 }}>
-                  <Shield size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-                  Secured by Razorpay · Tax invoice available
+          {/* STEPS */}
+          <div ref={stepRef} className={`st-sec fs${stepOn ? ' on' : ''}`}>
+            <div className="w">
+              <div style={{ textAlign: 'center' }}>
+                <span className="badge">How it works</span>
+                <h2 className="sh2" style={{ margin: '0 auto 8px' }}>Simple by design.</h2>
+                <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
+                  From sign-up to signed offer — three clear steps.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* PRICE COMPARISON */}
-        <div className={`pcmp-sec fs${stepOn ? ' on' : ''}`}>
-          <div className="w">
-            <div style={{ textAlign: 'center', marginBottom: 48 }}>
-              <span className="badge">Value comparison</span>
-              <h2 className="sh2" style={{ margin: '0 auto 8px' }}>Replace the <em>tool stack.</em></h2>
-              <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
-                One Pro membership vs. juggling separate subscriptions for chat, resume, interview, and research tools.
-              </p>
-            </div>
-            <div className="tbl-wrap">
-              <table className="ptbl">
-                <thead>
-                  <tr>
-                    <th style={{ width: '36%' }}>Feature</th>
-                    <th className="us-col">Nyrvexa Pro</th>
-                    <th>Platform A</th>
-                    <th>Platform B</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PRICE_COMPARE.map(({ feature, us, a, b }) => (
-                    <tr key={feature} className={feature.includes('Total') ? 'total-row' : ''}>
-                      <td>{feature}</td>
-                      <td className="us-col">{us}</td>
-                      <td>{a}</td>
-                      <td>{b}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div ref={ctaRef} className={`cta-sec fs${ctaOn ? ' on' : ''}`}>
-          <div className="w">
-            <div className="cta-c">
-              <h2 className="cta-h">Your next chapter<br /><em>starts here.</em></h2>
-              <p className="cta-s">
-                Join professionals across India using Nyrvexa to navigate their careers with clarity, data, and confidence.
-              </p>
-              <div className="cta-btns">
-                <Link to="/register" className="bw">
-                  Get started — it's free <ArrowRight size={16} strokeWidth={2.5} />
-                </Link>
-                <Link to="/login" className="bwo">
-                  Sign in <ChevronRight size={15} />
-                </Link>
+              <div className="st-grid">
+                {STEPS.map(({ n, title, desc }) => (
+                  <div key={n} className="stc">
+                    <div className="stn">Step {n}</div>
+                    <div className="stt">{title}</div>
+                    <p className="std">{desc}</p>
+                  </div>
+                ))}
               </div>
-              <p className="cta-note">
-                <Shield size={11} strokeWidth={2} />
-                No credit card · Secure & private · Built in India
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* FOOTER */}
-        <footer className="foot-pro">
-          <div className="w">
-            <div className="foot-top">
-              <div className="foot-brand">
-                <Link to="/" className="logo" style={{ marginBottom: 14 }}>
-                  <img src="/logos.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-                  <span className="lname">Nyrvexa</span>
-                </Link>
-                <p className="foot-desc">The intelligent career platform built for modern professionals. Designed for results.</p>
-                <div className="foot-social">
-                  <a href="#" className="foot-slink" aria-label="Twitter">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
-                  </a>
-                  <a href="#" className="foot-slink" aria-label="LinkedIn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-                  </a>
-                  <a href="#" className="foot-slink" aria-label="Email"><Mail size={16} /></a>
+          {/* PRICING */}
+          <div className={`pricing-sec fs${stepOn ? ' on' : ''}`}>
+            <div className="w">
+              <div style={{ textAlign: 'center', marginBottom: 52 }}>
+                <span className="badge">Pricing</span>
+                <h2 className="sh2" style={{ margin: '0 auto 8px' }}>One plan. <em>Everything unlocked.</em></h2>
+                <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
+                  Start free with basic access. Upgrade to Pro for the full experience.
+                </p>
+              </div>
+
+              <div className="price-cards">
+                {/* FREE / EXPLORER */}
+                <div className="price-card">
+                  <p className="lp-tier">Explorer</p>
+                  <div className="lp-price-row">
+                    <span className="lp-price">₹0</span>
+                    <span className="lp-period">forever</span>
+                  </div>
+                  <p className="lp-subhead">Preview the tools with daily basic limits.</p>
+                  <div className="lp-divider" />
+                  <p className="lp-sec-title">Limits &amp; Access</p>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {FREE_LIMITS.map(({ feature, free }) => (
+                      <div key={feature} className="lp-limit-row">
+                        <span className="lp-limit-name">{feature}</span>
+                        <span className={`lp-badge ${free === 'Locked' ? 'locked' : 'limited'}`}>{free}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button type="button" className="lp-cta ghost" disabled>
+                    Current Tier
+                  </button>
+                </div>
+
+                {/* PRO / PROFESSIONAL */}
+                <div className="price-card pro">
+                  <span className="lp-pop"><Sparkles size={11} strokeWidth={2.5} /> Most popular</span>
+                  <p className="lp-tier">Professional</p>
+                  <div className="lp-price-row">
+                    <span className="lp-price">₹199</span>
+                    <span className="lp-period">/ month</span>
+                  </div>
+                  <p className="lp-subhead">Complete, unrestricted access to the suite.</p>
+                  <div className="lp-divider" />
+                  <p className="lp-sec-title">Everything Unlocked</p>
+                  <div style={{ padding: 0, margin: 0 }}>
+                    {[
+                      'Unlimited AI career chat',
+                      'Unlimited ATS resume analysis',
+                      'Resume builder PDF exports',
+                      'Voice mock interviews (Pro exclusive)',
+                      'Unlimited career \u0026 roadmap graphs',
+                      'Unlimited skill match, salary \u0026 company research',
+                      'Premium job alerts (rolling out)',
+                      'Priority support',
+                    ].map(f => (
+                      <div key={f} className="lp-feat-item">
+                        <CheckCircle size={15} strokeWidth={2.5} />
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="lp-pay-tags">
+                    {['UPI', 'Google Pay', 'PhonePe', 'Cards', 'Netbanking'].map(m => (
+                      <span key={m}>{m}</span>
+                    ))}
+                  </div>
+                  <Link to="/pricing" className="lp-cta primary">
+                    Upgrade to Pro — ₹199 <ArrowRight size={15} />
+                  </Link>
+                  <p style={{ textAlign: 'center', fontSize: 11, color: '#64748b', marginTop: 14 }}>
+                    <Shield size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                    Secured by Razorpay · Tax invoice available
+                  </p>
                 </div>
               </div>
-              <div className="foot-col">
-                <h4 className="foot-colh">Product</h4>
-                <Link to="/register" className="foot-link">AI Chat</Link>
-                <Link to="/register" className="foot-link">Resume Analyzer</Link>
-                <Link to="/register" className="foot-link">Resume Tailor</Link>
-                <Link to="/register" className="foot-link">Voice Interview</Link>
-              </div>
-              <div className="foot-col">
-                <h4 className="foot-colh">Resources</h4>
-                <Link to="/roadmap-graph" className="foot-link">Interactive Roadmaps</Link>
-                <Link to="/career" className="foot-link">Career Path AI</Link>
-                <Link to="/register" className="foot-link">Salary Insights</Link>
-                <Link to="/register" className="foot-link">Company Research</Link>
-                <Link to="/register" className="foot-link">Tech News</Link>
-              </div>
-              <div className="foot-col">
-                <h4 className="foot-colh">Company</h4>
-                <a href="#" className="foot-link">About</a>
-                <a href="#" className="foot-link">Privacy Policy</a>
-                <a href="#" className="foot-link">Terms of Service</a>
-                <a href="#" className="foot-link">Contact</a>
-              </div>
-            </div>
-            <div className="foot-bottom">
-              <span className="foot-copy">© 2026 Nyrvexa. All rights reserved.</span>
-              <span className="foot-loc"><Globe size={12} strokeWidth={1.5} /> Made in India</span>
             </div>
           </div>
-        </footer>
+
+          {/* PRICE COMPARISON */}
+          <div className={`pcmp-sec revert-dark fs${stepOn ? ' on' : ''}`}>
+            <div className="w">
+              <div style={{ textAlign: 'center', marginBottom: 48 }}>
+                <span className="badge">Value comparison</span>
+                <h2 className="sh2" style={{ margin: '0 auto 8px' }}>Replace the <em>tool stack.</em></h2>
+                <p className="ssub" style={{ margin: '0 auto', textAlign: 'center' }}>
+                  One Pro membership vs. juggling separate subscriptions for chat, resume, interview, and research tools.
+                </p>
+              </div>
+              <div className="tbl-wrap">
+                <table className="ptbl">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '36%' }}>Feature</th>
+                      <th className="us-col">Nyrvexa Pro</th>
+                      <th>Platform A</th>
+                      <th>Platform B</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {PRICE_COMPARE.map(({ feature, us, a, b }) => (
+                      <tr key={feature} className={feature.includes('Total') ? 'total-row' : ''}>
+                        <td>{feature}</td>
+                        <td className="us-col">{us}</td>
+                        <td>{a}</td>
+                        <td>{b}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div ref={ctaRef} className={`cta-sec fs${ctaOn ? ' on' : ''}`}>
+            <div className="w">
+              <div className="cta-c">
+                <h2 className="cta-h">Your next chapter<br /><em>starts here.</em></h2>
+                <p className="cta-s">
+                  Join professionals across India using Nyrvexa to navigate their careers with clarity, data, and confidence.
+                </p>
+                <div className="cta-btns">
+                  <Link to="/register" className="bw">
+                    Get started — it's free <ArrowRight size={16} strokeWidth={2.5} />
+                  </Link>
+                  <Link to="/login" className="bwo">
+                    Sign in <ChevronRight size={15} />
+                  </Link>
+                </div>
+                <p className="cta-note">
+                  <Shield size={11} strokeWidth={2} />
+                  No credit card · Secure & private · Built in India
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <footer className="foot-pro">
+            <div className="w">
+              <div className="foot-top">
+                <div className="foot-brand">
+                  <Link to="/" className="logo" style={{ marginBottom: 14 }}>
+                    <img src="/logos.png" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+                    <span className="lname">Nyrvexa</span>
+                  </Link>
+                  <p className="foot-desc">The intelligent career platform built for modern professionals. Designed for results.</p>
+                  <div className="foot-social">
+                    <a href="#" className="foot-slink" aria-label="Twitter">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>
+                    </a>
+                    <a href="#" className="foot-slink" aria-label="LinkedIn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
+                    </a>
+                    <a href="#" className="foot-slink" aria-label="Email"><Mail size={16} /></a>
+                  </div>
+                </div>
+                <div className="foot-col">
+                  <h4 className="foot-colh">Product</h4>
+                  <Link to="/register" className="foot-link">AI Chat</Link>
+                  <Link to="/register" className="foot-link">Resume Analyzer</Link>
+                  <Link to="/register" className="foot-link">Resume Tailor</Link>
+                  <Link to="/register" className="foot-link">Voice Interview</Link>
+                </div>
+                <div className="foot-col">
+                  <h4 className="foot-colh">Resources</h4>
+                  <Link to="/roadmap-graph" className="foot-link">Interactive Roadmaps</Link>
+                  <Link to="/career" className="foot-link">Career Path AI</Link>
+                  <Link to="/register" className="foot-link">Salary Insights</Link>
+                  <Link to="/register" className="foot-link">Company Research</Link>
+                  <Link to="/register" className="foot-link">Tech News</Link>
+                </div>
+                <div className="foot-col">
+                  <h4 className="foot-colh">Company</h4>
+                  <a href="#" className="foot-link">About</a>
+                  <a href="#" className="foot-link">Privacy Policy</a>
+                  <a href="#" className="foot-link">Terms of Service</a>
+                  <a href="#" className="foot-link">Contact</a>
+                </div>
+              </div>
+              <div className="foot-bottom">
+                <span className="foot-copy">© 2026 Nyrvexa. All rights reserved.</span>
+                <span className="foot-loc"><Globe size={12} strokeWidth={1.5} /> Made in India</span>
+              </div>
+            </div>
+          </footer>
 
         </div>
       </div>

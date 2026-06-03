@@ -1,4 +1,5 @@
 import Layout from '../components/layout/Layout'
+import SEO from '../components/SEO'
 import { useState } from 'react'
 import { usePagePersistedState } from '../context/PageStateContext'
 import {
@@ -587,6 +588,7 @@ export default function CareerPath() {
     <>
       <AuthPromptModal {...authPromptProps} />
     <Layout>
+      <SEO title="Career Architect" description="Build a career path you can actually follow. Generate AI-powered roadmaps for your dream tech role." />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
         .cp-sans  { font-family: 'DM Sans', system-ui, sans-serif; }

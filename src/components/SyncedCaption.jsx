@@ -49,7 +49,7 @@ export default function SyncedCaption({
 
   const builtParts = useMemo(() => {
     if (!built) return []
-    return built.match(/\S+\s*|\s+/g) || []
+    return built.match(/\S+|\s+/g) || []
   }, [built])
 
   if (!text) return null
@@ -61,12 +61,13 @@ export default function SyncedCaption({
     <span style={{ transition: "opacity 0.08s ease" }}>
       <span>{prefix}</span>
       {builtParts.map((part, index) => (
-        <span
-          key={`${index}-${part}`}
-          className={part.trim() ? "caption-reveal-word" : undefined}
-        >
-          {part}
-        </span>
+        part.trim()
+          ? (
+              <span key={`${index}-${part}`} className="caption-reveal-word">
+                {part}
+              </span>
+            )
+          : part
       ))}
       {!done && (
         <span

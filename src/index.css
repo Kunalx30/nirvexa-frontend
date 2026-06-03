@@ -126,3 +126,13 @@
   .badge-amber  { @apply badge bg-amber-900/50  text-amber-400  border border-amber-800;  }
   .badge-red    { @apply badge bg-red-900/50    text-red-400    border border-red-800;    }
 }
+
+html.dark-theme {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #050505;
+}
+html.dark-theme img,
+html.dark-theme video,
+html.dark-theme .revert-dark {
+  filter: invert(1) hue-rotate(180deg);
+}

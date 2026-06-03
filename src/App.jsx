@@ -5,6 +5,7 @@ import SkillMatch from './pages/SkillMatch'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword  from './pages/ResetPassword'
 import { PageStateProvider } from './context/PageStateContext'
+import { ThemeProvider } from './context/ThemeContext'
 import Pricing from './pages/Pricing'
 
 // Pages
@@ -86,21 +87,23 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <PageStateProvider>
-          <AppRoutes />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: '#21262D',
-                color: '#E6EDF3',
-                border: '1px solid #30363D',
-              },
-              success: { iconTheme: { primary: '#0A7C3E', secondary: '#fff' } },
-              error:   { iconTheme: { primary: '#CF222E', secondary: '#fff' } },
-            }}
-          />
-        </PageStateProvider>
+        <ThemeProvider>
+          <PageStateProvider>
+            <AppRoutes />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: '#21262D',
+                  color: '#E6EDF3',
+                  border: '1px solid #30363D',
+                },
+                success: { iconTheme: { primary: '#0A7C3E', secondary: '#fff' } },
+                error:   { iconTheme: { primary: '#CF222E', secondary: '#fff' } },
+              }}
+            />
+          </PageStateProvider>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   )

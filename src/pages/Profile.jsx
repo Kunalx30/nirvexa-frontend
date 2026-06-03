@@ -10,8 +10,9 @@ import {
   Settings, MapPin, Briefcase, Zap, ShieldCheck, History,
   ArrowRight, BrainCircuit, Plus, Trash2, Loader2, Bell,
   X, RefreshCw, Eye, EyeOff, CheckCircle2, TrendingUp,
-  Mic, Clock, Star
+  Mic, Clock, Star, Moon, Sun
 } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 
 const FREQUENCIES = ['daily', 'weekly']
 
@@ -143,6 +144,7 @@ function PasswordModal({ onClose }) {
 // ── Main Profile Component ────────────────────────────────────────────────────
 export default function Profile() {
   const { user, setUser } = useAuth()
+  const { isDarkMode, toggleDarkMode } = useTheme()
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || user?.avatarUrl || '')
   const [userName, setUserName] = useState(user?.name || '')
   const [savingName, setSavingName] = useState(false)
@@ -395,9 +397,9 @@ export default function Profile() {
       `}</style>
       {showPasswordModal && <PasswordModal onClose={() => setShowPasswordModal(false)} />}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pb-12 font-sans selection:bg-indigo-500/30">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pb-12 font-sans selection:bg-indigo-500/30 overflow-hidden">
 
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-50/60 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-full max-w-[500px] h-[500px] bg-purple-50/60 blur-[100px] rounded-full pointer-events-none" />
 
         {/* Header */}
         <div className="flex items-center justify-between mb-10 z-10 relative pt-4">
@@ -418,7 +420,7 @@ export default function Profile() {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-6">
                 <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg border border-[#e4e4e4] transition-all duration-300 hover:scale-105"
+                  className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl shadow-lg border border-[#e4e4e4] transition-all duration-300 hover:scale-105 revert-dark"
                   style={{
                     background: activePreset
                       ? `linear-gradient(135deg, ${activePreset.from}, ${activePreset.to})`
@@ -512,7 +514,7 @@ export default function Profile() {
                     key={p.id}
                     onClick={() => saveAvatar(p.id)}
                     title={p.label}
-                    className={`h-11 w-full rounded-xl border flex items-center justify-center transition-all ${
+                    className={`h-11 w-full rounded-xl border flex items-center justify-center transition-all revert-dark ${
                       avatarUrl === p.id
                         ? 'border-indigo-600 ring-2 ring-indigo-500/20 scale-95 shadow-inner'
                         : 'border-[#e4e4e4] bg-white hover:border-[#a3a3a3] hover:-translate-y-px'
@@ -592,6 +594,24 @@ export default function Profile() {
               <Button variant="secondary" className="w-full justify-center"
                 onClick={() => setShowPasswordModal(true)}>
                 Change Password
+              </Button>
+            </div>
+
+            {/* Theme Card */}
+            <div className="bg-white border border-[#e4e4e4] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col justify-between transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 hover:border-[#c4c4c4]">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  {isDarkMode ? <Moon className="text-indigo-600" size={20} /> : <Sun className="text-amber-500" size={20} />}
+                  <h3 className="text-[#0a0a0a] font-bold text-lg tracking-tight">Appearance</h3>
+                </div>
+                <p className="text-[#6b6b6b] text-sm font-light mb-5">
+                  Toggle between light and dark themes to suit your preference.
+                </p>
+              </div>
+              <Button variant="secondary" className="w-full justify-center gap-2"
+                onClick={toggleDarkMode}>
+                {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+                {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               </Button>
             </div>
           </div>

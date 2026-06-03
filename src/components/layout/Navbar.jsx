@@ -5,7 +5,7 @@ import {
   MessageSquare, Briefcase, FileText,
   Map, Mic, Bookmark, User, Newspaper,
   LogOut, Menu, X, Zap, TrendingUp, Building2,
-  ChevronDown,   GitBranch, LifeBuoy, Mail
+  ChevronDown, GitBranch, LifeBuoy, Mail
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import toast from 'react-hot-toast'
@@ -22,23 +22,23 @@ const GRADIENT_PRESETS = [
 ]
 
 const NAV_LINKS = [
-  { to: '/chat',          label: 'AI Chat',     icon: MessageSquare },
-  { to: '/jobs',          label: 'Jobs',        icon: Briefcase     },
-  { to: '/resume',        label: 'Resume',      icon: FileText      },
-  { to: '/career',        label: 'Career Path', icon: Map           },
-  { to: '/skills',        label: 'Skill Match', icon: Zap           },
-  { to: '/interview',     label: 'Interview',   icon: Mic           },
-  { to: '/news',          label: 'News',        icon: Newspaper     },
-  { to: '/salary',        label: 'Salary',      icon: TrendingUp    },
-  { to: '/company',       label: 'Company',     icon: Building2     },
-  { to: '/roadmap-graph', label: 'Roadmaps',    icon: GitBranch     },
+  { to: '/chat', label: 'AI Chat', icon: MessageSquare },
+  { to: '/jobs', label: 'Jobs', icon: Briefcase },
+  { to: '/resume', label: 'Resume', icon: FileText },
+  { to: '/career', label: 'Career Path', icon: Map },
+  { to: '/skills', label: 'Skill Match', icon: Zap },
+  { to: '/interview', label: 'Interview', icon: Mic },
+  { to: '/news', label: 'News', icon: Newspaper },
+  { to: '/salary', label: 'Salary', icon: TrendingUp },
+  { to: '/company', label: 'Company', icon: Building2 },
+  { to: '/roadmap-graph', label: 'Roadmaps', icon: GitBranch },
 ]
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth()
-  const navigate  = useNavigate()
-  const location  = useLocation()
-  const [mobileOpen,  setMobileOpen]  = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
   const avatarUrl = user?.avatar_url || user?.avatarUrl || null

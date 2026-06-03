@@ -44,7 +44,7 @@ function timeAgo(dateString) {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now - date) / 1000);
-  
+
   if (diffInSeconds < 60) return 'Just now';
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
@@ -62,22 +62,22 @@ export default function Jobs() {
   const { isPremium } = useUsage()
 
   // ── Search & Filter State ──────────────────────────────────────────────────
-  const [searchQuery, setSearchQuery]        = usePagePersistedState('jobs_search_query', '')
-  const [filterLocation, setFilterLocation]  = usePagePersistedState('jobs_filter_location', '')
-  const [filterCompany, setFilterCompany]    = usePagePersistedState('jobs_filter_company', '')
-  const [filterSource, setFilterSource]      = usePagePersistedState('jobs_filter_source', 'all')
+  const [searchQuery, setSearchQuery] = usePagePersistedState('jobs_search_query', '')
+  const [filterLocation, setFilterLocation] = usePagePersistedState('jobs_filter_location', '')
+  const [filterCompany, setFilterCompany] = usePagePersistedState('jobs_filter_company', '')
+  const [filterSource, setFilterSource] = usePagePersistedState('jobs_filter_source', 'all')
   const [filterPostedWithin, setFilterPostedWithin] = usePagePersistedState('jobs_filter_posted_within', 'all')
-  const [filterType, setFilterType]          = usePagePersistedState('jobs_filter_type', 'all')
-  const debouncedSearch    = useDebounce(searchQuery, 500)
-  const debouncedLocation  = useDebounce(filterLocation, 500)
-  const debouncedCompany   = useDebounce(filterCompany, 500)
+  const [filterType, setFilterType] = usePagePersistedState('jobs_filter_type', 'all')
+  const debouncedSearch = useDebounce(searchQuery, 500)
+  const debouncedLocation = useDebounce(filterLocation, 500)
+  const debouncedCompany = useDebounce(filterCompany, 500)
 
   // ── Jobs Data State ────────────────────────────────────────────────────────
-  const [jobs, setJobs]       = useState([])
+  const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState(null)
+  const [error, setError] = useState(null)
   const [paginationError, setPaginationError] = useState(false)
-  const [page, setPage]       = usePagePersistedState('jobs_page', 1)
+  const [page, setPage] = usePagePersistedState('jobs_page', 1)
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [totalJobs, setTotalJobs] = useState(0)
@@ -85,8 +85,8 @@ export default function Jobs() {
   const animatedTotal = useCountUp(totalJobs, 1200)
 
   // ── Saved Jobs State ───────────────────────────────────────────────────────
-  const [savedMap, setSavedMap] = useState({})   
-  const [savingId, setSavingId] = useState(null)  
+  const [savedMap, setSavedMap] = useState({})
+  const [savingId, setSavingId] = useState(null)
 
   const [dynamicSources, setDynamicSources] = useState([])
   const [dynamicTypes, setDynamicTypes] = useState([])
@@ -117,17 +117,17 @@ export default function Jobs() {
         page: pageNum,
         limit: LIMIT,
       }
-      if (debouncedSearch)   params.q             = debouncedSearch
-      if (debouncedLocation) params.location      = debouncedLocation
-      if (debouncedCompany)  params.company       = debouncedCompany
-      if (filterType !== 'all') params.type       = filterType
-      if (filterSource !== 'all') params.source   = filterSource
+      if (debouncedSearch) params.q = debouncedSearch
+      if (debouncedLocation) params.location = debouncedLocation
+      if (debouncedCompany) params.company = debouncedCompany
+      if (filterType !== 'all') params.type = filterType
+      if (filterSource !== 'all') params.source = filterSource
       if (filterPostedWithin !== 'all') params.posted_within = filterPostedWithin
 
-      const res  = await fetchJobs(params)
+      const res = await fetchJobs(params)
       const data = res.data?.data || res.data || {}
       const list = Array.isArray(data) ? data : data.jobs || []
-      
+
       // Extract total from backend, fallback to length if unknown
       const apiTotal = !Array.isArray(data) && (data.total || data.totalCount || data.count)
       setTotalJobs(apiTotal ? parseInt(apiTotal) : (list.length === LIMIT ? list.length + 500 : list.length))
@@ -591,7 +591,7 @@ export default function Jobs() {
             <div className="jg-grid">
               {jobs.map(job => (
                 <div key={job.id} className="jc-card" onClick={() => navigate(`/jobs/${job.id}`)}>
-                  
+
                   <div className="jc-header">
                     <div className="jc-company-info">
                       <div className="jc-logo">
@@ -607,7 +607,7 @@ export default function Jobs() {
                         )}
                       </div>
                     </div>
-                    
+
                     <button
                       onClick={(e) => toggleSave(e, job.id)}
                       disabled={savingId === job.id}

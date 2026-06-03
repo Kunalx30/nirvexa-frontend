@@ -2,9 +2,9 @@ import Navbar from './Navbar'
 
 export default function Layout({ children }) {
   return (
-    <div style={{ minHeight: '100vh', background: '#fafafa' }}>
+    <div className="min-h-screen bg-[#fafafa]">
       <Navbar />
-      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+      <main className="max-w-[1200px] mx-auto px-4 sm:px-6 w-full">
         {children}
       </main>
     </div>

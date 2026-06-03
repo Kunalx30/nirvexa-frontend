@@ -1,4 +1,5 @@
 import Layout from '../components/layout/Layout'
+import SEO from '../components/SEO'
 import { useState } from 'react'
 import { usePagePersistedState } from '../context/PageStateContext'
 import {
@@ -39,7 +40,13 @@ export default function SalaryInsights() {
   }
 
   return (
-    <Layout>\n      <style>{`\n        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');\n        .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }\n        .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }\n      `}</style>
+    <Layout>
+      <SEO title="Salary Insights" description="Explore salary insights, trends, and compensation data across various tech roles and companies." />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
+        .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }
+        .font-serif { font-family: 'DM Serif Display', Georgia, serif !important; }
+      `}</style>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-16 relative font-sans">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-emerald-50/80 blur-[100px] rounded-full pointer-events-none" />
 

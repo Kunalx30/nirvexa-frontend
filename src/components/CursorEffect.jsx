@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 /**
  * Google Antigravity style magnetic repulsion grid.
@@ -7,7 +8,7 @@ import { useEffect, useRef } from 'react'
  * Phone / touch responsive.
  */
 
-const DOT_COLORS = [
+const LIGHT_COLORS = [
   '#4285F4', // Google Blue
   '#8AB4F8', // Light Blue
   '#9B72CB', // Purple
@@ -16,7 +17,17 @@ const DOT_COLORS = [
   '#a8a8a8', // Subtle grey
 ]
 
+const DARK_COLORS = [
+  '#06b6d4', // Cyan
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#3b82f6', // Blue
+  '#10b981', // Emerald
+  '#fcd34d', // Amber
+]
+
 export default function CursorEffect() {
+  const { isDarkMode } = useTheme() || { isDarkMode: false }
   const canvasRef = useRef(null)
   const mouse = useRef({ x: -1000, y: -1000 })
   const raf = useRef(null)
@@ -62,7 +73,9 @@ export default function CursorEffect() {
             ox, oy,
             x: ox, y: oy,
             vx: 0, vy: 0,
-            color: DOT_COLORS[Math.floor(Math.random() * DOT_COLORS.length)],
+            color: isDarkMode
+              ? DARK_COLORS[Math.floor(Math.random() * DARK_COLORS.length)]
+              : LIGHT_COLORS[Math.floor(Math.random() * LIGHT_COLORS.length)],
             baseSize: 1 + Math.random() * 0.6,
             // Random offset for the continuous wave
             waveOffset: Math.random() * Math.PI * 2
@@ -192,11 +205,12 @@ export default function CursorEffect() {
       document.removeEventListener('touchcancel', onLeave)
       if (raf.current) cancelAnimationFrame(raf.current)
     }
-  }, [])
+  }, [isDarkMode])
 
   return (
     <canvas
       ref={canvasRef}
+      className="revert-dark"
       style={{
         position: 'fixed',
         top: 0, left: 0,

@@ -7,6 +7,7 @@
  */
 
 import Layout from '../components/layout/Layout'
+import SEO from '../components/SEO'
 import TemplateMockup from '../components/TemplateMockup'
 import {
   UploadCloud, FileText, CheckCircle2, XCircle, AlertTriangle,
@@ -1498,6 +1499,7 @@ export default function Resume() {
     <>
       <AuthPromptModal {...authPromptProps} />
     <Layout>
+      <SEO title="Resume Suite" description="Build an ATS-optimized resume with AI. Upload, analyze, and tailor your resume for specific job descriptions." />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
         .font-sans, .font-sans * { font-family: 'DM Sans', system-ui, sans-serif; }
