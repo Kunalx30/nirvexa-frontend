@@ -1,5 +1,38 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 
+function cleanSpeechText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim()
+}
+
+function mergeSpeechText(current, incoming) {
+  const base = cleanSpeechText(current)
+  const next = cleanSpeechText(incoming)
+  if (!base) return next
+  if (!next) return base
+
+  const baseLower = base.toLowerCase()
+  const nextLower = next.toLowerCase()
+  if (baseLower === nextLower) return base
+  if (baseLower.endsWith(nextLower)) return base
+  if (nextLower.startsWith(baseLower)) return next
+
+  const baseWords = base.split(" ")
+  const nextWords = next.split(" ")
+  const baseFolded = baseWords.map((w) => w.toLowerCase())
+  const nextFolded = nextWords.map((w) => w.toLowerCase())
+  const maxOverlap = Math.min(baseWords.length, nextWords.length)
+
+  for (let size = maxOverlap; size > 0; size--) {
+    const baseTail = baseFolded.slice(baseFolded.length - size).join(" ")
+    const nextHead = nextFolded.slice(0, size).join(" ")
+    if (baseTail === nextHead) {
+      return cleanSpeechText([...baseWords, ...nextWords.slice(size)].join(" "))
+    }
+  }
+
+  return cleanSpeechText(`${base} ${next}`)
+}
+
 /**
  * Enhanced Web Speech API hook for Nyrvexa AI Interviewer.
  * - Silence detection: auto-submits after 2.5s of no speech
@@ -34,7 +67,7 @@ export default function useSpeechRecognition({ onSilence, silenceMs = 2500 } = {
   const armSilence = useCallback(() => {
     clearSilence()
     silenceTimerRef.current = setTimeout(() => {
-      const text = [finalRef.current, interimRef.current].join(" ").replace(/\s+/g, " ").trim()
+      const text = mergeSpeechText(finalRef.current, interimRef.current)
       if (text && onSilenceRef.current && !submittedRef.current) {
         submittedRef.current = true
         onSilenceRef.current(text)
@@ -43,14 +76,10 @@ export default function useSpeechRecognition({ onSilence, silenceMs = 2500 } = {
   }, [clearSilence, silenceMs])
 
   const appendFinal = useCallback((chunk) => {
-    const text = String(chunk || "").replace(/\s+/g, " ").trim()
+    const text = cleanSpeechText(chunk)
     if (!text) return
 
-    const current = finalRef.current.replace(/\s+/g, " ").trim()
-    const tail = current.slice(Math.max(0, current.length - text.length - 8)).toLowerCase()
-    if (tail.includes(text.toLowerCase())) return
-
-    finalRef.current = `${current} ${text}`.replace(/\s+/g, " ").trim()
+    finalRef.current = mergeSpeechText(finalRef.current, text)
     setTranscript(finalRef.current)
   }, [])
 
@@ -98,7 +127,7 @@ export default function useSpeechRecognition({ onSilence, silenceMs = 2500 } = {
         } else { interim += result[0].transcript }
       }
       if (newFinal) appendFinal(newFinal)
-      interimRef.current = interim.replace(/\s+/g, " ").trim()
+      interimRef.current = cleanSpeechText(interim)
       setInterimTranscript(interimRef.current)
       if (newFinal || interimRef.current) armSilence()
     }
@@ -137,7 +166,7 @@ export default function useSpeechRecognition({ onSilence, silenceMs = 2500 } = {
   }, [stop])
 
   const getTranscript = useCallback(() => {
-    return [finalRef.current, interimRef.current].join(" ").replace(/\s+/g, " ").trim()
+    return mergeSpeechText(finalRef.current, interimRef.current)
   }, [])
 
   useEffect(() => {

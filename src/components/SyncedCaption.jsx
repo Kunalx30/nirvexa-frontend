@@ -2,7 +2,7 @@ import { useMemo } from "react"
 
 /**
  * Smooth word-by-word captions synced to TTS (minimal lag).
- * Keeps future/pending text visible in a low-opacity style to prevent layout shift and text disappearing.
+ * Reveals text as the TTS progresses so questions do not appear before Anya speaks them.
  */
 export default function SyncedCaption({
   text,
@@ -71,7 +71,7 @@ export default function SyncedCaption({
           aria-hidden
         />
       )}
-      <span className="opacity-35 select-none">{pending}</span>
+      <span className="sr-only">{pending}</span>
     </span>
   )
 }

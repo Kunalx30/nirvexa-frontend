@@ -526,7 +526,7 @@ export default function Register() {
                   type="text"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Kunal Chandelkar"
+                  placeholder="e.g. Alex Morgan"
                   className={`reg-input${errors.name ? ' err' : ''}`}
                 />
               </div>
@@ -540,7 +540,7 @@ export default function Register() {
                   type="email"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
-                  placeholder="name@nyrvexa.com"
+                  placeholder="alex@example.com"
                   className={`reg-input${errors.email ? ' err' : ''}`}
                 />
               </div>

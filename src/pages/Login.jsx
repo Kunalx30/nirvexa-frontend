@@ -197,7 +197,7 @@ export default function Login() {
                   type="email"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
-                  placeholder="name@nyrvexa.com"
+                  placeholder="alex@example.com"
                   className={`log-input${errors.email ? ' err' : ''}`}
                 />
               </div>
@@ -214,7 +214,7 @@ export default function Login() {
                   type={showPass ? 'text' : 'password'}
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
-                  placeholder="••••••••"
+                  placeholder="Password"
                   className={`log-input${errors.password ? ' err' : ''}`}
                   style={{ paddingRight: 42 }}
                 />

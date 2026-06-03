@@ -49,6 +49,33 @@ function getUserName() {
     return parsed?.name || parsed?.full_name || parsed?.username || parsed?.email?.split("@")[0] || null
   } catch (_) { return null }
 }
+
+function firstNameOnly(value) {
+  const name = String(value || "").replace(/\s+/g, " ").trim()
+  if (!name) return ""
+  return name.split(/[\s@._-]+/)[0]?.replace(/[^\p{L}\p{N}'-]/gu, "") || name
+}
+
+function mergeSpeechText(current, incoming) {
+  const base = String(current || "").replace(/\s+/g, " ").trim()
+  const next = String(incoming || "").replace(/\s+/g, " ").trim()
+  if (!base) return next
+  if (!next) return base
+  const baseLower = base.toLowerCase()
+  const nextLower = next.toLowerCase()
+  if (baseLower === nextLower || baseLower.endsWith(nextLower)) return base
+  if (nextLower.startsWith(baseLower)) return next
+
+  const baseWords = base.split(" ")
+  const nextWords = next.split(" ")
+  const maxOverlap = Math.min(baseWords.length, nextWords.length)
+  for (let size = maxOverlap; size > 0; size--) {
+    const tail = baseWords.slice(baseWords.length - size).join(" ").toLowerCase()
+    const head = nextWords.slice(0, size).join(" ").toLowerCase()
+    if (tail === head) return [...baseWords, ...nextWords.slice(size)].join(" ").replace(/\s+/g, " ").trim()
+  }
+  return `${base} ${next}`.replace(/\s+/g, " ").trim()
+}
 function getAuthToken() {
   try {
     const params = new URLSearchParams(window.location.search)
@@ -285,7 +312,7 @@ function ScoreBar({ label, value }) {
 
 /* ─── MAIN APP ───────────────────────────────────────────────────────────────*/
 export default function App() {
-  const [userName]      = useState(() => getUserName() || "Candidate")
+  const [userName]      = useState(() => firstNameOnly(getUserName()) || "Candidate")
   const [authToken]     = useState(() => getAuthToken())
   const [mainBackendUrl]= useState(() => getMainBackendUrl())
   const [sessionId,       setSessionId]   = useState(null)
@@ -333,7 +360,7 @@ export default function App() {
   } = useSpeechRecognition({ onSilence: handleSilence, silenceMs: 4200 })
 
   useEffect(() => {
-    const text = [transcript, interimTranscript].join(" ").replace(/\s+/g, " ").trim()
+    const text = mergeSpeechText(transcript, interimTranscript)
     setLiveTranscript(text)
     if (text) setTypedAnswer(text)
   }, [transcript, interimTranscript])
@@ -747,7 +774,7 @@ function ChatBubble({ msg, speakingMessageId, captionProgress, captionSlice }) {
   }
 
   if (ai && !msg.spoken && !isLiveCaption) {
-    body = <span className="opacity-60">{msg.text}</span>
+    body = <span className="opacity-60">Anya is speaking...</span>
   }
 
 
