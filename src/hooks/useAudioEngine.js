@@ -62,7 +62,7 @@ export default function useAudioEngine() {
   }, [])
 
   const play = useCallback(
-    async (url) => {
+    async (url, { onStart } = {}) => {
       if (!audioRef.current) {
         console.error("[Audio] Not initialized — call initAudioCtx() on user click")
         return
@@ -93,6 +93,7 @@ export default function useAudioEngine() {
         audio.onplay = () => {
           setIsSpeaking(true)
           setPlaybackProgress(0)
+          onStart?.()
           startProgressLoop()
         }
         audio.onended = finish

@@ -425,11 +425,14 @@ export default function App() {
       stopSTT()
       if (messageId) {
         setMessages((prev) => prev.map((m) => m.id === messageId ? { ...m, spoken: false } : m))
-        setSpeakingMessageId(messageId)
         setCaptionSlice(slice || { charStart: 0, charEnd: null })
       }
       const blobUrl = await fetchTTSAudio(text)
-      await playAudio(blobUrl)
+      await playAudio(blobUrl, {
+        onStart: () => {
+          if (messageId) setSpeakingMessageId(messageId)
+        },
+      })
     } catch (e) {
       console.warn("[TTS] speak failed:", e.message)
     } finally {
@@ -850,7 +853,7 @@ function ChatBubble({ msg, speakingMessageId, captionProgress, captionSlice }) {
   }
 
   if (ai && !msg.spoken && !isLiveCaption) {
-    body = <span className="opacity-60">Anya is speaking...</span>
+    body = <PendingCaptionDots />
   }
 
 
@@ -882,6 +885,20 @@ function ChatBubble({ msg, speakingMessageId, captionProgress, captionSlice }) {
         </p>
       </div>
     </div>
+  )
+}
+
+function PendingCaptionDots() {
+  return (
+    <span className="inline-flex items-center gap-1 py-1" aria-label="Anya is preparing audio">
+      {[0,1,2].map((i) => (
+        <span
+          key={i}
+          className="h-1.5 w-1.5 rounded-full bg-[#8b5cf6] opacity-60 anim-thinking"
+          style={{ animationDelay: `${i * 0.16}s` }}
+        />
+      ))}
+    </span>
   )
 }
 
