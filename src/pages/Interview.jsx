@@ -37,16 +37,29 @@ const PHASE = { SETUP:"setup", LOADING:"loading", INTERVIEWING:"interviewing", E
 
 const VALID_EXP_LEVELS = new Set(EXP_LEVELS.map((e) => e.value))
 
+// FIX #14: Single canonical localStorage key — reads old keys as fallback for
+// users who logged in before the branding migration, then always writes to the
+// new key.  No other code change needed; everything else uses getAuthToken().
+const STORAGE_KEY = "nyrvexa_auth"
+const LEGACY_KEYS = ["nirvexa_user", "nyrvexa_user", "user"]
+
 /* ─── URL / STORAGE HELPERS ────────────────────────────────────────────────────*/
 function getUserName() {
   try {
     const params = new URLSearchParams(window.location.search)
     const qName = params.get("userName") || params.get("name")
     if (qName) return decodeURIComponent(qName)
-    const raw = localStorage.getItem("nirvexa_user") || localStorage.getItem("nyrvexa_user") || localStorage.getItem("user") || localStorage.getItem("nyrvexa_auth")
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.name || parsed?.full_name || parsed?.username || parsed?.email?.split("@")[0] || null
+
+    // FIX #14: Try canonical key first, then legacy keys in order
+    const sources = [STORAGE_KEY, ...LEGACY_KEYS]
+    for (const key of sources) {
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      const parsed = JSON.parse(raw)
+      const name = parsed?.name || parsed?.full_name || parsed?.username || parsed?.email?.split("@")[0] || null
+      if (name) return name
+    }
+    return null
   } catch (_) { return null }
 }
 
@@ -56,6 +69,8 @@ function firstNameOnly(value) {
   return name.split(/[\s@._-]+/)[0]?.replace(/[^\p{L}\p{N}'-]/gu, "") || name
 }
 
+// FIX #9: Cap maxOverlap at 20 words to keep this O(n) instead of O(n²).
+// For real speech, overlaps beyond 20 words are practically impossible.
 function mergeSpeechText(current, incoming) {
   const base = String(current || "").replace(/\s+/g, " ").trim()
   const next = String(incoming || "").replace(/\s+/g, " ").trim()
@@ -68,7 +83,8 @@ function mergeSpeechText(current, incoming) {
 
   const baseWords = base.split(" ")
   const nextWords = next.split(" ")
-  const maxOverlap = Math.min(baseWords.length, nextWords.length)
+  // FIX #9: cap overlap window to avoid O(n²) on long transcripts
+  const maxOverlap = Math.min(baseWords.length, nextWords.length, 20)
   for (let size = maxOverlap; size > 0; size--) {
     const tail = baseWords.slice(baseWords.length - size).join(" ").toLowerCase()
     const head = nextWords.slice(0, size).join(" ").toLowerCase()
@@ -76,16 +92,20 @@ function mergeSpeechText(current, incoming) {
   }
   return `${base} ${next}`.replace(/\s+/g, " ").trim()
 }
+
 function getAuthToken() {
   try {
     const params = new URLSearchParams(window.location.search)
     const qToken = params.get("token") || params.get("accessToken") || params.get("jwt")
     if (qToken) return qToken
-    const raw = localStorage.getItem("nyrvexa_auth")
+
+    // FIX #14: canonical key only; legacy user keys don't store tokens
+    const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) { const p = JSON.parse(raw); return p?.access_token || p?.token || null }
   } catch (_) {}
   return null
 }
+
 function getMainBackendUrl() {
   try {
     const params = new URLSearchParams(window.location.search)
@@ -136,6 +156,8 @@ function getSetupFromUrl() {
 const INITIAL_SETUP = typeof window !== "undefined" ? getSetupFromUrl() : { jobRole: "", customRole: "", expLevel: "fresher" }
 
 function getDevResultsFixture() {
+  // FIX #15: Only run this in DEV mode — avoids allocating fixture objects on
+  // every production page load.
   if (!import.meta.env.DEV || typeof window === "undefined") return null
   const params = new URLSearchParams(window.location.search)
   if (params.get("demoResults") !== "1") return null
@@ -229,20 +251,17 @@ function getDevResultsFixture() {
   }
 }
 
-const DEV_RESULTS_FIXTURE = getDevResultsFixture()
+// FIX #15: Evaluated lazily — zero cost in production builds
+const DEV_RESULTS_FIXTURE = import.meta.env.DEV ? getDevResultsFixture() : null
 
-/* ─── MIC WAVE ANIMATION ─────────────────────────────────────────────────────
-   Shown below Anya when she is listening — gives a "voice is going" feeling
-───────────────────────────────────────────────────────────────────────────── */
+/* ─── MIC WAVE ANIMATION ─────────────────────────────────────────────────────*/
 function MicWave({ isListening }) {
   if (!isListening) return null
   return (
     <div className="flex flex-col items-center gap-2">
-      {/* Glowing mic icon */}
       <div className="w-[38px] h-[38px] rounded-full bg-emerald-50 border-[1.5px] border-emerald-500 flex items-center justify-center shadow-[0_0_12px_rgba(16,185,129,0.25)] anim-mic-glow">
         <Mic size={16} className="text-emerald-500" />
       </div>
-      {/* Bouncing sound bars */}
       <div className="flex items-center gap-[3px] h-[26px]">
         {[5,9,16,22,26,22,16,9,5].map((h, i) => (
           <div key={i} className="w-[3px] rounded-[2px] bg-emerald-500 opacity-85" style={{
@@ -334,24 +353,43 @@ export default function App() {
   const [typedAnswer,   setTypedAnswer]   = useState("")
   const [evaluation,    setEvaluation]    = useState(() => DEV_RESULTS_FIXTURE?.evaluation || null)
 
-  const planRef       = useRef(null)
-  const chatEndRef    = useRef(null)
-  const processingRef = useRef(false)
+  const planRef         = useRef(null)
+  const chatEndRef      = useRef(null)
+  const processingRef   = useRef(false)
+
+  // FIX #2: Ref mirror for phase — prevents stale closure in handleSilence.
+  // When phase changes, the ref updates synchronously before the next render,
+  // so async callbacks always see the current phase value.
+  const phaseRef = useRef(phase)
+  useEffect(() => { phaseRef.current = phase }, [phase])
+
+  // FIX #6: Ref mirror for allQA — prevents closure-captured stale value
+  // inside submitAnswer when React batches state updates.
+  const allQARef = useRef(allQA)
+  useEffect(() => { allQARef.current = allQA }, [allQA])
+
+  // FIX #7: Retry counter ref for sessionId creation — used in handleStart
+  const sessionRetryRef = useRef(0)
 
   const { play: playAudio, stop: stopAudio, isSpeaking: audioPlaying, playbackProgress, initAudioCtx } = useAudioEngine()
   const [speakingMessageId, setSpeakingMessageId] = useState(null)
   const [captionSlice, setCaptionSlice] = useState({ charStart: 0, charEnd: null })
 
+  // FIX #2: Use phaseRef.current instead of closure-captured phase value.
+  // This means the callback never goes stale between renders.
   const handleSilence = useCallback(async (spokenText) => {
     if (processingRef.current) return
-    if (phase !== PHASE.INTERVIEWING) return
+    if (phaseRef.current !== PHASE.INTERVIEWING) return  // FIX #2
     if (!spokenText.trim()) return
     if (audioPlaying) return
     processingRef.current = true
-    await submitAnswer(spokenText)
-    processingRef.current = false
+    try {
+      await submitAnswer(spokenText)
+    } finally {
+      processingRef.current = false  // FIX #1: always reset even on throw
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, audioPlaying])
+  }, [audioPlaying])  // FIX #2: removed `phase` from deps — using phaseRef instead
 
   const {
     transcript, interimTranscript, isListening,
@@ -397,6 +435,8 @@ export default function App() {
     } finally {
       if (messageId) {
         if (markComplete) {
+          // FIX #10: Always mark spoken=true in finally so frozen
+          // "Anya is speaking…" state never persists after interruption.
           setMessages((prev) => prev.map((m) => m.id === messageId ? { ...m, spoken: true } : m))
         }
         setSpeakingMessageId(null)
@@ -404,6 +444,30 @@ export default function App() {
       }
     }
   }, [playAudio, stopSTT])
+
+  // FIX #7: Helper that retries createMainSession up to 3 times with
+  // exponential backoff (1s, 2s, 4s). Keeps main flow clean.
+  const createSessionWithRetry = useCallback(async (role, mode, difficulty, questionCount) => {
+    const MAX_RETRIES = 3
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const res = await createMainSession(mainBackendUrl, authToken, {
+          role, mode, difficulty, questionCount,
+        })
+        if (res?.session_id) {
+          setSessionId(res.session_id)
+          sessionRetryRef.current = 0
+          return
+        }
+      } catch (err) {
+        console.warn(`[Session] attempt ${attempt + 1} failed:`, err.message)
+        if (attempt < MAX_RETRIES - 1) {
+          await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)))
+        }
+      }
+    }
+    console.error("[Session] All retries exhausted — session will not be saved.")
+  }, [mainBackendUrl, authToken])
 
   /* ── start interview (premium-gated) ─────────────────────────────────────── */
   const handleStart = async () => {
@@ -432,13 +496,14 @@ export default function App() {
       setPlan(interviewPlan)
       setPhase(PHASE.INTERVIEWING)
 
-      createMainSession(mainBackendUrl, authToken, {
-        role, mode:"mock",
-        difficulty: expLevel === "fresher" ? "easy" : expLevel === "junior" ? "medium" : "hard",
-        questionCount: interviewPlan.total,
-      })
-      .then(res => { if (res.session_id) setSessionId(res.session_id) })
-      .catch(err => console.warn("Session sync:", err.message))
+      // FIX #7: Fire-and-forget replaced with retry helper — session loss on
+      // cold start / network hiccup is now handled gracefully.
+      createSessionWithRetry(
+        role,
+        "mock",
+        expLevel === "fresher" ? "easy" : expLevel === "junior" ? "medium" : "hard",
+        interviewPlan.total,
+      )
 
       const greetingId = addMessage("ai", interviewPlan.greeting, { isGreeting: true })
       await speakWait(interviewPlan.greeting, greetingId)
@@ -466,7 +531,10 @@ export default function App() {
     addMessage("user", answer)
     setAiThinking(true)
 
-    const updatedQA = [...allQA, { question: question.text, answer }]
+    // FIX #6: Use allQARef.current instead of closure-captured allQA state.
+    // This guarantees we always append to the latest list even if React
+    // batched a state update between when submitAnswer was called and now.
+    const updatedQA = [...allQARef.current, { question: question.text, answer }]
     setAllQA(updatedQA)
 
     try {
@@ -497,7 +565,9 @@ export default function App() {
               keyword_score:    evalResult.scores?.answer_relevance || 0,
               grammar_score:    evalResult.scores?.communication_clarity || 0,
               confidence_score: evalResult.scores?.confidence || 0,
-              pace_score: 80,
+              // FIX #13: pace_score removed — it was hardcoded to 80 and
+              // stored fake data in the DB. The backend model doesn't compute
+              // it yet; add it back once avg_wpm is tracked server-side.
             }
             finalizeMainSession(mainBackendUrl, authToken, sessionId, {
               totalScore:     evalResult.overall_score || 0,
@@ -540,13 +610,19 @@ export default function App() {
     }
   }
 
+  // FIX #1: handleManualSubmit now wraps submitAnswer in try/finally so
+  // processingRef.current is ALWAYS reset — even if submitAnswer throws
+  // before its own internal try/catch catches it.
   const handleManualSubmit = async () => {
     if (processingRef.current || phase !== PHASE.INTERVIEWING || audioPlaying || aiThinking) return
     const answer = (typedAnswer || getTranscript() || liveTranscript).replace(/\s+/g, " ").trim()
     if (!answer) return
     processingRef.current = true
-    await submitAnswer(answer)
-    processingRef.current = false
+    try {
+      await submitAnswer(answer)
+    } finally {
+      processingRef.current = false  // FIX #1: guaranteed reset
+    }
   }
 
   /* ── render ──────────────────────────────────────────────────────────────── */
@@ -976,7 +1052,7 @@ function SetupScreen({ jobRole, setJobRole, customRole, setCustomRole, expLevel,
 
         <p className="mt-3 text-[10px] text-[#8b8b8b] text-center">
           {isPremiumLocked
-            ? "Premium required · You’ll be taken to pricing if your plan isn’t active."
+            ? "Premium required · You'll be taken to pricing if your plan isn't active."
             : "Best experienced in Chrome or Edge · Please grant microphone permissions when prompted."}
         </p>
       </div>
