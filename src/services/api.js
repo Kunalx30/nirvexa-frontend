@@ -78,6 +78,8 @@ api.interceptors.response.use(
 
 // ── Profile + Auth helpers ────────────────────────────────────────────────────
 export const updateProfile          = (data) => api.put('/auth/me', data)
+export const fetchPublicProfile     = (username) => api.get(`/profile/public/${username}`)
+export const updatePublicSettings   = (data) => api.patch('/profile/settings', data)
 export const changePassword         = (data) => api.put('/auth/change-password', data)
 export const fetchInterviewSessions = ()     => api.get('/interview/sessions')
 

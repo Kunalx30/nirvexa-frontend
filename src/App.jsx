@@ -7,6 +7,7 @@ import ResetPassword  from './pages/ResetPassword'
 import { PageStateProvider } from './context/PageStateContext'
 import { ThemeProvider } from './context/ThemeContext'
 import Pricing from './pages/Pricing'
+import PublicProfile from './pages/PublicProfile'
 
 // Pages
 import Landing    from './pages/Landing'
@@ -59,6 +60,7 @@ function AppRoutes() {
       <Route path="/reset-password"  element={<ResetPassword />} />
       <Route path="/pricing"  element={<Pricing />} />
       <Route path="/support"  element={<Support />} />
+      <Route path="/u/:username" element={<PublicProfile />} />
       <Route path="/useradmin" element={<UserAdmin />} />
       <Route path="/teamadmin" element={<UserAdmin />} />
 
