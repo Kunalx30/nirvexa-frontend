@@ -69,12 +69,12 @@ function AppRoutes() {
       <Route path="/jobs"        element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
       <Route path="/jobs/:id"    element={<ProtectedRoute><JobDetail /></ProtectedRoute>} />
       <Route path="/premium-jobs" element={<ProtectedRoute><PremiumJobs /></ProtectedRoute>} />
-      <Route path="/resume"      element={<Resume />} />
-      <Route path="/career"      element={<CareerPath />} />
-      <Route path="/interview"   element={<Interview />} />
+      <Route path="/resume"      element={<ProtectedRoute><Resume /></ProtectedRoute>} />
+      <Route path="/career"      element={<ProtectedRoute><CareerPath /></ProtectedRoute>} />
+      <Route path="/interview"   element={<ProtectedRoute><Interview /></ProtectedRoute>} />
       <Route path="/saved"       element={<ProtectedRoute><SavedJobs /></ProtectedRoute>} />
       <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/skills"      element={<SkillMatch />} />
+      <Route path="/skills"      element={<ProtectedRoute><SkillMatch /></ProtectedRoute>} />
       <Route path="/salary"      element={<SalaryInsights />} />
       <Route path="/company"     element={<CompanyResearch />} />
       <Route path="/roadmap-graph" element={<RoadmapGraph />} />

@@ -31,15 +31,8 @@ import {
 
 const TEAM_EMAIL = 'team@nyrvexa.in'
 
-// #region agent log
-const dbg = (hypothesisId, location, message, data = {}) => {
-  fetch('http://127.0.0.1:7720/ingest/52c63316-278c-4201-8661-ac6483482833', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'd6f639' },
-    body: JSON.stringify({ sessionId: 'd6f639', hypothesisId, location, message, data, timestamp: Date.now() }),
-  }).catch(() => {})
-}
-// #endregion
+// Debug helper (disabled in production)
+const dbg = () => {}
 
 const NAV = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, desc: 'Platform health at a glance' },
