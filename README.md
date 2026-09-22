@@ -676,5 +676,5 @@ This single-page application rewrite rule ensures that deep URLs (e.g., navigati
 
 ## Authors & Acknowledgments
 
-* **NirVexa Engineering Team** — [@kunalx30](https://github.com/kunalx30)
+* **Nyrvexa Engineering Team** — [@kunalx30](https://github.com/kunalx30)
 * Built with [React](https://react.dev/), [Vite](https://vitejs.dev/), and [Tailwind CSS](https://tailwindcss.com/).
