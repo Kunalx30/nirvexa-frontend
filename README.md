@@ -1,4 +1,4 @@
-# Frontend Documentation — NirVexa
+# Frontend Documentation — Nyrvexa
 
 > High-performance React 19 single-page application powering the NirVexa career acceleration, AI interview intelligence, ATS resume studio, and talent analytics platform.
 
